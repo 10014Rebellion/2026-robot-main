@@ -15,7 +15,8 @@ public interface ObjectDetectIO {
         public String[] iTrackedTargetsClass = new String[] {};
         public double[] iTrackedTargetsArea = new double[] {};
         public double[] iTrackedTargetsPitch = new double[] {};
-        public double[] iTrackedTargetsYaw = new double[] {};     
+        public double[] iTrackedTargetsYaw = new double[] {};  
+        public double[] iTrackedTargetsSkew = new double[] {};   
         public double[] iTrackedTargetsCorners = new double[] {};
     }
 
