@@ -7,10 +7,8 @@ import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.Constants;
@@ -79,8 +77,8 @@ public class ObjectDetectIOPV implements ObjectDetectIO{
                 double[] pitches = new double[latestResult.targets.size()];
                 double[] yaws = new double[latestResult.targets.size()];
                 double[] skews = new double[latestResult.targets.size()];
-                double[][] cornersX = new double[latestResult.targets.size()][4];
-                double[][] cornersY = new double[latestResult.targets.size()][4];
+                double[][] cornersX = new double[4][latestResult.targets.size()];
+                double[][] cornersY = new double[4][latestResult.targets.size()];
 
                 for (int i = 0; i < latestResult.targets.size(); i++){
                     classes[i] = mapObjectID(latestResult.targets.get(i).objDetectId); 
@@ -90,8 +88,8 @@ public class ObjectDetectIOPV implements ObjectDetectIO{
                     skews[i] = latestResult.targets.get(i).skew; 
 
                     for(int j = 0; j < 4; j++){
-                        cornersX[i][j] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).x;
-                        cornersY[i][j] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).y;
+                        cornersX[j][i] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).x;
+                        cornersY[j][i] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).y;
                     }
                 }
 
