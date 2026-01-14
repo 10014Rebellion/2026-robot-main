@@ -167,8 +167,8 @@ public class ObjectDetectIOPV implements ObjectDetectIO{
 
         Pose2d poseFinal = new Pose2d(
             new Translation2d(
-                pose.getX() + pLastPose.getX(), 
-                pose.getY() + pLastPose.getY()), 
+                pose.getX() + pLastPose.getX() + mCameraTransform.getX(), 
+                pose.getY() + pLastPose.getY() + mCameraTransform.getY()), 
                 new Rotation2d());
 
         
