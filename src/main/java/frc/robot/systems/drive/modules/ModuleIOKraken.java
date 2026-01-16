@@ -5,6 +5,8 @@ package frc.robot.systems.drive.modules;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.systems.drive.DriveConstants.*;
 
+import java.util.Queue;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -29,6 +31,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.systems.drive.DriveConstants.ModuleHardwareConfig;
+import frc.robot.systems.drive.PhoenixOdometryThread;
 
 public class ModuleIOKraken implements ModuleIO {
     private final TalonFX mDriveMotor;
@@ -59,6 +62,10 @@ public class ModuleIOKraken implements ModuleIO {
 
     private final CANcoder mAbsoluteEncoder;
     private final StatusSignal<Angle> mAbsolutePositionSignal;
+
+    private final Queue<Double> timestampQueue;
+    private final Queue<Double> drivePositionQueue;
+    private final Queue<Double> turnPositionQueue;
 
     public ModuleIOKraken(ModuleHardwareConfig pConfig) {
         mDriveMotor = new TalonFX(pConfig.driveID(), kCANBus);
@@ -136,6 +143,33 @@ public class ModuleIOKraken implements ModuleIO {
         mAzimuthStatorCurrent = mAzimuthMotor.getStatorCurrent();
         mAzimuthSupplyCurrent = mAzimuthMotor.getSupplyCurrent();
         mAzimuthTemp = mAzimuthMotor.getDeviceTemp();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            kOdometryFrequency, 
+            mDrivePositionM, 
+            mAzimuthPosition);
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            50.0, 
+            mDriveVelocityMPS,
+            mDriveStatorCurrent,
+            mDriveSupplyCurrent,
+            mDriveTempCelsius,
+            mDriveTorqueCurrent,
+            mDriveVoltage,
+            mDriveAccelerationMPSS,
+            mAzimuthVelocity,
+            mAzimuthStatorCurrent,
+            mAzimuthSupplyCurrent,
+            mAzimuthVoltage,
+            mAzimuthTemp);
+
+        mDriveMotor.optimizeBusUtilization();
+        mAzimuthMotor.optimizeBusUtilization();
+
+        timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
+        turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(mAzimuthPosition.clone());
+        drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(mDrivePositionM.clone());
     }
 
     @Override
@@ -177,6 +211,20 @@ public class ModuleIOKraken implements ModuleIO {
 
         pInputs.iIsCancoderConnected = BaseStatusSignal.refreshAll(mAbsolutePositionSignal).isOK();
         pInputs.iAzimuthAbsolutePosition = Rotation2d.fromRotations(mAbsolutePositionSignal.getValueAsDouble());
+
+        pInputs.odometryTimestamps =
+        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+        pInputs.odometryDrivePositionsM =
+            drivePositionQueue.stream()
+                .mapToDouble((Double value) -> value)
+                .toArray();
+        pInputs.odometryTurnPositions =
+            turnPositionQueue.stream()
+                .map((Double value) -> Rotation2d.fromRotations(value))
+                .toArray(Rotation2d[]::new);
+        timestampQueue.clear();
+        drivePositionQueue.clear();
+        turnPositionQueue.clear();
     }
 
     /////////// DRIVE MOTOR METHODS \\\\\\\\\\\

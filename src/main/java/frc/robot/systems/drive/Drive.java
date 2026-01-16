@@ -18,6 +18,7 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -148,20 +149,22 @@ public class Drive extends SubsystemBase {
 
         mSetpointGenerator = new SwerveSetpointGenerator(mRobotConfig, kMaxAzimuthAngularRadiansPS);
 
+        PhoenixOdometryThread.getInstance().start();
+
         AutoBuilder.configure(
-                this::getPoseEstimate,
-                this::setPose,
-                this::getRobotChassisSpeeds,
-                (speeds, ff) -> {
-                    mDriveState = DriveState.AUTON;
-                    mPPDesiredSpeeds = new ChassisSpeeds(
-                            speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
-                    mPathPlanningFF = ff;
-                },
-                new PPHolonomicDriveController(kPPTranslationPID, kPPRotationPID),
-                mRobotConfig,
-                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-                this);
+            this::getPoseEstimate,
+            this::setPose,
+            this::getRobotChassisSpeeds,
+            (speeds, ff) -> {
+                mDriveState = DriveState.AUTON;
+                mPPDesiredSpeeds = new ChassisSpeeds(
+                    speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+                mPathPlanningFF = ff;
+            },
+            new PPHolonomicDriveController(kPPTranslationPID, kPPRotationPID),
+            mRobotConfig,
+            () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+            this);
 
         Pathfinding.setPathfinder(new LocalADStarAK());
         PathPlannerLogging.setLogActivePathCallback((activePath) ->
@@ -182,8 +185,6 @@ public class Drive extends SubsystemBase {
 
     @Override
     public void periodic() {
-        for (Module module : mModules) module.periodic();
-
         updateSensorsAndOdometry();
         updateDriveControllers();
         computeDesiredSpeeds();
@@ -192,6 +193,7 @@ public class Drive extends SubsystemBase {
     }
 
     private void updateSensorsAndOdometry() {
+        kOdometryLock.lock();
         if(mPrevStates == null || mPrevPositions == null) {
             mPrevStates = SwerveUtils.zeroStates();
             mPrevPositions = SwerveUtils.zeroPositions();
@@ -200,17 +202,13 @@ public class Drive extends SubsystemBase {
             mPrevPositions = getModulePositions();
         }
 
+        
+        for (Module module : mModules) module.periodic();
+
         /* GYRO */
         mGyro.updateInputs(mGyroInputs);
         Logger.processInputs("Drive/Gyro", mGyroInputs);
-        if (mGyroInputs.iConnected) mRobotRotation = mGyroInputs.iYawPosition;
-        else
-            mRobotRotation = Rotation2d.fromRadians(
-                    (mPoseEstimator.getEstimatedPosition().getRotation().getRadians()
-                                    /* D=vt. Uses modules and IK to estimate turn */
-                                    + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02)
-                            /* Scopes result between 0 and 360 */
-                            % 360.0);
+        kOdometryLock.unlock();
 
         /* VISION */
         mVision.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
@@ -228,15 +226,15 @@ public class Drive extends SubsystemBase {
                     observation.stdDevs().get(2));
         }
 
-        for(int i = 0; i < mModules.length; i++) {
-            Rotation2d deltaChange = mPrevPositions[i].angle.minus(getModulePositions()[i].angle);
 
-            double deltaD = deltaChange.getRadians() * DriveConstants.kDriveMotorGearing * DriveConstants.kWheelCircumferenceMeters;
-
-            getModulePositions()[i] = new SwerveModulePosition(
-                getModulePositions()[i].distanceMeters + deltaD,
-                getModulePositions()[i].angle); 
-        }
+        if (mGyroInputs.iConnected) mRobotRotation = mGyroInputs.iYawPosition;
+        else
+            mRobotRotation = Rotation2d.fromRadians(
+                    (mPoseEstimator.getEstimatedPosition().getRotation().getRadians()
+                                    /* D=vt. Uses modules and IK to estimate turn */
+                                    + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02)
+                            /* Scopes result between 0 and 360 */
+                            % 360.0);
 
         mPoseEstimator.update(mRobotRotation, getModulePositions());
         mOdometry.update(mRobotRotation, getModulePositions());

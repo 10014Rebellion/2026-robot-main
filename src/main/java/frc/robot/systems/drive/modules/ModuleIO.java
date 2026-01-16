@@ -31,6 +31,10 @@ public interface ModuleIO {
 
         public boolean iIsCancoderConnected = true;
         public Rotation2d iAzimuthAbsolutePosition = new Rotation2d();
+
+        public double[] odometryTimestamps = new double[] {};
+        public double[] odometryDrivePositionsM = new double[] {};
+        public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
     }
 
     public default void updateInputs(ModuleInputs inputs) {}

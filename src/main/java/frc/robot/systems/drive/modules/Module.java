@@ -40,6 +40,8 @@ public class Module {
     private SwerveModuleState mCurrentState = new SwerveModuleState();
     private SwerveModulePosition mCurrentPosition = new SwerveModulePosition();
 
+    private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
+
     public Module(String pKey, ModuleIO pIO) {
         this.mIO = pIO;
         kModuleName = "Module/" + pKey;
@@ -68,6 +70,15 @@ public class Module {
                 double ffOutput = mAzimuthFF.calculateWithVelocities(0, 0);
                 Telemetry.log("Drive/" + kModuleName + "/SimpleFeedforward", ffOutput);
                 mIO.setAzimuthPosition(mAzimuthSetpointAngle, ffOutput);
+            }
+
+            int sampleCount = mInputs.odometryTimestamps.length;
+            odometryPositions = new SwerveModulePosition[sampleCount];
+            for (int i = 0; i < sampleCount; i++) {
+                odometryPositions[i] = 
+                    new SwerveModulePosition(
+                        mInputs.odometryDrivePositionsM[i], 
+                        mInputs.odometryTurnPositions[i]);
             }
 
             if (DriverStation.isDisabled()) stop();
@@ -219,5 +230,9 @@ public class Module {
     /* Resets azimuth encoder from CANCoder */
     public void resetAzimuthEncoder() {
         mIO.resetAzimuthEncoder();
+    }
+
+    public double[] getOdometryTimeStamps() {
+        return mInputs.odometryTimestamps;
     }
 }

@@ -11,6 +11,9 @@ public interface GyroIO {
         public boolean iConnected = false;
         public Rotation2d iYawPosition = new Rotation2d();
         public Rotation2d iYawVelocityPS = Rotation2d.fromDegrees(0.0);
+
+        public double[] odometryYawTimestamps = new double[] {};
+        public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
     }
 
     public default void updateInputs(GyroInputs inputs) {}

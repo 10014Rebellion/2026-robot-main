@@ -2,6 +2,9 @@
 
 package frc.robot.systems.drive;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.path.PathConstraints;
@@ -81,6 +84,9 @@ public class DriveConstants {
     /* If 180 was added, the person who got the offset had the bevel gears on the wrong side when they did it */
     // BEVEL FACING LEFT (it shoulda been facing right tho)
     public static final CANBus kCANBus = new CANBus("drive"); // TODO: TUNE ME
+    public static final boolean isCANFD = true; 
+    public static final double kOdometryFrequency = isCANFD ? 250.0 : 100.0;
+    public static final Lock kOdometryLock = new ReentrantLock(); 
 
     public static final int kPigeonCANID = 5; // TODO: TUNE ME
 
