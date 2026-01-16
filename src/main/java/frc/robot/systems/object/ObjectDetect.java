@@ -1,6 +1,9 @@
 package frc.robot.systems.object;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -62,22 +65,20 @@ public class ObjectDetect {
         System.arraycopy(frontRightPoses, 0, poses, frontLeftPoses.length, frontRightPoses.length);
         
         // Run quick sort based on Distance from the robot //
-        poses = Pose2dSorter.quickSort(poses);
-        
+        ArrayList<Pose2d> posesList = new ArrayList<>(Arrays.asList(poses));
+        ArrayList<Pose2d> uniquePosesList = new ArrayList<>();
 
-        boolean isSameObject;
-        for(int i = 0; i < poses.length -1; i++){
-            Pose2d pose1 = poses[i];
-            Pose2d pose2 = poses[i+1];
+        for (Pose2d pose : poses) {
+            boolean isPoseDuplicate  = posesList.stream()
+                .anyMatch(uniquePose -> areObjectsSame(pose, uniquePose));
 
-            isSameObject = areObjectsSame(pose1, pose2);
-
-            if(isSameObject){
-
+            if(!isPoseDuplicate) {
+                uniquePosesList.add(pose);
             }
         }
-        
-        return poses;
+
+        return new Pose2d[0];
+
     }
 
     public double getDistance(Pose2d pose){
