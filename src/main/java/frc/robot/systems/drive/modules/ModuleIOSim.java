@@ -4,6 +4,8 @@ package frc.robot.systems.drive.modules;
 
 import static frc.robot.systems.drive.DriveConstants.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -56,6 +58,10 @@ public class ModuleIOSim implements ModuleIO {
         pInputs.iAzimuthTemperatureCelsius = 0.0;
         pInputs.iAzimuthAppliedVolts = mAzimuthAppliedVolts;
         pInputs.iAzimuthMotorVolts = mAzimuthAppliedVolts;
+
+        pInputs.odometryTimestamps = new double[] {((double) Logger.getTimestamp()) / 100000.0};
+        pInputs.odometryDrivePositionsM = new double[] {pInputs.iDrivePositionM};
+        pInputs.odometryTurnPositions = new Rotation2d[] {pInputs.iAzimuthPosition};
     }
 
     /////////// DRIVE MOTOR METHODS \\\\\\\\\\\

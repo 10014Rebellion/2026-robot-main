@@ -235,4 +235,8 @@ public class Module {
     public double[] getOdometryTimeStamps() {
         return mInputs.odometryTimestamps;
     }
+
+    public SwerveModulePosition[] getOdometryPositions() {
+        return odometryPositions;
+    }
 }

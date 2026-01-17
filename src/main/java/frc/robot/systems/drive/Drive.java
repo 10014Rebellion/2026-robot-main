@@ -210,6 +210,8 @@ public class Drive extends SubsystemBase {
         Logger.processInputs("Drive/Gyro", mGyroInputs);
         kOdometryLock.unlock();
 
+
+
         /* VISION */
         mVision.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
         VisionObservation[] observations = mVision.getVisionObservations();
@@ -227,17 +229,48 @@ public class Drive extends SubsystemBase {
         }
 
 
-        if (mGyroInputs.iConnected) mRobotRotation = mGyroInputs.iYawPosition;
-        else
-            mRobotRotation = Rotation2d.fromRadians(
-                    (mPoseEstimator.getEstimatedPosition().getRotation().getRadians()
-                                    /* D=vt. Uses modules and IK to estimate turn */
-                                    + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02)
-                            /* Scopes result between 0 and 360 */
-                            % 360.0);
+        double[] sampleTimestamps =
+            mModules[0].getOdometryTimeStamps(); // All signals are sampled together
+        int sampleCount = sampleTimestamps.length;
+        for (int i = 0; i < sampleCount; i++) {
+            // Read wheel positions and deltas from each module
+            SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+            SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
+            for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+                modulePositions[moduleIndex] = mModules[moduleIndex].getOdometryPositions()[i];
+                moduleDeltas[moduleIndex] =
+                new SwerveModulePosition(
+                    modulePositions[moduleIndex].distanceMeters
+                        - mPrevPositions[moduleIndex].distanceMeters,
+                    modulePositions[moduleIndex].angle);
+                mPrevPositions[moduleIndex] = modulePositions[moduleIndex];
+            }
 
-        mPoseEstimator.update(mRobotRotation, getModulePositions());
-        mOdometry.update(mRobotRotation, getModulePositions());
+            // Update gyro angle
+            if (mGyroInputs.iConnected) {
+                // Use the real gyro angle
+                mRobotRotation = mGyroInputs.odometryYawPositions[i];
+            } else {
+                // Use the angle delta from the kinematics and module deltas
+                Twist2d twist = kKinematics.toTwist2d(moduleDeltas);
+                mRobotRotation = mRobotRotation.plus(new Rotation2d(twist.dtheta));
+            }
+        }
+
+        // Apply update
+        // poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+
+        // if (mGyroInputs.iConnected) mRobotRotation = mGyroInputs.iYawPosition;
+        // else
+        //     mRobotRotation = Rotation2d.fromRadians(
+        //             (mPoseEstimator.getEstimatedPosition().getRotation().getRadians()
+        //                             /* D=vt. Uses modules and IK to estimate turn */
+        //                             + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02)
+        //                     /* Scopes result between 0 and 360 */
+        //                     % 360.0);
+
+        // mPoseEstimator.update(mRobotRotation, getModulePositions());
+        // mOdometry.update(mRobotRotation, getModulePositions());
 
         mField.setRobotPose(getPoseEstimate());
     }
