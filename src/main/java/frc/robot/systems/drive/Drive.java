@@ -287,6 +287,14 @@ public class Drive extends SubsystemBase {
             case AUTO_ALIGN:
                 mDesiredSpeeds = mAutoAlignController.calculate(mGoalPoseSup.get(), getPoseEstimate());
                 break;
+            case LINE_ALIGN:
+                mDesiredSpeeds = 
+                    mAutoAlignController.lineAlignCalculate(
+                        mGoalPoseSup.get(), 
+                        new ChassisSpeeds(), 
+                        getPoseEstimate(), 
+                        teleopSpeeds);
+                break;
             case AUTON:
                 mDesiredSpeeds = mPPDesiredSpeeds;
                 break;
@@ -416,7 +424,7 @@ public class Drive extends SubsystemBase {
 
     public Command setToGenericLineAlign(Supplier<Pose2d> desiredPose, Supplier<Rotation2d> desiredRotation) {
         return setToGenericLineAlign(
-            () -> Math.atan2(desiredPose.get().getY(), desiredPose.get().getX()), 
+            () -> desiredPose.get().getRotation().getTan(), 
             () -> desiredPose.get().getX(),
             () -> desiredPose.get().getY(),
             desiredRotation);
@@ -448,17 +456,17 @@ public class Drive extends SubsystemBase {
                             desiredRotation.get()
                         );
 
-                        mAutoAlignController.setLineDirection(() -> new Rotation2d(slope.getAsDouble(), 1.0));
+                        mAutoAlignController.setLineDirection(() -> new Rotation2d(1, slope.getAsDouble()));
                     } else {
                         mGoalPoseSup = () -> new Pose2d(
                             anchorX.getAsDouble(),
                             getPoseEstimate().getY(),
                             desiredRotation.get());
 
-                            mAutoAlignController.setLineDirection(() -> Rotation2d.kCCW_90deg);
+                        mAutoAlignController.setLineDirection(() -> Rotation2d.kCCW_90deg);
                     }
 
-                    mAutoAlignController.setConstraintType(ConstraintType.AXIS);
+                    mAutoAlignController.setConstraintType(ConstraintType.LINEAR);
                     mAutoAlignController.reset(
                             getPoseEstimate(),
                             ChassisSpeeds.fromRobotRelativeSpeeds(

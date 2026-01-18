@@ -2,6 +2,8 @@
 
 package frc.robot.bindings;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.controllers.FlydigiApex4;
 import frc.robot.game.GameGoalPoseChooser;
@@ -36,6 +38,11 @@ public class ButtonBindings {
                 mDriveSS.setToGenericHeadingAlign(() -> GameGoalPoseChooser.turnFromHub(mDriveSS.getPoseEstimate())))
             .onFalse(mDriveSS.setToTeleop());
             
+       mDriverController.b()
+            .onTrue(mDriveSS.setToGenericLineAlign(() -> 
+                new Pose2d(3, 3, Rotation2d.fromRadians(Math.PI / 4.0)), 
+                () -> Rotation2d.fromRadians(Math.PI / 4.0)))
+            .onFalse(mDriveSS.setToTeleop());
 
         mDriverController.x()
             .onTrue(mDriveSS.characterizeAzimuths(0))
