@@ -213,7 +213,7 @@ public class ModuleIOKraken implements ModuleIO {
         pInputs.iAzimuthAbsolutePosition = Rotation2d.fromRotations(mAbsolutePositionSignal.getValueAsDouble());
 
         pInputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+            timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
         pInputs.odometryDrivePositionsM =
             drivePositionQueue.stream()
                 .mapToDouble((Double value) -> value)
