@@ -82,7 +82,6 @@ public class HeadingController {
         double adjustedOutputRadians = outputRadians;
         if (Math.abs(goalError.getDegrees()) < mToleranceDegrees.get()) adjustedOutputRadians *= 0.0;
 
-
         Telemetry.log("Drive/HeadingController/setpointError", setpointError);
         Telemetry.log("Drive/HeadingController/goalError", goalError);
 
