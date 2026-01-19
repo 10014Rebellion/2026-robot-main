@@ -27,8 +27,8 @@ public class GyroIOPigeon2 implements GyroIO {
         mGyro.getConfigurator().apply(new Pigeon2Configuration());
         mGyro.getConfigurator().setYaw(0.0);
 
-        mYaw.setUpdateFrequency(DriveConstants.kOdometryFrequency);
-        mYawVelocity.setUpdateFrequency(50.0);
+        BaseStatusSignal.setUpdateFrequencyForAll(DriveConstants.kOdometryFrequency, mYaw);
+        BaseStatusSignal.setUpdateFrequencyForAll(50, mYawVelocity);
 
         yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
         yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(mYaw.clone());
@@ -48,6 +48,9 @@ public class GyroIOPigeon2 implements GyroIO {
             yawPositionQueue.stream()
             .map((Double value) -> Rotation2d.fromDegrees(value))
             .toArray(Rotation2d[]::new);
+        
+        yawTimestampQueue.clear();
+        yawPositionQueue.clear();
     }
 
     @Override
