@@ -196,19 +196,24 @@ public class Drive extends SubsystemBase {
     }
 
     private void updateSensorsAndOdometry() {
-        kOdometryLock.lock();
-        if(mPrevStates == null || mPrevPositions == null) {
-            mPrevStates = SwerveUtils.zeroStates();
-            mPrevPositions = SwerveUtils.zeroPositions();
-        }
+        try {
+            kOdometryLock.lock();
+            if(mPrevStates == null || mPrevPositions == null) {
+                mPrevStates = SwerveUtils.zeroStates();
+                mPrevPositions = SwerveUtils.zeroPositions();
+            }
 
         
-        for (Module module : mModules) module.periodic();
+            for (Module module : mModules) module.periodic();
 
-        /* GYRO */
-        mGyro.updateInputs(mGyroInputs);
-        Logger.processInputs("Drive/Gyro", mGyroInputs);
-        kOdometryLock.unlock();
+            /* GYRO */
+            mGyro.updateInputs(mGyroInputs);
+            Logger.processInputs("Drive/Gyro", mGyroInputs);
+        } catch (Exception e) {
+            Telemetry.reportException(e);
+        } finally {
+            kOdometryLock.unlock();
+        }
 
         /* VISION */
         mVision.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
