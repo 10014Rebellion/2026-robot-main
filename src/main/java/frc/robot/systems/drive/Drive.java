@@ -48,6 +48,7 @@ import frc.robot.game.GameDriveManager;
 import frc.robot.game.GameDriveManager.GameDriveStates;
 import frc.robot.systems.drive.controllers.HeadingController;
 import frc.robot.systems.drive.controllers.HolonomicController;
+import frc.robot.systems.drive.controllers.LineController;
 import frc.robot.systems.drive.controllers.HolonomicController.ConstraintType;
 import frc.robot.systems.drive.controllers.ManualTeleopController;
 import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
@@ -121,6 +122,9 @@ public class Drive extends SubsystemBase {
 
     @AutoLogOutput(key = "Drive/HeadingController/GoalPose")
     private Supplier<Pose2d> mGoalPoseSup = () -> new Pose2d();
+
+    private final LineController mLineAlignController = new LineController(
+        () -> 0.0, () -> 1.0, () -> false);
 
     private final GameDriveManager mGameDriveManager = new GameDriveManager(this);
 
@@ -288,12 +292,7 @@ public class Drive extends SubsystemBase {
                 mDesiredSpeeds = mAutoAlignController.calculate(mGoalPoseSup.get(), getPoseEstimate());
                 break;
             case LINE_ALIGN:
-                mDesiredSpeeds = 
-                    mAutoAlignController.lineAlignCalculate(
-                        mGoalPoseSup.get(), 
-                        new ChassisSpeeds(), 
-                        getPoseEstimate(), 
-                        teleopSpeeds);
+                mDesiredSpeeds = mLineAlignController.calculate(teleopSpeeds, mGoalPoseSup.get(), getPoseEstimate());
                 break;
             case AUTON:
                 mDesiredSpeeds = mPPDesiredSpeeds;
@@ -418,62 +417,12 @@ public class Drive extends SubsystemBase {
                 () -> new ChassisSpeeds()));
     }
 
-    public Command setToGenericLineAlign(Supplier<Pose2d> desiredPose) {
-        return setToGenericLineAlign(desiredPose, () -> desiredPose.get().getRotation());
-    }
-
-    public Command setToGenericLineAlign(Supplier<Pose2d> desiredPose, Supplier<Rotation2d> desiredRotation) {
-        return setToGenericLineAlign(
-            () -> desiredPose.get().getRotation().getTan(), 
-            () -> desiredPose.get().getX(),
-            () -> desiredPose.get().getY(),
-            desiredRotation);
-    }
-
-    /*
-     * Reference GameDriveManager to use game-specific implementation of this command
-     * @param Goal strategy, based on where you're aligning
-     * @param Constraint type, linear or on an axis
-     */
-    private Command setToGenericLineAlign(DoubleSupplier slope, DoubleSupplier anchorX, DoubleSupplier anchorY, Supplier<Rotation2d> desiredRotation) {
+    public Command setToGenericLineAlign(Supplier<Pose2d> pGoalPoseSupplier, Supplier<Rotation2d> pLineAngle, DoubleSupplier pTeleopScalar, BooleanSupplier pTeleopInvert) {
         return new InstantCommand(() -> {
-                    if(!Double.isNaN(slope.getAsDouble())) {
-                        DoubleSupplier m = slope;
-                        DoubleSupplier b = ()-> - anchorX.getAsDouble() * m.getAsDouble() + anchorY.getAsDouble();
-
-                        DoubleSupplier x1 = () -> getPoseEstimate().getX();
-                        DoubleSupplier y1 = () -> getPoseEstimate().getY();
-
-                        mGoalPoseSup = () -> new Pose2d(
-                            ( x1.getAsDouble() 
-                                + m.getAsDouble() * y1.getAsDouble() 
-                                - m.getAsDouble() * b.getAsDouble() ) 
-                                    / ( 1 + m.getAsDouble() * m.getAsDouble()),
-                            ( m.getAsDouble() * x1.getAsDouble() 
-                                + m.getAsDouble() * m.getAsDouble() * y1.getAsDouble() 
-                                + b.getAsDouble() ) 
-                                    / ( 1 + m.getAsDouble() * m.getAsDouble()),
-                            desiredRotation.get()
-                        );
-
-                        mAutoAlignController.setLineDirection(() -> new Rotation2d(1, slope.getAsDouble()));
-                    } else {
-                        mGoalPoseSup = () -> new Pose2d(
-                            anchorX.getAsDouble(),
-                            getPoseEstimate().getY(),
-                            desiredRotation.get());
-
-                        mAutoAlignController.setLineDirection(() -> Rotation2d.kCCW_90deg);
-                    }
-
-                    mAutoAlignController.setConstraintType(ConstraintType.LINEAR);
-                    mAutoAlignController.reset(
-                            getPoseEstimate(),
-                            ChassisSpeeds.fromRobotRelativeSpeeds(
-                                    getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
-                            mGoalPoseSup.get());
-                })
-                .andThen(setDriveStateCommandContinued(DriveState.LINE_ALIGN));
+            mGoalPoseSup = pGoalPoseSupplier;
+            mLineAlignController.setControllerGoalSettings(pTeleopScalar, () -> pLineAngle.get().getTan(), pTeleopInvert);
+            mLineAlignController.reset(getPoseEstimate(), mGoalPoseSup.get());
+        }).andThen(setDriveStateCommandContinued(DriveState.LINE_ALIGN));
     }
 
     ////// BASE STATES \\\\\\

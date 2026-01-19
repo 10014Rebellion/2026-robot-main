@@ -27,18 +27,18 @@ public class GameDriveManager {
             case HUB_HEADING_ALIGN:
                 return mDrive.setToGenericHeadingAlign(
                     () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()));
-            case DRIVE_TO_TRENCH:
-                return mDrive.setToGenericLineAlign(
-                    () -> GameGoalPoseChooser.getClosestTrench(mDrive.getPoseEstimate()));
-            case DRIVE_TO_BUMP:
-                return mDrive.setToGenericLineAlign(
-                    () -> GameGoalPoseChooser.getClosestBump(mDrive.getPoseEstimate()));
-            case DRIVE_TO_O:
-                return mDrive.setToGenericLineAlign(
-                    () -> GameGoalPoseChooser.getO());
-            case DRIVE_TO_D:
-                return mDrive.setToGenericLineAlign(
-                    () -> GameGoalPoseChooser.getD());
+            // case DRIVE_TO_TRENCH:
+            //     return mDrive.setToGenericLineAlign(
+            //         () -> GameGoalPoseChooser.getClosestTrench(mDrive.getPoseEstimate()));
+            // case DRIVE_TO_BUMP:
+            //     return mDrive.setToGenericLineAlign(
+            //         () -> GameGoalPoseChooser.getClosestBump(mDrive.getPoseEstimate()));
+            // case DRIVE_TO_O:
+            //     return mDrive.setToGenericLineAlign(
+            //         () -> GameGoalPoseChooser.getO());
+            // case DRIVE_TO_D:
+            //     return mDrive.setToGenericLineAlign(
+            //         () -> GameGoalPoseChooser.getD());
             default:
                 return new InstantCommand(() -> DriverStation.reportError(
                         "<<< UNACCOUNTED DRIVE STATE \"" + pGameDriveState.toString() + "\" >>>", true));

@@ -12,11 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.lib.tuning.LoggedTunableNumber;
-
-import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 public class HolonomicController {
     public static enum ConstraintType {
@@ -81,10 +77,7 @@ public class HolonomicController {
 
     private ConstraintType tType = ConstraintType.AXIS;
 
-    private Supplier<Rotation2d> mLineDirection = () -> new Rotation2d();
-
     public HolonomicController() {
-
         this.tXController = new ProfiledPIDController(
                 tXP.get(), tXI.get(), tXD.get(), new Constraints(tXMaxVMPS.get(), tXMaxAMPSS.get()));
         tXController.setIntegratorRange(-tXIRange.get(), tXIRange.get());
@@ -118,10 +111,6 @@ public class HolonomicController {
 
     public void reset(Pose2d pStartPose, Pose2d pGoalPose) {
         reset(pStartPose, new ChassisSpeeds(), pGoalPose);
-    }
-
-    public void setLineDirection(Supplier<Rotation2d> direction) {
-        mLineDirection = direction;
     }
 
     /*
@@ -186,52 +175,6 @@ public class HolonomicController {
                         Math.toDegrees(pGoalSpeed.omegaRadiansPerSecond)))
                 + tOmegaFeedforward.calculate(tOmegaController.getSetpoint().velocity))),
                 pCurrentPose.getRotation());
-    }
-
-    public ChassisSpeeds lineAlignCalculate(Pose2d goalPose, ChassisSpeeds goalSpeed, Pose2d currentPose, ChassisSpeeds teleopSpeeds) {
-        double ffScalar = Math.min(
-            Math.hypot(goalPose.getX() - currentPose.getX(), goalPose.getY() - currentPose.getY()) / tFFRadius.get(),
-            1.0);
-
-        ChassisSpeeds alignRelative = ChassisSpeeds.fromFieldRelativeSpeeds(
-            (tXController.calculate(
-                currentPose.getX(),
-                    new TrapezoidProfile.State(goalPose.getX(), goalSpeed.vxMetersPerSecond))
-                + ffScalar * tXFeedforward.calculate(tXController.getSetpoint().velocity)),
-            (tYController.calculate(
-                currentPose.getY(),
-                    new TrapezoidProfile.State(goalPose.getY(), goalSpeed.vyMetersPerSecond))
-                + ffScalar * tYFeedforward.calculate(tYController.getSetpoint().velocity)),
-            (Math.toRadians(tOmegaController.calculate(
-                currentPose.getRotation().getDegrees(),
-                    new TrapezoidProfile.State(
-                        goalPose.getRotation().getDegrees(),
-                        Math.toDegrees(goalSpeed.omegaRadiansPerSecond)))
-            + tOmegaFeedforward.calculate(tOmegaController.getSetpoint().velocity))),
-            mLineDirection.get().unaryMinus().minus(Rotation2d.kCCW_90deg));
-
-        double alignSpeedsSign = Math.signum(alignRelative.vxMetersPerSecond);
-        double alignSpeedMagVector = alignSpeedsSign * Math.hypot(alignRelative.vxMetersPerSecond, alignRelative.vyMetersPerSecond);
-
-        Logger.recordOutput("Drive/LineAlign/AutoSpeeds", alignRelative);
-
-        double teleopSpeedsSign = Math.signum(teleopSpeeds.vxMetersPerSecond);
-        double teleopSpeedsMagVector = teleopSpeedsSign * Math.hypot(teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond);
-
-        ChassisSpeeds teleopAlignRelative = ChassisSpeeds.fromFieldRelativeSpeeds(
-            new ChassisSpeeds(
-                teleopSpeedsMagVector,
-                alignSpeedMagVector, 
-                alignRelative.omegaRadiansPerSecond),
-            currentPose.getRotation());
-
-        Logger.recordOutput("Drive/LineAlign/TeleopSpeeds", teleopAlignRelative);
-
-        return 
-            new ChassisSpeeds(
-                alignRelative.vxMetersPerSecond + teleopAlignRelative.vxMetersPerSecond,
-                alignRelative.vyMetersPerSecond + teleopAlignRelative.vyMetersPerSecond,
-                alignRelative.omegaRadiansPerSecond);
     }
 
     ////////////////////////// GETTERS \\\\\\\\\\\\\\\\\\\\\\\\\\\\

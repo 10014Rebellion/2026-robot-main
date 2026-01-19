@@ -39,9 +39,12 @@ public class ButtonBindings {
             .onFalse(mDriveSS.setToTeleop());
             
        mDriverController.b()
-            .onTrue(mDriveSS.setToGenericLineAlign(() -> 
-                new Pose2d(3, 3, Rotation2d.fromRadians(Math.PI / 4.0)), 
-                () -> Rotation2d.fromRadians(Math.PI / 4.0)))
+            .onTrue(mDriveSS.setToGenericLineAlign(
+                () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
+                () -> Rotation2d.fromDegrees(45),
+                () -> 1.0,
+                () -> false
+            ))
             .onFalse(mDriveSS.setToTeleop());
 
         mDriverController.x()
