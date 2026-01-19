@@ -129,10 +129,10 @@ public class Drive extends SubsystemBase {
 
     private final GameDriveManager mGameDriveManager = new GameDriveManager(this);
 
-    private final LoggedTunableNumber tDriftRate = new LoggedTunableNumber("Drive/DriftRate", DriveConstants.kDriftRate);
-    private final LoggedTunableNumber tRotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
-    private final LoggedTunableNumber tLinearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
-    private final LoggedTunableNumber tAzimuthCharacterizationVoltage = new LoggedTunableNumber("Drive/AzimuthCharacterizationVoltage", 0);
+    public static final LoggedTunableNumber tDriftRate = new LoggedTunableNumber("Drive/DriftRate", DriveConstants.kDriftRate);
+    public static final LoggedTunableNumber tRotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
+    public static final LoggedTunableNumber tLinearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
+    public static final LoggedTunableNumber tAzimuthCharacterizationVoltage = new LoggedTunableNumber("Drive/AzimuthCharacterizationVoltage", 0);
     // private final LoggedTunableNumber tAzimuthDriveScalar = new LoggedTunableNumber("Drive/AzimuthDriveScalar", DriveConstants.kAzimuthDriveScalar);
 
     private final Debouncer mAutoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
@@ -614,77 +614,6 @@ public class Drive extends SubsystemBase {
         });
     }
 
-    //////////////////////// CHARACTERIZATION \\\\\\\\\\\\\\\\\\\\\\\\\\
-    /* LINEAR CHARACTERIZATION: The x-y movement of the drivetrain(basically drive motor feedforward) */
-    public Command characterizeLinearMotion() {
-        return setToSysIDCharacterization()
-                .andThen(SysIDCharacterization.runDriveSysIDTests(
-                        (voltage) -> {
-                            runLinearCharcterization(voltage);
-                        },
-                        this));
-    }
-
-    /* Runs the robot forward at a voltage */
-    public void runLinearCharcterization(double volts) {
-        setToSysIDCharacterization().initialize();
-        for (int i = 0; i < 4; i++) mModules[i].runCharacterization(volts);
-    }
-
-    public void setDriveAmperagesForAllModules(double amps) {
-        for (int i = 0; i < 4; i++) {
-            mModules[i].setDesiredVelocity(null);
-            mModules[i].setDriveAmperage(amps);
-            mModules[i].setDesiredRotation(Rotation2d.fromDegrees(0.0));
-        }
-    }
-
-    /*
-     * ANGULAR CHARACTERIZATION: The angular movement of the drivetrain(basically used to get drivebase MOI)
-     * https://choreo.autos/usage/estimating-moi/
-     */
-    public Command characterizeAngularMotion() {
-        return setToSysIDCharacterization()
-                .andThen(SysIDCharacterization.runDriveSysIDTests(
-                        (voltage) -> runAngularCharacterization(voltage), this));
-    }
-
-    /* Runs the rotate's robot at a voltage */
-    public void runAngularCharacterization(double volts) {
-        setToSysIDCharacterization().initialize();
-        mModules[0].runCharacterization(volts, Rotation2d.fromDegrees(-45.0));
-        mModules[1].runCharacterization(-volts, Rotation2d.fromDegrees(45.0));
-        mModules[2].runCharacterization(volts, Rotation2d.fromDegrees(45.0));
-        mModules[3].runCharacterization(-volts, Rotation2d.fromDegrees(-45.0));
-    }
-
-    public Command characterizeAzimuths(int pModNumber) {
-        return setToSysIDCharacterization()
-            .andThen(SysIDCharacterization.runDriveSysIDTests(
-                (voltage) -> {
-                mModules[pModNumber].setDesiredRotation(null);
-                mModules[pModNumber].setDesiredVelocity(0.0);
-                mModules[pModNumber].setAzimuthVoltage(voltage);
-            }, this));
-    }
-
-    public Command testAzimuths(int pModNumber) {
-        return characterizeAzimuths(pModNumber, tAzimuthCharacterizationVoltage);
-    }
-
-    public Command characterizeAzimuths(int pModNumber, DoubleSupplier voltage) {
-        return new FunctionalCommand(
-            () -> setDriveState(DriveState.SYSID_CHARACTERIZATION), 
-            () -> {
-                mModules[pModNumber].setDesiredRotation(null);
-                mModules[pModNumber].setDesiredVelocity(0.0);
-                mModules[pModNumber].setAzimuthVoltage(voltage.getAsDouble());
-            }, 
-            (interrupted) -> {}, 
-            () -> false, 
-            this);
-    }
-
     ///////////////////////// GETTERS \\\\\\\\\\\\\\\\\\\\\\\\
     @AutoLogOutput(key = "Drive/Swerve/MeasuredStates")
     public SwerveModuleState[] getModuleStates() {
@@ -731,6 +660,10 @@ public class Drive extends SubsystemBase {
         return GeomUtil.getSmallestChangeInRotation(mRobotRotation, mGoalRotationSup.get())
                         .getDegrees()
                 < HeadingController.mToleranceDegrees.get();
+    }
+
+    public Module[] getModules() {
+        return this.mModules;
     }
 
     public void acceptJoystickInputs(
