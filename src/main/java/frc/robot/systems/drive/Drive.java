@@ -615,7 +615,7 @@ public class Drive extends SubsystemBase {
         for (int i = 0; i < 4; i++) mModules[i].runCharacterization(volts);
     }
 
-    public void setForwardAmperagesForAllModules(double amps) {
+    public void setDriveAmperagesForAllModules(double amps) {
         for (int i = 0; i < 4; i++) {
             mModules[i].setDesiredVelocity(null);
             mModules[i].setDriveAmperage(amps);
@@ -642,37 +642,32 @@ public class Drive extends SubsystemBase {
         mModules[3].runCharacterization(-volts, Rotation2d.fromDegrees(-45.0));
     }
 
-    public void runMOICharacterization(double amps) {
-        setDriveState(DriveState.SYSID_CHARACTERIZATION);
-        mModules[0].setDriveAmperage(amps);
-        mModules[1].setDriveAmperage(-amps);
-        mModules[2].setDriveAmperage(amps);
-        mModules[3].setDriveAmperage(-amps);
-
-        mModules[0].setDesiredRotation(Rotation2d.fromDegrees(-45.0));
-        mModules[1].setDesiredRotation(Rotation2d.fromDegrees(45.0));
-        mModules[2].setDesiredRotation(Rotation2d.fromDegrees(45.0));
-        mModules[3].setDesiredRotation(Rotation2d.fromDegrees(-45.0));
-
-        Telemetry.log(
-                "Drive/MOI/RadiansVelocity",
-                mModules[0].getInputs().iDriveVelocityMPS / DriveConstants.kDrivebaseRadiusMeters);
-        Telemetry.log(
-                "Drive/MOI/DriveTorqueNM",
-                (SwerveUtils.getTorqueOfKrakenDriveMotor(mModules[0].getInputs().iDriveTorqueCurrentAmps)
-                                * kDriveMotorGearing
-                                / kWheelRadiusMeters)
-                        * kDrivebaseRadiusMeters);
+    public Command characterizeAzimuths(int pModNumber) {
+        return setDriveStateCommand(DriveState.SYSID_CHARACTERIZATION)
+            .andThen(SysIDCharacterization.runDriveSysIDTests(
+                (voltage) -> {
+                mModules[pModNumber].setDesiredRotation(null);
+                mModules[pModNumber].setDesiredVelocity(0.0);
+                mModules[pModNumber].setAzimuthVoltage(voltage);
+            }, this));
     }
 
-    public Command characterizeAzimuths(int pModNumber) {
+    public Command testAzimuths(int pModNumber) {
+        return characterizeAzimuths(pModNumber, tAzimuthCharacterizationVoltage);
+    }
+
+    public Command characterizeAzimuths(int pModNumber, DoubleSupplier voltage) {
         return new FunctionalCommand(
             () -> setDriveState(DriveState.SYSID_CHARACTERIZATION), 
-            () -> mModules[pModNumber].setAzimuthVoltage(tAzimuthCharacterizationVoltage.get()), 
+            () -> {
+                mModules[pModNumber].setDesiredRotation(null);
+                mModules[pModNumber].setDesiredVelocity(0.0);
+                mModules[pModNumber].setAzimuthVoltage(voltage.getAsDouble());
+            }, 
             (interrupted) -> {}, 
             () -> false, 
             this);
-    } 
+    }
 
     ///////////////////////// GETTERS \\\\\\\\\\\\\\\\\\\\\\\\
     @AutoLogOutput(key = "Drive/Swerve/MeasuredStates")
