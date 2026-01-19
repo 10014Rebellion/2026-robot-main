@@ -402,6 +402,7 @@ public class Drive extends SubsystemBase {
     /*
      * Reference GameDriveManager to use game-specific implementation of this command
      * @param The desired rotation
+     * @param Turn feedforward
      */
     public Command setToGenericHeadingAlign(Supplier<Rotation2d> pGoalRotation, TurnPointFeedforward pTurnPointFeedforward) {
         return new InstantCommand(() -> {
@@ -413,6 +414,7 @@ public class Drive extends SubsystemBase {
                 .andThen(setDriveStateCommandContinued(DriveState.HEADING_ALIGN));
     }
 
+    /* Accoutns for velocity of drive when turning */
     public Command setToGenericHeadingAlign(Supplier<Rotation2d> pGoalRotation) {
         return setToGenericHeadingAlign(
             pGoalRotation, 
