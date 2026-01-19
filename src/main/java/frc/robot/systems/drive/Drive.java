@@ -427,12 +427,14 @@ public class Drive extends SubsystemBase {
             case AUTON:
                 /* No need to optimize for Choreo, as it handles it under the hood */
                 driveAmps = SwerveUtils.convertChoreoNewtonsToAmps(currentState, mPathPlanningFF, i);
+                break;
             // TODO: Fix this.
             case AUTO_ALIGN:
                 driveAmps =  SwerveUtils.optimizeTorque(
                     unoptimizedState, optimizedState,
                     setpoint.feedforwards().torqueCurrentsAmps()[i],
                     i);
+                break;
             default:
                 driveAmps = SwerveUtils.optimizeTorque(
                     unoptimizedState, optimizedState,
