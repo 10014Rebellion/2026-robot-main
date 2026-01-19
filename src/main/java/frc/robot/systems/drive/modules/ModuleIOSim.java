@@ -59,7 +59,7 @@ public class ModuleIOSim implements ModuleIO {
         pInputs.iAzimuthAppliedVolts = mAzimuthAppliedVolts;
         pInputs.iAzimuthMotorVolts = mAzimuthAppliedVolts;
 
-        pInputs.odometryTimestamps = new double[] {((double) Logger.getTimestamp()) / 1e-6};
+        pInputs.odometryTimestamps = new double[] {((double) Logger.getTimestamp()) / 1e6};
         pInputs.odometryDrivePositionsM = new double[] {
             mDriveMotor.getAngularPositionRotations() * kWheelCircumferenceMeters
         };
