@@ -411,7 +411,7 @@ public class SwerveSetpointGenerator {
                 torqueCurrent *= -1.0;
             }
 
-            double azimuthRadiansPS = deltaRotation.getRadians() / 0.02;
+            double azimuthRadiansPS = deltaRotation.getRadians() / dt;
 
             accelFF[m] = (retStates[m].speedMetersPerSecond - prevSetpoint.moduleStates()[m].speedMetersPerSecond) / dt;
             linearForceFF[m] = appliedForce;
