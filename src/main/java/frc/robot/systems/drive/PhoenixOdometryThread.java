@@ -38,6 +38,7 @@ public class PhoenixOdometryThread extends Thread {
 
   private static boolean isCANFD = DriveConstants.isCANFD;
   private static PhoenixOdometryThread instance = null;
+  private static boolean hasNotStarted = true;
 
   public static PhoenixOdometryThread getInstance() {
     if (instance == null) {
@@ -53,8 +54,13 @@ public class PhoenixOdometryThread extends Thread {
 
   @Override
   public void start() {
-    if (timestampQueues.size() > 0) {
-      super.start();
+    /* Prevents re-starts */
+    if(hasNotStarted) {
+      if (timestampQueues.size() > 0) {
+        super.start();
+      }
+
+      hasNotStarted = !hasNotStarted;
     }
   }
 
