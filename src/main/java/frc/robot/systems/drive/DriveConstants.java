@@ -80,7 +80,7 @@ public class DriveConstants {
                     new PIDController(3.5, 0.0, 0.0), new SimpleMotorFeedforward(0.3, 2.25, 0.0)) // AZIMUTH // TODO: TUNE ME
             : new ModuleControlConfig(
                     new PIDController(0.1, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 2.36, 0.005), // TODO: TUNE ME
-                    new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.0)); // TODO: TUNE ME
+                    new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.5)); // TODO: TUNE ME
 
     /* MODULE SPECIFIC CONSTANTS */
     /* If 180 was added, the person who got the offset had the bevel gears on the wrong side when they did it */
