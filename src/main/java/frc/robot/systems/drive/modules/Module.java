@@ -56,6 +56,7 @@ public class Module {
         mCurrentState = new SwerveModuleState(mInputs.iDriveVelocityMPS, mInputs.iAzimuthPosition);
         mCurrentPosition = new SwerveModulePosition(mInputs.iDrivePositionM, mInputs.iAzimuthPosition);
 
+        /* Works because signals are sampled together */
         int sampleCount = mInputs.odometryTimestamps.length;
         odometryPositions = new SwerveModulePosition[sampleCount];
         // System.out.println("\n\n\n\n\n\n\n\n"+sampleCount+"\n\n\n\n\n\n\n\n\n\n");
