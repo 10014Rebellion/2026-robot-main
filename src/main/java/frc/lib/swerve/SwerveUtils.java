@@ -147,4 +147,8 @@ public class SwerveUtils {
     public static double getTorqueOfKrakenDriveMotor(double amps) {
         return kKrakenFOCModel.getTorque(amps);
     }
+
+    public static double lowPassFilter(double previous, double input, double alpha) {
+        return alpha * input + (1 - alpha) * previous;
+    }
 }

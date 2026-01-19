@@ -106,6 +106,7 @@ public class Drive extends SubsystemBase {
     private ChassisSpeeds mDesiredSpeeds = new ChassisSpeeds();
     private ChassisSpeeds mPPDesiredSpeeds = new ChassisSpeeds();
     private DriveFeedforwards mPathPlanningFF = DriveFeedforwards.zeros(4);
+    private double[] mPrevDriveAmps = new double[] {0.0, 0.0, 0.0, 0.0};
     private final PathConstraints mDriveConstraints = DriveConstants.kAutoDriveConstraints;
 
     private SwerveModuleState[] mPrevSetpointStates = SwerveUtils.zeroStates();
@@ -133,6 +134,7 @@ public class Drive extends SubsystemBase {
     public static final LoggedTunableNumber tRotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
     public static final LoggedTunableNumber tLinearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
     public static final LoggedTunableNumber tAzimuthCharacterizationVoltage = new LoggedTunableNumber("Drive/AzimuthCharacterizationVoltage", 0);
+    public static final LoggedTunableNumber tDriveAggressiveness = new LoggedTunableNumber("Drive/Teleop/DriveAggresivenes", 0.0001);
     // private final LoggedTunableNumber tAzimuthDriveScalar = new LoggedTunableNumber("Drive/AzimuthDriveScalar", DriveConstants.kAzimuthDriveScalar);
 
     private final Debouncer mAutoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
@@ -268,6 +270,7 @@ public class Drive extends SubsystemBase {
     private void updateDriveControllers() {
         mHeadingController.updateHeadingController();
         mAutoAlignController.updateAlignmentControllers();
+        mLineAlignController.updateAlignmentControllers();
     }
 
     private void computeDesiredSpeeds() {
@@ -366,49 +369,28 @@ public class Drive extends SubsystemBase {
                                 mPreviousSetpoint.moduleStates()[i], mModules[i].getCurrentState()));
 
                 unOptimizedSetpointStates[i] = SwerveUtils.copyState(setpointStates[i]);
-
                 setpointStates[i].optimize(mModules[i].getCurrentState().angle);
 
                 /* Feedforward cases based on driveState */
                 /* 0 unless in auto or auto-align */
                 double driveAmps = calculateDriveFeedforward(
-                        mPreviousSetpoint,
-                        mModules[i].getCurrentState(),
-                        unOptimizedSetpointStates[i],
-                        setpointStates[i],
-                        i);
+                    mPreviousSetpoint,
+                    mModules[i].getCurrentState(),
+                    unOptimizedSetpointStates[i],
+                    setpointStates[i],
+                    i);
+                double desiredAzimuthVelocityRadPS = 
+                    mPreviousSetpoint.azimuthFeedforwards().azimuthSpeedRadiansPS()[i];
 
-                /*
-                 * Multiplies by cos(angleError) to stop the drive from going in the wrong direction
-                 * when azimuth angle changes
-                 */
+                // Multiplies by cos(angleError) to stop the drive from going in the wrong direction
                 setpointStates[i].cosineScale(mModules[i].getCurrentState().angle);
 
-                double directionOfVelChange =
-                        Math.signum(setpointStates[i].speedMetersPerSecond - mPrevSetpointStates[i].speedMetersPerSecond);
-                Telemetry.log("Drive/Module/Feedforward/" + i + "/dir", directionOfVelChange);
-                if (mDriveState.equals(DriveState.AUTON)) {
-                    driveAmps = Math.abs(driveAmps) * Math.signum(directionOfVelChange);
-                }
-
-                double desiredAzimuthVelocityRadPS = mPreviousSetpoint.azimuthFeedforwards().azimuthSpeedRadiansPS()[i];
+                optimizedSetpointStates[i] = mModules[i].setDesiredStateWithAmpFF(setpointStates[i], driveAmps, desiredAzimuthVelocityRadPS);
 
                 Logger.recordOutput("Drive/DesiredAzimuthRotationSpeed"+mModules[i].getModuleName(), desiredAzimuthVelocityRadPS);
-
-                // Rotation2d deltaChange = mPrevPositions[i].angle.minus(getModulePositions()[i].angle);
-
-                // double deltaV = deltaChange.getRadians() * DriveConstants.kDriveMotorGearing * DriveConstants.kWheelCircumferenceMeters / 0.02;
-                // double desV = Math.abs(setpointStates[i].speedMetersPerSecond);
-                // double desDriveV = desV - deltaV;
-
-                // setpointStates[i] = new SwerveModuleState(desDriveV, setpointStates[i].angle);
-
-                mModules[i].setDesiredAzimuthVelocityRadPS(desiredAzimuthVelocityRadPS);
-
-                optimizedSetpointStates[i] = mModules[i].setDesiredStateWithAmpFF(setpointStates[i], driveAmps);
-
+                /* Normalized for logging */
                 moduleTorques[i] =
-                        new SwerveModuleState((driveAmps * kMaxLinearSpeedMPS / 80), optimizedSetpointStates[i].angle);
+                        new SwerveModuleState((driveAmps * kMaxLinearSpeedMPS / kDriveFOCAmpLimit), optimizedSetpointStates[i].angle);
             } else {
                 setpointStates[i] = new SwerveModuleState(
                         setpointStates[i].speedMetersPerSecond,
@@ -439,20 +421,36 @@ public class Drive extends SubsystemBase {
             SwerveModuleState unoptimizedState,
             SwerveModuleState optimizedState,
             int i) {
+        
+        double driveAmps = 0.0;
         switch (mDriveState) {
             case AUTON:
                 /* No need to optimize for Choreo, as it handles it under the hood */
-                return SwerveUtils.convertChoreoNewtonsToAmps(currentState, mPathPlanningFF, i);
-                // TODO: Fix this.
+                driveAmps = SwerveUtils.convertChoreoNewtonsToAmps(currentState, mPathPlanningFF, i);
+            // TODO: Fix this.
             case AUTO_ALIGN:
-                return SwerveUtils.optimizeTorque(
-                        unoptimizedState,
-                        optimizedState,
-                        setpoint.feedforwards().torqueCurrentsAmps()[i],
-                        i);
+                driveAmps =  SwerveUtils.optimizeTorque(
+                    unoptimizedState, optimizedState,
+                    setpoint.feedforwards().torqueCurrentsAmps()[i],
+                    i);
             default:
-                return 0.0;
+                driveAmps = SwerveUtils.optimizeTorque(
+                    unoptimizedState, optimizedState,
+                    setpoint.feedforwards().torqueCurrentsAmps()[i],
+                    i);
         }
+
+        double directionOfVelChange = Math.signum(
+            optimizedState.speedMetersPerSecond - mPrevSetpointStates[i].speedMetersPerSecond);
+        Telemetry.log("Drive/Module/Feedforward/" + i + "/dir", directionOfVelChange);
+        driveAmps = Math.abs(driveAmps) * Math.signum(directionOfVelChange);
+
+        if(!(mDriveState.equals(DriveState.AUTON) || mDriveState.equals(DriveState.AUTO_ALIGN))) {
+            driveAmps = SwerveUtils.lowPassFilter(mPrevDriveAmps[i], driveAmps, tDriveAggressiveness.get());
+        }
+
+        mPrevDriveAmps[i] = driveAmps;
+        return driveAmps;
     }
 
     ///////////////////////// STATE SETTING \\\\\\\\\\\\\\\\\\\\\\\\

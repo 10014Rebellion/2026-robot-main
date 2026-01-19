@@ -142,6 +142,18 @@ public class Module {
      * @param state the desired velocity and rotation of the module
      * @param ampFeedforward The amperage added to the PID from FF, also enables the PID
      */
+    public SwerveModuleState setDesiredStateWithAmpFF(SwerveModuleState pState, Double pAmpFeedforward, double pAzimuthSetpointAngularVelocityRadPS) {
+        setAmpFeedforward(pAmpFeedforward);
+        setDesiredVelocity(pState.speedMetersPerSecond);
+        setDesiredRotation(pState.angle);
+        setDesiredAzimuthVelocityRadPS(pAzimuthSetpointAngularVelocityRadPS);
+        return getDesiredState();
+    }
+
+    /* Sets the desired setpoint of the module with FF
+     * @param state the desired velocity and rotation of the module
+     * @param ampFeedforward The amperage added to the PID from FF, also enables the PID
+     */
     public SwerveModuleState setDesiredStateWithAmpFF(SwerveModuleState pState, Double pAmpFeedforward) {
         setAmpFeedforward(pAmpFeedforward);
         setDesiredVelocity(pState.speedMetersPerSecond);

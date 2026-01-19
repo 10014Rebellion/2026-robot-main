@@ -168,4 +168,63 @@ public class LineController {
         mSlope = pSlope;
         mInvertTeleop = pInvertTeleop;
     }
+
+        public void updateAlignmentControllers() {
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    tXController.setPID(tXP.get(), tXI.get(), tXD.get());
+                    tXController.setIntegratorRange(-tXIRange.get(), tXIRange.get());
+                    tXController.setIZone(tXIZone.get());
+                    tXController.setConstraints(new Constraints(tXMaxVMPS.get(), tXMaxAMPSS.get()));
+                },
+                tXP,
+                tXI,
+                tXD,
+                tXIRange,
+                tXIZone,
+                tXMaxVMPS,
+                tXMaxAMPSS);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    tXFeedforward = new SimpleMotorFeedforward(tXS.get(), tXV.get());
+                },
+                tXS,
+                tXV);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    tOmegaController.setPID(tOmegaP.get(), tOmegaI.get(), tOmegaD.get());
+                    tOmegaController.setIntegratorRange(-tOmegaIRange.get(), tOmegaIRange.get());
+                    tOmegaController.setIZone(tOmegaIZone.get());
+                    tOmegaController.setConstraints(new Constraints(tOmegaMaxVDPS.get(), tOmegaMaxADPSS.get()));
+                },
+                tOmegaP,
+                tOmegaI,
+                tOmegaD,
+                tOmegaIRange,
+                tOmegaIZone,
+                tOmegaMaxVDPS,
+                tOmegaMaxADPSS);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    tOmegaFeedforward = new SimpleMotorFeedforward(tOmegaS.get(), tOmegaV.get());
+                },
+                tOmegaS,
+                tOmegaV);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                () -> {
+                    tXController.setTolerance(tXToleranceMeters.get());
+                    tOmegaController.setTolerance(tOmegaToleranceDegrees.get());
+                },
+                tXToleranceMeters,
+                tOmegaToleranceDegrees);
+    }
 }
