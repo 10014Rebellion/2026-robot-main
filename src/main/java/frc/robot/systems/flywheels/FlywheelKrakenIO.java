@@ -18,7 +18,7 @@ import frc.robot.systems.drive.DriveConstants;
 import frc.robot.systems.drive.modules.ModuleIO.ModuleInputs;
 import frc.robot.systems.flywheels.FlywheelConstants.FlywheelHardwareConfiguration;
 
-public class KrakenIO implements FlywheelIO{
+public class FlywheelKrakenIO implements FlywheelIO{
     private final TalonFX mFlywheelLeftMotor;
     private StatusSignal<Voltage> mFlywheelLeftMotorVoltage;
     private StatusSignal<AngularVelocity> mFlywheelLeftMotorVelocity;
@@ -31,7 +31,7 @@ public class KrakenIO implements FlywheelIO{
     private final VelocityVoltage motorSetpointRequestLeft = new VelocityVoltage(0);
     private final VelocityVoltage motorSetpointRequestRight = new VelocityVoltage(0);
     
-    public KrakenIO(FlywheelHardwareConfiguration pFlywheelHardwareConfiguration){
+    public FlywheelKrakenIO(FlywheelHardwareConfiguration pFlywheelHardwareConfiguration){
 
         /*TODO: check if I need to add anything more for the configs! Also should I init the other logging inputs? What are the main things I need?*/
         
@@ -83,18 +83,18 @@ public class KrakenIO implements FlywheelIO{
 
     //TODO: see if I am doing this right
     @Override
-    public void setLeftFlywheelPID(AngularVelocity setpointRPS) {
+    public void setLeftFlywheelPID(double kP, double kI, double kD, double kV, double kA, AngularVelocity setpointRPS, double pFF) {
         var slotConfigLeft = new Slot0Configs();
-        slotConfigLeft.kP = FlywheelConstants.kP;
-        slotConfigLeft.kI = FlywheelConstants.kI;
-        slotConfigLeft.kD = FlywheelConstants.kD;
-        slotConfigLeft.kV = FlywheelConstants.kV;
-        slotConfigLeft.kA = FlywheelConstants.kA;
+        slotConfigLeft.kP = kP;
+        slotConfigLeft.kI = kI;
+        slotConfigLeft.kD = kD;
+        slotConfigLeft.kV = kV;
+        slotConfigLeft.kA = kA;
         mFlywheelLeftMotor.getConfigurator().apply(slotConfigLeft);
-        motorSetpointRequestLeft.withVelocity(setpointRPS);
+        double ff = pFF;
+        motorSetpointRequestLeft.withVelocity(setpointRPS).withFeedForward(ff);
 
         mFlywheelLeftMotor.setControl(motorSetpointRequestLeft);
-
     }
     
     @Override
@@ -104,16 +104,18 @@ public class KrakenIO implements FlywheelIO{
 
     //TODO: NOT SURE IF THIS METHOD WORKS RIGHT!!!
     @Override
-    public void setRightFlywheelPID(AngularVelocity setpointRPS) {
+    public void setRightFlywheelPID(double kP, double kI, double kD, double kV, double kA, AngularVelocity setpointRPS, double pFF) {
         var slotConfigRight = new Slot0Configs();
-        slotConfigRight.kP = FlywheelConstants.kP;
-        slotConfigRight.kI = FlywheelConstants.kI;
-        slotConfigRight.kD = FlywheelConstants.kD;
-        slotConfigRight.kV = FlywheelConstants.kV;
-        slotConfigRight.kA = FlywheelConstants.kA;
+        slotConfigRight.kP = kP;
+        slotConfigRight.kI = kI;
+        slotConfigRight.kD = kD;
+        slotConfigRight.kV = kV;
+        slotConfigRight.kA = kA;
         mFlywheelRightMotor.getConfigurator().apply(slotConfigRight);
 
-        motorSetpointRequestRight.withVelocity(setpointRPS);
+        double ff = pFF;
+
+        motorSetpointRequestRight.withVelocity(setpointRPS).withFeedForward(ff);
 
         mFlywheelLeftMotor.setControl(motorSetpointRequestRight);
     }

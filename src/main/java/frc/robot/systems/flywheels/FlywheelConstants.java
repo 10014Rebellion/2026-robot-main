@@ -5,6 +5,10 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 
@@ -22,11 +26,15 @@ public class FlywheelConstants {
     public static double kPeakVoltage = 12;
 
     //TODO: tune me!
-    public static double kP = 0.1;
+    public static double kP = 0.0;
     public static double kI = 0.0;
     public static double kD = 0.0;
-    public static double kV = 0.12;
+    public static double kVMax = 0.0;
+    public static double kAMax = 0.0;
+    public static double kS = 0.0;
+    public static double kV = 0.0;
     public static double kA = 0.0;
+    
     
 
     public enum FlywheelSetpoint {
@@ -51,6 +59,12 @@ public class FlywheelConstants {
         kInverted
     );
 
+    /*TODO: fix FF controller later*/
+    /*TODO: can the two motor share the same PID controller? */
+    public static FlywheelControlConfig LeftControlConfig = new FlywheelControlConfig(new ProfiledPIDController(kP, kI, kD, new Constraints(kVMax, kAMax)), new SimpleMotorFeedforward(kS, kV, kA));
+    public static FlywheelControlConfig RightControlConfig = new FlywheelControlConfig(new ProfiledPIDController(kP, kI, kD, new Constraints(kVMax, kAMax)), new SimpleMotorFeedforward(kS, kV, kA));
+
+
     public static FlywheelHardwareConfiguration RightMotorConfiguration = new FlywheelHardwareConfiguration(
         kRightFlywheelMotorID,
         kCanBus,
@@ -58,6 +72,8 @@ public class FlywheelConstants {
         kSecondaryCurrentLimit,  
         kInverted
     );
+
+
     
 
     //TODO: should I add more parameters? 
@@ -68,6 +84,10 @@ public class FlywheelConstants {
         double kSecondaryLimit,
         boolean kInverted
     ){}
+
+    public static record FlywheelControlConfig(
+        ProfiledPIDController motorController,
+        SimpleMotorFeedforward motorFF) {}
     
 
 }

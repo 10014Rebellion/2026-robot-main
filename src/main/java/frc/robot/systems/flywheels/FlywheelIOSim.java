@@ -8,7 +8,9 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import frc.robot.systems.flywheels.FlywheelConstants.FlywheelControlConfig;
 
+/*TODO: Fix SIM file I'm pretty sure the PID command isnt going to work*/
 public class FlywheelIOSim implements FlywheelIO{
     private DCMotorSim mFlywheelLeftMotor =
         new DCMotorSim(
@@ -24,9 +26,8 @@ public class FlywheelIOSim implements FlywheelIO{
         0.0,
         0.0);
 
-    private ProfiledPIDController mLeftController = new ProfiledPIDController(FlywheelConstants.kP, 0, 0, new Constraints(100, 100));
-    private ProfiledPIDController mRightController = new ProfiledPIDController(FlywheelConstants.kP, 0, 0, new Constraints(100, 100));
-
+    private ProfiledPIDController mLeftController = FlywheelConstants.LeftControlConfig.motorController();
+    private ProfiledPIDController mRightController = FlywheelConstants.RightControlConfig.motorController();
     private double mLeftMotorVolts = 0.0;
     private double mRightMotorVolts = 0.0;
 

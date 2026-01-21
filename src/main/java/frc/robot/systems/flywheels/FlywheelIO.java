@@ -38,10 +38,14 @@ public interface FlywheelIO {
 
     public default void setLeftFlywheelVolts(double volts) {}
 
-    public default void setLeftFlywheelPID(AngularVelocity setpointRPS) {}
+    public default void setLeftFlywheelPID(double kP, double kI, double kD, double kV, double kA, AngularVelocity setpointRPS, double pFF) {}
 
+    public default void setLeftFlywheelFF(double kS, double kV, double kA) {}
+    
     public default void setRightFlywheelVolts(double volts) {}
 
-    public default void setRightFlywheelPID(AngularVelocity setpointRPS) {}
+    public default void setRightFlywheelPID(double kP, double kI, double kD, double kV, double kA, AngularVelocity setpointRPS, double pFF) {}
+
+    public default void setRightFlywheelFF(double kS, double kV, double kA) {}
 
 }
