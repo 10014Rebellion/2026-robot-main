@@ -214,22 +214,6 @@ public class Drive extends SubsystemBase {
             kOdometryLock.unlock();
         }
 
-        /* VISION */
-        mVision.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
-        VisionObservation[] observations = mVision.getVisionObservations();
-        for (VisionObservation observation : observations) {
-            if (observation.hasObserved())
-                mPoseEstimator.addVisionMeasurement(observation.pose(), observation.timeStamp(), observation.stdDevs());
-
-            Telemetry.log(
-                    observation.camName() + "/stdDevX", observation.stdDevs().get(0));
-            Telemetry.log(
-                    observation.camName() + "/stdDevY", observation.stdDevs().get(1));
-            Telemetry.log(
-                    observation.camName() + "/stdDevTheta",
-                    observation.stdDevs().get(2));
-        }
-
         double[] sampleTimestamps =
             mModules[0].getOdometryTimeStamps(); // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
@@ -262,6 +246,23 @@ public class Drive extends SubsystemBase {
             }
 
             mPoseEstimator.updateWithTime(sampleTimestamps[i], mRobotRotation, modulePositions);
+        }
+        mOdometry.update(mRobotRotation, getModulePositions());
+
+        /* VISION */
+        mVision.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
+        VisionObservation[] observations = mVision.getVisionObservations();
+        for (VisionObservation observation : observations) {
+            if (observation.hasObserved())
+                mPoseEstimator.addVisionMeasurement(observation.pose(), observation.timeStamp(), observation.stdDevs());
+
+            Telemetry.log(
+                    observation.camName() + "/stdDevX", observation.stdDevs().get(0));
+            Telemetry.log(
+                    observation.camName() + "/stdDevY", observation.stdDevs().get(1));
+            Telemetry.log(
+                    observation.camName() + "/stdDevTheta",
+                    observation.stdDevs().get(2));
         }
 
         mField.setRobotPose(getPoseEstimate());
