@@ -68,7 +68,7 @@ public class DriveCharacterizationCommands {
 
     public Command characterizeAzimuths(int pModNumber, DoubleSupplier voltage, Drive pDrive) {
         return new FunctionalCommand(
-            () -> pDrive.setToSysIDCharacterization(), 
+            () -> pDrive.setToSysIDCharacterization().initialize(), 
             () -> {
                 pDrive.getModules()[pModNumber].setDesiredRotation(null);
                 pDrive.getModules()[pModNumber].setDesiredVelocity(0.0);
