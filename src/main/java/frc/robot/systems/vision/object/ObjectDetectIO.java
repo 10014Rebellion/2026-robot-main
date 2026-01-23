@@ -1,4 +1,4 @@
-package frc.robot.systems.object;
+package frc.robot.systems.vision.object;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -25,6 +25,6 @@ public interface ObjectDetectIO {
         public double[][] iTrackedTargetsCornersY = new double[][] {};
     }
 
-    public default void updateInputs(ObjectDetectIOInputs inputs, Pose2d latestPose) {}
+    public default void updateInputs(ObjectDetectIOInputs inputs, Pose2d pLastRobotPose, Pose2d pSimOdomPose) {}
     
 }

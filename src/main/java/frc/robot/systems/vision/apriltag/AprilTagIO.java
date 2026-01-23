@@ -1,6 +1,6 @@
 // REBELLION 10014
 
-package frc.robot.systems.apriltag;
+package frc.robot.systems.vision.apriltag;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;

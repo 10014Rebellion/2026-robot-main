@@ -1,6 +1,6 @@
 // REBELLION 10014
 
-package frc.robot.systems.apriltag;
+package frc.robot.systems.vision.apriltag;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -32,7 +32,7 @@ public class AprilTagConstants {
 
     // Best to get these from CAD, or in person.
     public static final String kLeftCamName = "FrontLeft-OV9281"; // >>> TODO: TUNE ME
-    public static final Orientation kLeftCamOrientation = Orientation.BACK; // >>> TODO: TUNE ME
+    public static final AprilTagOrientation kLeftCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
     public static final Transform3d kLeftCamTransform = new Transform3d(
             new Translation3d(
                     Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
@@ -46,7 +46,7 @@ public class AprilTagConstants {
                     ));
 
     public static final String kRightCamName = "FrontRight-OV9281"; // >>> TODO: TUNE ME
-    public static final Orientation kRightCamOrientation = Orientation.BACK; // >>> TODO: TUNE ME
+    public static final AprilTagOrientation kRightCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
     public static final Transform3d kRightCamTransform = new Transform3d(
             new Translation3d(
                     Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
@@ -91,7 +91,7 @@ public class AprilTagConstants {
 
     public static final double kAmbiguityThreshold = (RobotBase.isReal()) ? 0.2 : 1.0;
 
-    public static enum Orientation {
+    public static enum AprilTagOrientation {
         BACK,
         FRONT
     }

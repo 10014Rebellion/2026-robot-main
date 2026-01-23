@@ -1,6 +1,6 @@
 // REBELLION 10014
 
-package frc.robot.systems.apriltag;
+package frc.robot.systems.vision.apriltag;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -13,11 +13,12 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.lib.telemetry.Telemetry;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.game.FieldConstants;
+import frc.robot.systems.vision.apriltag.AprilTagIOInputsAutoLogged;
 
-import static frc.robot.systems.apriltag.AprilTagConstants.KUseSingleTagTransform;
-import static frc.robot.systems.apriltag.AprilTagConstants.kAmbiguityThreshold;
-import static frc.robot.systems.apriltag.AprilTagConstants.kMultiStdDevs;
-import static frc.robot.systems.apriltag.AprilTagConstants.kSingleStdDevs;
+import static frc.robot.systems.vision.apriltag.AprilTagConstants.KUseSingleTagTransform;
+import static frc.robot.systems.vision.apriltag.AprilTagConstants.kAmbiguityThreshold;
+import static frc.robot.systems.vision.apriltag.AprilTagConstants.kMultiStdDevs;
+import static frc.robot.systems.vision.apriltag.AprilTagConstants.kSingleStdDevs;
 
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
@@ -45,7 +46,7 @@ public class AprilTag {
     public void periodic(Pose2d pLastRobotPose, Pose2d pSimOdomPose) {
         for (int i = 0; i < mCameras.length; i++) {
             mCameras[i].updateInputs(mCamerasData[i], pLastRobotPose, pSimOdomPose);
-            Logger.processInputs("Vision/" + mCamerasData[i].iCamName, mCamerasData[i]);
+            Logger.processInputs("Vision/AprilTag/" + mCamerasData[i].iCamName, mCamerasData[i]);
         }
     }
 

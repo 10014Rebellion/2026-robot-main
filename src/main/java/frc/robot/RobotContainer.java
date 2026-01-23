@@ -8,11 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.bindings.BindingsConstants;
 import frc.robot.bindings.ButtonBindings;
 import frc.robot.game.StateTracker;
-import frc.robot.systems.apriltag.AprilTag;
-import frc.robot.systems.apriltag.AprilTagConstants.Orientation;
-import frc.robot.systems.apriltag.AprilTagIO;
-import frc.robot.systems.apriltag.AprilTagIOPVTag;
-import frc.robot.systems.apriltag.AprilTagConstants;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
 import frc.robot.systems.drive.gyro.GyroIO;
@@ -21,6 +16,15 @@ import frc.robot.systems.drive.modules.Module;
 import frc.robot.systems.drive.modules.ModuleIO;
 import frc.robot.systems.drive.modules.ModuleIOKraken;
 import frc.robot.systems.drive.modules.ModuleIOSim;
+import frc.robot.systems.vision.apriltag.AprilTag;
+import frc.robot.systems.vision.apriltag.AprilTagConstants;
+import frc.robot.systems.vision.apriltag.AprilTagIO;
+import frc.robot.systems.vision.apriltag.AprilTagIOPVTag;
+import frc.robot.systems.vision.object.ObjectDetect;
+import frc.robot.systems.vision.object.ObjectDetectConstants;
+import frc.robot.systems.vision.object.ObjectDetectIO;
+import frc.robot.systems.vision.object.ObjectDetectIOPV;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -45,11 +49,21 @@ public class RobotContainer {
                             new AprilTagIOPVTag(
                                     AprilTagConstants.kRightCamName,
                                     AprilTagConstants.kRightCamTransform,
-                                    Orientation.BACK),
+                                    AprilTagConstants.kRightCamOrientation),
                             new AprilTagIOPVTag(
                                     AprilTagConstants.kLeftCamName, 
                                     AprilTagConstants.kLeftCamTransform, 
-                                    Orientation.BACK)
+                                    AprilTagConstants.kLeftCamOrientation)
+                        }),
+                        new ObjectDetect(new ObjectDetectIO[] {
+                            new ObjectDetectIOPV(
+                                    ObjectDetectConstants.kFrontRightCamName,
+                                    ObjectDetectConstants.kFrontRightCamTransform,
+                                    ObjectDetectConstants.kFrontRightCamOrientation),
+                            new ObjectDetectIOPV(
+                                    ObjectDetectConstants.kFrontLeftCamName, 
+                                    ObjectDetectConstants.kFrontLeftCamTransform, 
+                                    ObjectDetectConstants.kFrontLeftCamOrientation)
                         }));
                 break;
 
@@ -66,9 +80,21 @@ public class RobotContainer {
                             new AprilTagIOPVTag(
                                     AprilTagConstants.kRightCamName,
                                     AprilTagConstants.kRightCamTransform,
-                                    Orientation.BACK),
+                                    AprilTagConstants.kRightCamOrientation),
                             new AprilTagIOPVTag(
-                                    AprilTagConstants.kLeftCamName, AprilTagConstants.kLeftCamTransform, Orientation.BACK)
+                                    AprilTagConstants.kLeftCamName, 
+                                    AprilTagConstants.kLeftCamTransform, 
+                                    AprilTagConstants.kLeftCamOrientation)
+                        }),
+                        new ObjectDetect(new ObjectDetectIO[] {
+                            new ObjectDetectIOPV(
+                                    ObjectDetectConstants.kFrontRightCamName,
+                                    ObjectDetectConstants.kFrontRightCamTransform,
+                                    ObjectDetectConstants.kFrontRightCamOrientation),
+                            new ObjectDetectIOPV(
+                                    ObjectDetectConstants.kFrontLeftCamName, 
+                                    ObjectDetectConstants.kFrontLeftCamTransform, 
+                                    ObjectDetectConstants.kFrontLeftCamOrientation)
                         }));
                 break;
 
@@ -81,7 +107,8 @@ public class RobotContainer {
                             new Module("BR", new ModuleIO() {})
                         },
                         new GyroIO() {},
-                        new AprilTag(new AprilTagIO[] {new AprilTagIO() {}, new AprilTagIO() {}}));
+                        new AprilTag(new AprilTagIO[] {new AprilTagIO() {}, new AprilTagIO() {}}),
+                        new ObjectDetect(new ObjectDetectIO[] {new ObjectDetectIO() {}, new ObjectDetectIO() {}}));
                 break;
         }
 

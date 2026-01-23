@@ -1,6 +1,6 @@
 // REBELLION 10014
 
-package frc.robot.systems.object;
+package frc.robot.systems.vision.object;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -26,7 +26,7 @@ public class ObjectDetectConstants {
 
     // Best to get these from CAD, or in person.
     public static final String kFrontLeftCamName = "FrontLeft"; // >>> TODO: TUNE ME
-    public static final Orientation kFrontLeftCamOrientation = Orientation.FRONT; // >>> TODO: TUNE ME
+    public static final ObjectOrientation kFrontLeftCamOrientation = ObjectOrientation.FRONT; // >>> TODO: TUNE ME
     public static final Transform3d kFrontLeftCamTransform = new Transform3d(
             new Translation3d(
                     Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
@@ -40,7 +40,7 @@ public class ObjectDetectConstants {
                     ));
 
     public static final String kFrontRightCamName = "FrontRight"; // >>> TODO: TUNE ME
-    public static final Orientation kFrontRightCamOrientation = Orientation.FRONT; // >>> TODO: TUNE ME
+    public static final ObjectOrientation kFrontRightCamOrientation = ObjectOrientation.FRONT; // >>> TODO: TUNE ME
     public static final Transform3d kFrontRightCamTransform = new Transform3d(
             new Translation3d(
                     Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
@@ -71,7 +71,7 @@ public class ObjectDetectConstants {
         }
     }
 
-    public static enum Orientation {
+    public static enum ObjectOrientation {
         BACK,
         FRONT
     }
@@ -85,6 +85,9 @@ public class ObjectDetectConstants {
     public static double kPixelToRad = 2.0;
     public static double kTranslationToleranceMeters = kDiameterFuelMeters / 2.0;
     public static double kRotationalToleranceDegrees = 3.0;
+
+    public static int kMinFuelClusterSize = 4;
+    public static double kMaxRadiusForCluster = kDiameterFuelMeters / 2.0;
 
     public static double kDensityHeuristic = 1;
     public static double kDistanceHeuristic = 1;

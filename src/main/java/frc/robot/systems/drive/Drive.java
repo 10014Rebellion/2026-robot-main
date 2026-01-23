@@ -48,8 +48,6 @@ import frc.robot.game.FieldConstants;
 import frc.robot.game.GameDriveManager;
 import frc.robot.game.GameDriveManager.GameDriveStates;
 import frc.robot.game.GameGoalPoseChooser;
-import frc.robot.systems.apriltag.AprilTag;
-import frc.robot.systems.apriltag.AprilTag.VisionObservation;
 import frc.robot.systems.drive.controllers.HeadingController;
 import frc.robot.systems.drive.controllers.HolonomicController;
 import frc.robot.systems.drive.controllers.HolonomicController.ConstraintType;
@@ -58,6 +56,10 @@ import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles
 import frc.robot.systems.drive.gyro.GyroIO;
 import frc.robot.systems.drive.gyro.GyroInputsAutoLogged;
 import frc.robot.systems.drive.modules.Module;
+import frc.robot.systems.vision.apriltag.AprilTag;
+import frc.robot.systems.vision.apriltag.AprilTag.VisionObservation;
+import frc.robot.systems.vision.object.ObjectDetect;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -87,6 +89,7 @@ public class Drive extends SubsystemBase {
     private final GyroIO mGyro;
     private final GyroInputsAutoLogged mGyroInputs = new GyroInputsAutoLogged();
     private final AprilTag mAprilTag;
+    private final ObjectDetect mObjectDetection;
 
     private Rotation2d mRobotRotation;
     private final SwerveDriveOdometry mOdometry;
@@ -135,10 +138,11 @@ public class Drive extends SubsystemBase {
     private final Debouncer mAutoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
     
 
-    public Drive(Module[] modules, GyroIO gyro, AprilTag vision) {
+    public Drive(Module[] modules, GyroIO gyro, AprilTag aprilTag, ObjectDetect object) {
         this.mModules = modules;
         this.mGyro = gyro;
-        this.mAprilTag = vision;
+        this.mAprilTag = aprilTag;
+        this.mObjectDetection = object;
 
         mRobotRotation = mGyroInputs.iYawPosition;
 
@@ -228,6 +232,9 @@ public class Drive extends SubsystemBase {
                     observation.camName() + "/stdDevTheta",
                     observation.stdDevs().get(2));
         }
+
+        /*OBJECT DETECTION VISION */
+        mObjectDetection.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
 
         for(int i = 0; i < mModules.length; i++) {
             Rotation2d deltaChange = mPrevPositions[i].angle.minus(getModulePositions()[i].angle);

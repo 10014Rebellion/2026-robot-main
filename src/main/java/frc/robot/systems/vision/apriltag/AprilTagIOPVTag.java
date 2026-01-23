@@ -1,6 +1,6 @@
 // REBELLION 10014
 
-package frc.robot.systems.apriltag;
+package frc.robot.systems.vision.apriltag;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.game.FieldConstants;
-import frc.robot.systems.apriltag.AprilTagConstants.CameraSimConfigs;
-import frc.robot.systems.apriltag.AprilTagConstants.Orientation;
+import frc.robot.systems.vision.apriltag.AprilTagConstants.AprilTagOrientation;
+import frc.robot.systems.vision.apriltag.AprilTagConstants.CameraSimConfigs;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +32,12 @@ public class AprilTagIOPVTag implements AprilTagIO {
     private PhotonCamera mPhotonCam;
     private PhotonPoseEstimator mPoseEstimator;
     private Transform3d mCameraTransform;
-    private final Orientation mOrientation;
+    private final AprilTagOrientation mOrientation;
 
     private VisionSystemSim mVisionSim;
     private PhotonCameraSim mCameraSim;
 
-    public AprilTagIOPVTag(String pName, Transform3d pCameraTransform, Orientation pOrientation) {
+    public AprilTagIOPVTag(String pName, Transform3d pCameraTransform, AprilTagOrientation pOrientation) {
         this.mCamName = pName;
         this.mPhotonCam = new PhotonCamera(mCamName);
         this.mCameraTransform = pCameraTransform;
@@ -113,7 +113,7 @@ public class AprilTagIOPVTag implements AprilTagIO {
             pInputs.iLatestTimestamp = latestValidResult.getTimestampSeconds();
 
             latestEstimatedRobotPose.ifPresent(est -> {
-                if (mOrientation == Orientation.BACK)
+                if (mOrientation == AprilTagOrientation.BACK)
                     pInputs.iLatestEstimatedRobotPose = est.estimatedPose.transformBy(
                             new Transform3d(new Translation3d(), new Rotation3d(0.0, 0.0, Math.PI)));
                 else pInputs.iLatestEstimatedRobotPose = est.estimatedPose;

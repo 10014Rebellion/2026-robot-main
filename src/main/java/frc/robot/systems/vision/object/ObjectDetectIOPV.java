@@ -1,4 +1,7 @@
-package frc.robot.systems.object;
+package frc.robot.systems.vision.object;
+
+import static frc.robot.systems.vision.object.ObjectDetectConstants.kDiameterFuelMeters;
+import static frc.robot.systems.vision.object.ObjectDetectConstants.kPixelToRad;
 
 import java.util.List;
 
@@ -14,25 +17,23 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.game.FieldConstants;
-import frc.robot.systems.apriltag.AprilTagConstants.CameraSimConfigs;
-import frc.robot.systems.object.ObjectDetectConstants.Orientation;
-
-import static frc.robot.systems.object.ObjectDetectConstants.kDiameterFuelMeters;
-import static frc.robot.systems.object.ObjectDetectConstants.kPixelToRad;
+import frc.robot.systems.vision.apriltag.AprilTagConstants.CameraSimConfigs;
+import frc.robot.systems.vision.object.ObjectDetectConstants.ObjectOrientation;
 
 public class ObjectDetectIOPV implements ObjectDetectIO{
     private String mCamName;
     private PhotonCamera mPhotonCam;
     private Transform3d mCameraTransform;
-    private Orientation mOrientation;
+    private ObjectOrientation mOrientation;
 
     private VisionSystemSim mVisionSim;
     private PhotonCameraSim mCameraSim;
     
-    public ObjectDetectIOPV(String pName, Transform3d pCameraTransform, Orientation pOrientation){
+    public ObjectDetectIOPV(String pName, Transform3d pCameraTransform, ObjectOrientation pOrientation){
         this.mCamName = pName;
         this.mPhotonCam = new PhotonCamera(mCamName);
         this.mCameraTransform = pCameraTransform;
@@ -62,17 +63,26 @@ public class ObjectDetectIOPV implements ObjectDetectIO{
     }
 
     @Override
-    public void updateInputs(ObjectDetectIOInputs pInputs, Pose2d pLastRobotPose){
+    public void updateInputs(ObjectDetectIOInputs pInputs, Pose2d pLastRobotPose, Pose2d pSimOdomPose){
         pInputs.iCamName = mCamName;
         pInputs.iCameraToRobot = mCameraTransform;
 
         try {
+
+            if (Constants.kCurrentMode == Mode.SIM){
+                mVisionSim.update(pSimOdomPose);
+            }
+            
             List<PhotonPipelineResult> results = mPhotonCam.getAllUnreadResults();
             PhotonPipelineResult latestResult = results.get(results.size() - 1);
-
+            
             pInputs.iIsConnected = mPhotonCam.isConnected();
             pInputs.iHasBeenUpdated = results.size() != 0;
-
+            
+            if(!(pInputs.iIsConnected && pInputs.iHasBeenUpdated)){
+                DriverStation.reportError(mCamName + ": will not update or is not connected!!!", true);
+            }
+            
             if(latestResult.hasTargets()){
                 pInputs.iHasTarget = true;
                 pInputs.iLatencySeconds = latestResult.metadata.getLatencyMillis() / 1000.0;
@@ -84,8 +94,8 @@ public class ObjectDetectIOPV implements ObjectDetectIO{
                 double[] yaws = new double[latestResult.targets.size()];
                 double[] skews = new double[latestResult.targets.size()];
                 Pose2d[] poses = new Pose2d[latestResult.targets.size()];
-                double[][] cornersX = new double[4][latestResult.targets.size()];
-                double[][] cornersY = new double[4][latestResult.targets.size()];
+                double[][] cornersX = new double[latestResult.targets.size()][4];
+                double[][] cornersY = new double[latestResult.targets.size()][4];
 
                 for (int i = 0; i < latestResult.targets.size(); i++){
                     classes[i] = mapObjectID(latestResult.targets.get(i).objDetectId); 
@@ -95,8 +105,8 @@ public class ObjectDetectIOPV implements ObjectDetectIO{
                     skews[i] = latestResult.targets.get(i).skew; 
 
                     for(int j = 0; j < 4; j++){
-                        cornersX[j][i] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).x;
-                        cornersY[j][i] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).y;
+                        cornersX[i][j] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).x;
+                        cornersY[i][j] = latestResult.targets.get(i).getMinAreaRectCorners().get(j).y;
                     }
 
                     poses[i] = computePose(cornersX[i], cornersY[i], kPixelToRad, pLastRobotPose);
@@ -158,7 +168,7 @@ public class ObjectDetectIOPV implements ObjectDetectIO{
             ), 
             new Rotation3d());
 
-        if (mOrientation.equals(Orientation.BACK)){
+        if (mOrientation.equals(ObjectOrientation.BACK)){
             pose = pose.transformBy(
                 new Transform3d(
                     new Translation3d(), 
