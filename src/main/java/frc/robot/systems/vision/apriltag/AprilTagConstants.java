@@ -31,9 +31,9 @@ public class AprilTagConstants {
             3.5; // >>> TODO: Maybe? TUNE ME, you probably wont have to but yk just in case
 
     // Best to get these from CAD, or in person.
-    public static final String kLeftCamName = "FrontLeft-OV9281"; // >>> TODO: TUNE ME
-    public static final AprilTagOrientation kLeftCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
-    public static final Transform3d kLeftCamTransform = new Transform3d(
+    public static final String kFrontLeftCamName = "FrontLeft-OV9281"; // >>> TODO: TUNE ME
+    public static final AprilTagOrientation kFrontLeftCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
+    public static final Transform3d kFrontLeftCamTransform = new Transform3d(
             new Translation3d(
                     Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
                     Units.inchesToMeters(0.0), // Y: inches left // >>> TODO: TUNE ME
@@ -45,9 +45,37 @@ public class AprilTagConstants {
                     Units.degreesToRadians(0.0) // Yaw: (angled inward/outward) // >>> TODO: TUNE ME
                     ));
 
-    public static final String kRightCamName = "FrontRight-OV9281"; // >>> TODO: TUNE ME
-    public static final AprilTagOrientation kRightCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
-    public static final Transform3d kRightCamTransform = new Transform3d(
+    public static final String kFrontRightCamName = "FrontRight-OV9281"; // >>> TODO: TUNE ME
+    public static final AprilTagOrientation kFrontRightCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
+    public static final Transform3d kFrontRightCamTransform = new Transform3d(
+            new Translation3d(
+                    Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
+                    Units.inchesToMeters(0.0), // Y: inches right // >>> TODO: TUNE ME
+                    Units.inchesToMeters(0.0) // Z: inches above ground // >>> TODO: TUNE ME
+                    ),
+            new Rotation3d(
+                    Units.degreesToRadians(0.0), // Roll: No side tilt // >>> TODO: TUNE ME
+                    Units.degreesToRadians(0.0), // Pitch: No upward tilt // >>> TODO: TUNE ME
+                    Units.degreesToRadians(0.0) // Yaw: (angled inward/outward) // >>> TODO: TUNE ME
+                    ));
+
+    public static final String kBackLeftCamName = "BackLeft-OV9281"; // >>> TODO: TUNE ME
+    public static final AprilTagOrientation kBackLeftCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
+    public static final Transform3d kBackLeftCamTransform = new Transform3d(
+            new Translation3d(
+                    Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
+                    Units.inchesToMeters(0.0), // Y: inches left // >>> TODO: TUNE ME
+                    Units.inchesToMeters(0.0) // Z: inches above ground // >>> TODO: TUNE ME
+                    ),
+            new Rotation3d(
+                    Units.degreesToRadians(0.0), // Roll: side tilt // >>> TODO: TUNE ME
+                    Units.degreesToRadians(0.0), // Pitch: upward tilt // >>> TODO: TUNE ME
+                    Units.degreesToRadians(0.0) // Yaw: (angled inward/outward) // >>> TODO: TUNE ME
+                    ));
+
+    public static final String kBackRightCamName = "BackRight-OV9281"; // >>> TODO: TUNE ME
+    public static final AprilTagOrientation kBackRightCamOrientation = AprilTagOrientation.FRONT; // >>> TODO: TUNE ME
+    public static final Transform3d kBackRightCamTransform = new Transform3d(
             new Translation3d(
                     Units.inchesToMeters(0.0), // X: inches forward // >>> TODO: TUNE ME
                     Units.inchesToMeters(0.0), // Y: inches right // >>> TODO: TUNE ME
