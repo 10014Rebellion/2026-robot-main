@@ -8,13 +8,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.controllers.FlydigiApex4;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.drive.controllers.HolonomicController.ConstraintType;
+import frc.robot.systems.flywheels.Flywheel;
 
 public class ButtonBindings {
     private final Drive mDriveSS;
+    private final Flywheel mFlywheel;
     private final FlydigiApex4 mDriverController = new FlydigiApex4(BindingsConstants.kDriverControllerPort);
 
-    public ButtonBindings(Drive pDriveSS) {
+    public ButtonBindings(Drive pDriveSS, Flywheel pFlywheel) {
         this.mDriveSS = pDriveSS;
+        this.mFlywheel = pFlywheel;
         this.mDriveSS.setDefaultCommand(mDriveSS.setToTeleop());
     }
 
@@ -36,5 +39,10 @@ public class ButtonBindings {
         mDriverController.x()
             .onTrue(mDriveSS.characterizeAzimuths(0))
             .onFalse(mDriveSS.setToTeleop());
+        
+        mDriverController.rightBumper()
+            .whileTrue(mFlywheel.shootCmd());
+
+        
     }
 }

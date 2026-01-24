@@ -40,6 +40,7 @@ public class FlywheelConstants {
 
         public final AngularVelocity target;
 
+
         private FlywheelSetpoint(AngularVelocity pTarget){
             target = pTarget;
         }

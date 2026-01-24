@@ -16,6 +16,11 @@ import frc.robot.systems.drive.modules.Module;
 import frc.robot.systems.drive.modules.ModuleIO;
 import frc.robot.systems.drive.modules.ModuleIOKraken;
 import frc.robot.systems.drive.modules.ModuleIOSim;
+import frc.robot.systems.flywheels.Flywheel;
+import frc.robot.systems.flywheels.FlywheelConstants;
+import frc.robot.systems.flywheels.FlywheelIO;
+import frc.robot.systems.flywheels.FlywheelIOSim;
+import frc.robot.systems.flywheels.FlywheelKrakenIO;
 import frc.robot.systems.vision.CameraIO;
 import frc.robot.systems.vision.CameraIOPVTag;
 import frc.robot.systems.vision.Vision;
@@ -25,6 +30,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
     private final Drive mDrive;
+    private final Flywheel mFlywheel;
     private final LoggedDashboardChooser<Command> mDriverProfileChooser = new LoggedDashboardChooser<>("DriverProfile");
     private final ButtonBindings mButtonBindings;
 
@@ -33,6 +39,8 @@ public class RobotContainer {
 
         switch (Constants.kCurrentMode) {
             case REAL:
+                mFlywheel = new Flywheel(new FlywheelKrakenIO(FlywheelConstants.LeftMotorConfiguration, FlywheelConstants.RightMotorConfiguration));
+
                 mDrive = new Drive(
                         new Module[] {
                             new Module("FL", new ModuleIOKraken(kFrontLeftHardware)),
@@ -52,6 +60,7 @@ public class RobotContainer {
                 break;
 
             case SIM:
+                mFlywheel = new Flywheel(new FlywheelIOSim());
                 mDrive = new Drive(
                         new Module[] {
                             new Module("FL", new ModuleIOSim()),
@@ -71,6 +80,8 @@ public class RobotContainer {
                 break;
 
             default:
+                mFlywheel = new Flywheel(new FlywheelIO() {});
+
                 mDrive = new Drive(
                         new Module[] {
                             new Module("FL", new ModuleIO() {}),
@@ -83,7 +94,7 @@ public class RobotContainer {
                 break;
         }
 
-        mButtonBindings = new ButtonBindings(mDrive);
+        mButtonBindings = new ButtonBindings(mDrive, mFlywheel);
 
         initBindings();
 

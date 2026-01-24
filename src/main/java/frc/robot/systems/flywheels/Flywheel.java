@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.systems.flywheels.FlywheelConstants.FlywheelSetpoint;
 
-public class FlywheelSubsystem extends SubsystemBase{
+public class Flywheel extends SubsystemBase{
 
     /* LEFT MOTOR LOGGING */
         /*ProfiledPIDController logging */
@@ -44,9 +44,7 @@ public class FlywheelSubsystem extends SubsystemBase{
     private SimpleMotorFeedforward mLeftFF = FlywheelConstants.LeftControlConfig.motorFF();
     private SimpleMotorFeedforward mRightFF = FlywheelConstants.RightControlConfig.motorFF();
     
-
-
-    public FlywheelSubsystem(FlywheelIO pIo) {
+    public Flywheel(FlywheelIO pIo) {
         this.io = pIo;
     }
 
@@ -57,10 +55,12 @@ public class FlywheelSubsystem extends SubsystemBase{
          LoggedTunableNumber.ifChanged(
                 hashCode(),
                 () -> {
-                    io.setLeftFlywheelPID(leftFlywheelMotorP.get(), 0.0, leftFlywheelMotorD.get(), leftFlywheelMotorVMax.get(), leftFlywheelMotorAMax.get(), FlywheelSetpoint.Outtake.getRPS(), (mLeftFF.calculate(FlywheelConstants.LeftControlConfig.motorController().getSetpoint().velocity)));
+                    io.setLeftFlywheelPID(leftFlywheelMotorP.get(), 0.0, leftFlywheelMotorD.get(), leftFlywheelMotorVMax.get(), leftFlywheelMotorAMax.get());
                 },
                 leftFlywheelMotorP,
-                leftFlywheelMotorD
+                leftFlywheelMotorD,
+                leftFlywheelMotorVMax,
+                leftFlywheelMotorAMax
             );
 
         LoggedTunableNumber.ifChanged(
@@ -76,10 +76,12 @@ public class FlywheelSubsystem extends SubsystemBase{
         LoggedTunableNumber.ifChanged(
             hashCode(),
             () -> {
-                io.setRightFlywheelPID(rightFlywheelMotorP.get(), 0.0, rightFlywheelMotorD.get(), rightFlywheelMotorVMax.get(), rightFlywheelMotorAMax.get(), FlywheelSetpoint.Outtake.getRPS(), (mRightFF.calculate(FlywheelConstants.RightControlConfig.motorController().getSetpoint().velocity)));
+                io.setRightFlywheelPID(rightFlywheelMotorP.get(), 0.0, rightFlywheelMotorD.get(), rightFlywheelMotorVMax.get(), rightFlywheelMotorAMax.get());
             },
             rightFlywheelMotorP,
-            rightFlywheelMotorD
+            rightFlywheelMotorD,
+            rightFlywheelMotorVMax,
+            rightFlywheelMotorAMax
         );
 
         LoggedTunableNumber.ifChanged(
@@ -91,50 +93,68 @@ public class FlywheelSubsystem extends SubsystemBase{
             rightFlywheelMotorV,
             rightFlywheelMotorA
         );
-
-
     }
 
     public void setLeftFlyWheelVolts(double pVolts){
         io.setLeftFlywheelVolts(pVolts);
     }
 
-    public void setLeftPID(double kP, double kI, double kD, double kV, double kA, AngularVelocity setpointRPS){
-        io.setLeftFlywheelPID(kP, kI, kD, kV, kA, setpointRPS, (mLeftFF.calculate(FlywheelConstants.LeftControlConfig.motorController().getSetpoint().velocity)));
+    public void setLeftPID(double kP, double kI, double kD, double kV, double kA){
+        io.setLeftFlywheelPID(kP, kI, kD, kV, kA);
     }
 
-    public void setLeftFF(double kS, double kV, double kA){
-        io.setLeftFlywheelFF(kS, kV, kA);
+    public void setLeftVelocity(AngularVelocity setpointRPS, double ff){
+        io.setLeftFlywheelVelocity(setpointRPS, ff);
     }
     
     public void setRightFlyWheelVolts(double pVolts){
         io.setRightFlywheelVolts(pVolts);
     }
 
-    public void setRightPID(double kP, double kI, double kD, double kV, double kA, AngularVelocity setpointRPS){
-        io.setRightFlywheelPID(kP, kI, kD, kV, kA, setpointRPS, (mLeftFF.calculate(FlywheelConstants.LeftControlConfig.motorController().getSetpoint().velocity)));
+    public void setRightPID(double kP, double kI, double kD, double kV, double kA){
+        io.setRightFlywheelPID(kP, kI, kD, kV, kA);
     }
 
-    public void setRightFF(double kS, double kV, double kA){
-        io.setRightFlywheelFF(kS, kV, kA);
+    public void setRightVelocity(AngularVelocity setpointRPS, double ff){
+        io.setRightFlywheelVelocity(setpointRPS, ff);
     }
 
-    /*TEMPORARY SHOOTER METHOD!! */
-    //TODO: Should I just run this in periodic the entire time? That way I don't need to call it in a button binding?
     public Command shootCmd() {
         return new FunctionalCommand(
             () -> {
-                /*setLeftFlyWheelVolts*/
-                setLeftPID(leftFlywheelMotorP.get(), leftFlywheelMotorI.get(), leftFlywheelMotorD.get(), leftFlywheelMotorVMax.get(), leftFlywheelMotorAMax.get(), FlywheelSetpoint.Outtake.getRPS());
-                // setRightFlyWheelVolts(-12);
-                setRightPID(rightFlywheelMotorP.get(), rightFlywheelMotorI.get(), rightFlywheelMotorD.get(), rightFlywheelMotorVMax.get(), rightFlywheelMotorAMax.get(), FlywheelSetpoint.Outtake.getRPS());
+                setLeftPID(
+                    leftFlywheelMotorP.get(),
+                    leftFlywheelMotorI.get(),
+                    leftFlywheelMotorD.get(),
+                    leftFlywheelMotorVMax.get(),
+                    leftFlywheelMotorAMax.get());
+
+                setLeftVelocity(
+                    FlywheelConstants.FlywheelSetpoint.Outtake.getRPS(),
+                    mLeftFF.calculate(FlywheelConstants.LeftControlConfig.motorController().getSetpoint().velocity));
+   
+
+                setRightPID(
+                    rightFlywheelMotorP.get(), 
+                    rightFlywheelMotorI.get(), 
+                    rightFlywheelMotorD.get(), 
+                    rightFlywheelMotorVMax.get(), 
+                    rightFlywheelMotorAMax.get());
+
+                setRightVelocity(
+                    FlywheelConstants.FlywheelSetpoint.Outtake.getRPS(), 
+                    mRightFF.calculate(FlywheelConstants.RightControlConfig.motorController().getSetpoint().velocity));
             },
+
             () -> {},
+
             (interrupted) -> {
                 setLeftFlyWheelVolts(0);
                 setRightFlyWheelVolts(0);
             },
+
             () -> false,
+            
             this);
     }
 }

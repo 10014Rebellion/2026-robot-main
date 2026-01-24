@@ -1,13 +1,20 @@
 package frc.robot.systems.flywheels;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.ctre.phoenix6.configs.Slot0Configs;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.systems.flywheels.FlywheelConstants.FlywheelControlConfig;
 
 /*TODO: Fix SIM file I'm pretty sure the PID command isnt going to work*/
@@ -28,32 +35,51 @@ public class FlywheelIOSim implements FlywheelIO{
 
     private ProfiledPIDController mLeftController = FlywheelConstants.LeftControlConfig.motorController();
     private ProfiledPIDController mRightController = FlywheelConstants.RightControlConfig.motorController();
+
+    private SimpleMotorFeedforward mLeftFF = FlywheelConstants.LeftControlConfig.motorFF();
+    private SimpleMotorFeedforward mRightFF = FlywheelConstants.RightControlConfig.motorFF();
+   
     private double mLeftMotorVolts = 0.0;
     private double mRightMotorVolts = 0.0;
 
-    /*NOT SURE WHAT TO PUT IN HERE */
+    /*Tbh do I even need to have anything here? If not do I even need the constructor. I can js use the default constructor*/
     public FlywheelIOSim(){
 
     }
 
-    /*TODO: put more logger variables to in here */
+    /*TODO: Do I need more logger variables in here?*/
     @Override
     public void updateInputs(FlywheelInputs inputs){
         mFlywheelLeftMotor.update(0.02);
         mFlywheelRightMotor.update(0.02);
 
+        /*TODO: Check if everything is logging correctly*/
         inputs.iFlywheelLeftMotorVolts = mLeftMotorVolts;
+        inputs.iFlywheelLeftVelocityMPS = (mFlywheelLeftMotor.getAngularVelocityRPM());
+        inputs.iFlywheelLeftStatorCurrentAmps = Math.abs(mFlywheelLeftMotor.getCurrentDrawAmps());
+        inputs.iFlywheelLeftTemperatureCelsius = 0.0;
+
         inputs.iFlywheelRightMotorVolts = mRightMotorVolts;
+        inputs.iFlywheelRightVelocityMPS = (mFlywheelRightMotor.getAngularVelocityRPM());
+        inputs.iFlywheelRightStatorCurrentAmps = Math.abs(mFlywheelRightMotor.getCurrentDrawAmps());
+        inputs.iFlywheelRightTemperatureCelsius = 0.0;
 
     }
+
     @Override
     public void setLeftFlywheelVolts(double volts) {
         mFlywheelLeftMotor.setInputVoltage(volts);
     }
 
-    //TODO: check if I am doing this right
-    public void setLeftFlywheePID() {
-        mLeftController.setPID(mLeftController.getP(), mLeftController.getI(), mLeftController.getD());
+    @Override
+    public void setLeftFlywheelPID(double kP, double kI, double kD, double kV, double kA) {
+        mLeftController.setPID(kP, kI, kD);
+        mLeftController.setConstraints(new Constraints(kV, kA));
+    }
+
+    @Override
+    public void setLeftFlywheelVelocity(AngularVelocity setpointRPS, double pFF){
+        setLeftFlywheelVolts(mLeftController.calculate(mFlywheelLeftMotor.getAngularVelocityRPM(), setpointRPS.in(RotationsPerSecond)) + pFF);
     }
     
     @Override
@@ -61,9 +87,15 @@ public class FlywheelIOSim implements FlywheelIO{
         mFlywheelRightMotor.setInputVoltage(volts);
     }
 
-    //TODO: check if I am doing this right
-    public void setRightFlywheePID() {
-        mRightController.setPID(mRightController.getP(), mRightController.getI(), mRightController.getD());
+    @Override
+    public void setRightFlywheelPID(double kP, double kI, double kD, double kV, double kA) {
+        mRightController.setPID(kP, kI, kD);
+        mRightController.setConstraints(new Constraints(kV, kA));
+    }
+
+    @Override
+    public void setRightFlywheelVelocity(AngularVelocity setpointRPS, double pFF){
+        setRightFlywheelVolts(mRightController.calculate(mFlywheelRightMotor.getAngularVelocityRPM(), setpointRPS.in(RotationsPerSecond)) + pFF);
     }
 
 
