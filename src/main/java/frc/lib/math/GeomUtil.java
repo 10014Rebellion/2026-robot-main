@@ -12,9 +12,11 @@ package frc.lib.math;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -140,4 +142,9 @@ public class GeomUtil {
                         .minus(rotation1.minus(Rotation2d.k180deg))
                         .getRadians())));
     }
+
+    public static Pose3d toPose3d(Pose2d pose){
+        return new Pose3d(new Translation3d(pose.getTranslation()), new Rotation3d(pose.getRotation()));
+    }
+
 }
