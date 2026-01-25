@@ -4,14 +4,29 @@
 
 package frc.robot.systems.climb;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climb extends SubsystemBase {
-  /** Creates a new Climb. */
-  public Climb() {}
+  private final ClimbIO mClimbIO;
+  private final ClimbInputsAutoLogged mClimbInputs = new ClimbInputsAutoLogged();
+
+  public Climb(ClimbIO pClimbIO) {
+    this.mClimbIO = pClimbIO;
+  }
+
+  public void setClimbVolts(double pVolts) {
+    mClimbIO.setMotorVolts(pVolts);
+  }
+
+  public void stopClimbMotor() {
+    mClimbIO.stopMotor();
+  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    mClimbIO.updateInputs(mClimbInputs);
+    Logger.processInputs("Climb", mClimbInputs);
   }
 }

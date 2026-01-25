@@ -34,7 +34,6 @@ public class ModuleIOKraken implements ModuleIO {
     private final TalonFX mDriveMotor;
     private final VelocityTorqueCurrentFOC mDriveControl = new VelocityTorqueCurrentFOC(0.0);
     private final VoltageOut mDriveVoltageControl = new VoltageOut(0.0);
-    private final double mDriveAppliedVolts = 0.0;
 
     private final StatusSignal<Angle> mDrivePositionM;
     private final StatusSignal<AngularVelocity> mDriveVelocityMPS;
@@ -48,8 +47,6 @@ public class ModuleIOKraken implements ModuleIO {
     private final TalonFX mAzimuthMotor;
     private final PositionDutyCycle mAzimuthPositionControl = new PositionDutyCycle(0.0);
     private final VoltageOut mAzimuthVoltageControl = new VoltageOut(0.0);
-    private final double mAzimuthAppliedVolts = 0.0;
-
     private final StatusSignal<Angle> mAzimuthPosition;
     private final StatusSignal<AngularVelocity> mAzimuthVelocity;
     private final StatusSignal<Voltage> mAzimuthVoltage;
@@ -151,7 +148,6 @@ public class ModuleIOKraken implements ModuleIO {
         ).isOK();
         pInputs.iDrivePositionM = (mDrivePositionM.getValueAsDouble());
         pInputs.iDriveVelocityMPS = (mDriveVelocityMPS.getValueAsDouble());
-        pInputs.iDriveAppliedVolts = mDriveAppliedVolts;
         pInputs.iDriveMotorVolts = mDriveVoltage.getValueAsDouble();
         pInputs.iDriveSupplyCurrentAmps = mDriveSupplyCurrent.getValueAsDouble();
         pInputs.iDriveStatorCurrentAmps = mDriveStatorCurrent.getValueAsDouble();
@@ -169,7 +165,6 @@ public class ModuleIOKraken implements ModuleIO {
                 .isOK();
         pInputs.iAzimuthPosition = Rotation2d.fromRotations(mAzimuthPosition.getValueAsDouble());
         pInputs.iAzimuthVelocity = Rotation2d.fromRotations(mAzimuthVelocity.getValueAsDouble());
-        pInputs.iAzimuthAppliedVolts = mAzimuthAppliedVolts;
         pInputs.iAzimuthMotorVolts = mAzimuthVoltage.getValueAsDouble();
         pInputs.iAzimuthStatorCurrentAmps = mAzimuthStatorCurrent.getValueAsDouble();
         pInputs.iAzimuthSupplyCurrentAmps = mAzimuthSupplyCurrent.getValueAsDouble();

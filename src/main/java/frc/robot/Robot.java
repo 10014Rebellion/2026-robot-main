@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DashboardConstants;
+import frc.robot.game.TransitionTracker;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -118,6 +120,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        TransitionTracker.autonInit();
         mAutonomousCommand = mRobotContainer.getAutonomousCommand();
 
         if (mAutonomousCommand != null) {
@@ -133,6 +136,7 @@ public class Robot extends LoggedRobot {
         if (mAutonomousCommand != null) {
             mAutonomousCommand.cancel();
         }
+        TransitionTracker.teleopInit();
 
         CommandScheduler.getInstance().schedule(mRobotContainer.getDriverProfileCommand());
     }
