@@ -142,7 +142,7 @@ public class AutonCommands extends SubsystemBase {
             .onTrue(autoPath);
         
         auto.condition(() -> autoPath.isFinished())
-            .onTrue(Commands.run(() -> auto.cancel()));
+            .onTrue(Commands.runOnce(() -> auto.cancel()));
 
         return auto;
     }
