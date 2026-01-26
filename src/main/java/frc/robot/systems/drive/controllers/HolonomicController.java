@@ -227,7 +227,7 @@ public class HolonomicController {
     }
 
     ////////////////////////// SETTERS \\\\\\\\\\\\\\\\\\\\\\\\\\\\
-    public void updateAlignmentControllers() {
+    public void updateControllers() {
         LoggedTunableNumber.ifChanged(
                 hashCode(),
                 () -> {

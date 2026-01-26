@@ -101,7 +101,7 @@ public class HeadingController {
     //             + pVelocityDPS);
     // }
 
-    public void updateHeadingController() {
+    public void updateController() {
         LoggedTunableNumber.ifChanged(
                 hashCode(),
                 () -> {

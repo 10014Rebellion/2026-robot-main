@@ -187,10 +187,8 @@ public class Drive extends SubsystemBase {
     @Override
     public void periodic() {
         updateSensorsAndOdometry();
-        updateDriveControllers();
-        computeDesiredSpeeds();
 
-        if (mDesiredSpeeds != null) runSwerve(mDesiredSpeeds);
+        if (mDesiredSpeeds != null) runSwerve(computeDesiredSpeeds());
     }
 
     private void updateSensorsAndOdometry() {
@@ -267,13 +265,11 @@ public class Drive extends SubsystemBase {
         mField.setRobotPose(getPoseEstimate());
     }
 
-    private void updateDriveControllers() {
-        mHeadingController.updateHeadingController();
-        mAutoAlignController.updateAlignmentControllers();
-        mLineAlignController.updateAlignmentControllers();
-    }
+    private ChassisSpeeds computeDesiredSpeeds() {
+        mHeadingController.updateController();
+        mAutoAlignController.updateControllers();
+        mLineAlignController.updateControllers();
 
-    private void computeDesiredSpeeds() {
         ChassisSpeeds teleopSpeeds =
                 mTeleopController.computeChassisSpeeds(getPoseEstimate().getRotation(), false, true);
         switch (mDriveState) {
@@ -281,18 +277,17 @@ public class Drive extends SubsystemBase {
                 mDesiredSpeeds = teleopSpeeds;
                 break;
             case TELEOP_SNIPER:
-                mDesiredSpeeds =
-                        mTeleopController.computeChassisSpeeds(getPoseEstimate().getRotation(), true, true);
+                mDesiredSpeeds = mTeleopController.computeChassisSpeeds(
+                    getPoseEstimate().getRotation(), true, true);
                 break;
             case POV_SNIPER:
                 mDesiredSpeeds = mTeleopController.computeSniperPOVChassisSpeeds(
-                        getPoseEstimate().getRotation(), false);
+                    getPoseEstimate().getRotation(), false);
                 break;
             case HEADING_ALIGN:
                 mDesiredSpeeds = new ChassisSpeeds(
-                        teleopSpeeds.vxMetersPerSecond,
-                        teleopSpeeds.vyMetersPerSecond,
-                        mHeadingController.getSnapOutputRadians(getPoseEstimate().getRotation()));
+                    teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond,
+                    mHeadingController.getSnapOutputRadians(getPoseEstimate().getRotation()));
                 break;
             case AUTO_ALIGN:
                 mDesiredSpeeds = mAutoAlignController.calculate(mGoalPoseSup.get(), getPoseEstimate());
@@ -304,14 +299,13 @@ public class Drive extends SubsystemBase {
                 mDesiredSpeeds = mPPDesiredSpeeds;
                 break;
             case DRIFT_TEST:
-                mDesiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                        new ChassisSpeeds(
-                                tLinearTestSpeedMPS.get(), 0.0, Math.toRadians(tRotationDriftTestSpeedDeg.get())),
+                mDesiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
+                    tLinearTestSpeedMPS.get(), 0.0, Math.toRadians(tRotationDriftTestSpeedDeg.get())),
                         mRobotRotation);
                 break;
             case LINEAR_TEST:
                 mDesiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-                        new ChassisSpeeds(tLinearTestSpeedMPS.get(), 0.0, 0.0), mRobotRotation);
+                    new ChassisSpeeds(tLinearTestSpeedMPS.get(), 0.0, 0.0), mRobotRotation);
                 break;
                 /* Set by characterization commands in the CHARACTERIZATION header. Wheel characterization is currently unimplemented */
             case SYSID_CHARACTERIZATION:
@@ -319,13 +313,13 @@ public class Drive extends SubsystemBase {
                 /* If null, then PID isn't set, so characterization can set motors w/o interruption */
                 mDesiredSpeeds = null;
             case STOP:
-                for (int i = 0; i < mModules.length; i++) {
-                    mDesiredSpeeds = new ChassisSpeeds();
-                }
+                for (int i = 0; i < mModules.length; i++) mDesiredSpeeds = new ChassisSpeeds();
                 break;
             default:
                 /* Defaults to Teleop control if no other cases are run*/
         }
+
+        return mDesiredSpeeds;
     }
 
         ////////////// CHASSIS SPEED TO MODULES \\\\\\\\\\\\\\\\
