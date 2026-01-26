@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.lib.hardware.Records.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
 
 public class IntakeIOKrakenx44 implements IntakeIO{
     private final TalonFX mIntakeMotor;

@@ -4,7 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants;
-import frc.lib.hardware.Records.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
 
 public class ConveyorConstants {
     public static final InternalMotorHardware kConveyorMotorConstants = new InternalMotorHardware(

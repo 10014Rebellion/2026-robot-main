@@ -13,7 +13,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.lib.hardware.Records.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
 
 public class HoodIOKrakenx44 implements HoodIO{
     private final TalonFX mHoodMotor;

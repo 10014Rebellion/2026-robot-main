@@ -14,8 +14,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.lib.hardware.Records.FollowerMotorHardware;
-import frc.lib.hardware.Records.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
+import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
 
 public class IndexerIOKrakenx44 implements IndexerIO{
     private final TalonFX mIndexerMotor;

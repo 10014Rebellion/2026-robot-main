@@ -9,7 +9,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
-public class Records {
+public class HardwareRecords {
     public static record InternalMotorHardware(
         int motorID, 
         CANBus canBus, 

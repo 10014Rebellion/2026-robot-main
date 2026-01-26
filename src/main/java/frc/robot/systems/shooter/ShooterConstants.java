@@ -5,8 +5,8 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants;
-import frc.lib.hardware.Records.FollowerMotorHardware;
-import frc.lib.hardware.Records.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
+import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
 
 public class ShooterConstants {
     public static class Flywheels {
