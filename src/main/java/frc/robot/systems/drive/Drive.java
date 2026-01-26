@@ -70,6 +70,7 @@ public class Drive extends SubsystemBase {
         TELEOP_SNIPER,
         POV_SNIPER,
         HEADING_ALIGN,
+        AUTON_HEADING_ALIGN,
         AUTO_ALIGN,
         LINE_ALIGN, // TODO: Implement this.
         AUTON,
@@ -284,6 +285,10 @@ public class Drive extends SubsystemBase {
                 mDesiredSpeeds = mTeleopController.computeSniperPOVChassisSpeeds(
                     getPoseEstimate().getRotation(), false);
                 break;
+            case AUTON_HEADING_ALIGN:
+                mDesiredSpeeds = new ChassisSpeeds(
+                    mPPDesiredSpeeds.vxMetersPerSecond, mPPDesiredSpeeds.vyMetersPerSecond,
+                    mHeadingController.getSnapOutputRadians(getPoseEstimate().getRotation()));
             case HEADING_ALIGN:
                 mDesiredSpeeds = new ChassisSpeeds(
                     teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond,
@@ -543,6 +548,32 @@ public class Drive extends SubsystemBase {
     /* Accoutns for velocity of drive when turning */
     public Command setToGenericHeadingAlign(Supplier<Rotation2d> pGoalRotation) {
         return setToGenericHeadingAlign(
+            pGoalRotation, 
+            new TurnPointFeedforward(
+                mPoseEstimator::getEstimatedPosition, 
+                () -> getDesiredChassisSpeeds(), 
+                mGoalPoseSup, 
+                () -> new ChassisSpeeds()));
+    }
+
+    /*
+     * Reference GameDriveManager to use game-specific implementation of this command
+     * @param The desired rotation
+     * @param Turn feedforward
+     */
+    public Command setToGenericHeadingAlignAuton(Supplier<Rotation2d> pGoalRotation, TurnPointFeedforward pTurnPointFeedforward) {
+        return new InstantCommand(() -> {
+                mGoalRotationSup = pGoalRotation;
+                mHeadingController.setHeadingGoal(mGoalRotationSup);
+                mHeadingController.reset(getPoseEstimate().getRotation(), mGyroInputs.iYawVelocityPS);
+                mHeadingController.setTurnPointFF(pTurnPointFeedforward);
+            })
+            .andThen(setDriveStateCommandContinued(DriveState.AUTON_HEADING_ALIGN));
+    }
+
+    /* Accoutns for velocity of drive when turning */
+    public Command setToGenericHeadingAlignAuton(Supplier<Rotation2d> pGoalRotation) {
+        return setToGenericHeadingAlignAuton(
             pGoalRotation, 
             new TurnPointFeedforward(
                 mPoseEstimator::getEstimatedPosition, 

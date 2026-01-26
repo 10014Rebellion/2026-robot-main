@@ -12,6 +12,7 @@ import frc.robot.systems.drive.controllers.HolonomicController.ConstraintType;
 public class GameDriveManager {
     public static enum GameDriveStates {
         HUB_HEADING_ALIGN,
+        AUTON_HUB_HEADING_ALIGN,
         LINE_TO_TRENCH,
         LINE_TO_BUMP,
         LINE_TO_O,
@@ -29,6 +30,9 @@ public class GameDriveManager {
         switch (pGameDriveState) {
             case HUB_HEADING_ALIGN:
                 return mDrive.setToGenericHeadingAlign(
+                    () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()));
+            case AUTON_HUB_HEADING_ALIGN:
+                return mDrive.setToGenericHeadingAlignAuton(
                     () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()));
             case LINE_TO_TRENCH:
                 return mDrive.setToGenericLineAlign(
