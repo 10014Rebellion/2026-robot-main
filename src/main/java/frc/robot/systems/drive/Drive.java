@@ -344,10 +344,10 @@ public class Drive extends SubsystemBase {
 
         if (DriverStation.isAutonomous()) {
             mPreviousSetpoint =
-                    mSetpointGenerator.generateSetpoint(mPreviousSetpoint, mDesiredSpeeds, kAutoDriveConstraints, 0.02);
+                mSetpointGenerator.generateSetpoint(mPreviousSetpoint, mDesiredSpeeds, kAutoDriveConstraints, 0.02);
         } else {
             mPreviousSetpoint =
-                    mSetpointGenerator.generateSetpoint(mPreviousSetpoint, mDesiredSpeeds, mDriveConstraints, 0.02);
+                mSetpointGenerator.generateSetpoint(mPreviousSetpoint, mDesiredSpeeds, mDriveConstraints, 0.02);
         }
 
         /* Only for logging purposes */
@@ -362,10 +362,10 @@ public class Drive extends SubsystemBase {
                 SwerveUtils.logDriveFeedforward(mPreviousSetpoint.feedforwards(), i);
 
                 setpointStates[i] = new SwerveModuleState(
-                        mPreviousSetpoint.moduleStates()[i].speedMetersPerSecond,
-                        /* setpointAngle = currentAngle if the speed is less than 0.01 */
-                        SwerveUtils.removeAzimuthJitter(
-                                mPreviousSetpoint.moduleStates()[i], mModules[i].getCurrentState()));
+                    mPreviousSetpoint.moduleStates()[i].speedMetersPerSecond,
+                    /* setpointAngle = currentAngle if the speed is less than 0.01 */
+                    SwerveUtils.removeAzimuthJitter(
+                        mPreviousSetpoint.moduleStates()[i], mModules[i].getCurrentState()));
 
                 unOptimizedSetpointStates[i] = SwerveUtils.copyState(setpointStates[i]);
                 setpointStates[i].optimize(mModules[i].getCurrentState().angle);
@@ -392,8 +392,8 @@ public class Drive extends SubsystemBase {
                         new SwerveModuleState((driveAmps * kMaxLinearSpeedMPS / kDriveFOCAmpLimit), optimizedSetpointStates[i].angle);
             } else {
                 setpointStates[i] = new SwerveModuleState(
-                        setpointStates[i].speedMetersPerSecond,
-                        SwerveUtils.removeAzimuthJitter(setpointStates[i], mModules[i].getCurrentState()));
+                    setpointStates[i].speedMetersPerSecond,
+                    SwerveUtils.removeAzimuthJitter(setpointStates[i], mModules[i].getCurrentState()));
 
                 setpointStates[i].optimize(mModules[i].getCurrentState().angle);
                 setpointStates[i].cosineScale(mModules[i].getCurrentState().angle);
@@ -407,9 +407,9 @@ public class Drive extends SubsystemBase {
         Telemetry.log("Drive/Swerve/SetpointsOptimized", optimizedSetpointStates);
         Telemetry.log("Drive/Swerve/SetpointsChassisSpeeds", kKinematics.toChassisSpeeds(optimizedSetpointStates));
         Telemetry.log(
-                "Drive/Odometry/FieldSetpointChassisSpeed",
-                ChassisSpeeds.fromRobotRelativeSpeeds(
-                        kKinematics.toChassisSpeeds(optimizedSetpointStates), mRobotRotation));
+            "Drive/Odometry/FieldSetpointChassisSpeed",
+            ChassisSpeeds.fromRobotRelativeSpeeds(
+                kKinematics.toChassisSpeeds(optimizedSetpointStates), mRobotRotation));
         Telemetry.log("Drive/Swerve/ModuleTorqueFF", moduleTorques);
     }
 
@@ -493,18 +493,16 @@ public class Drive extends SubsystemBase {
 
     public Command customFollowPathComamnd(PathPlannerPath path, PPHolonomicDriveController drivePID) {
         return new FollowPathCommand(
-                path,
-                this::getPoseEstimate,
-                this::getRobotChassisSpeeds,
-                (speeds, ff) -> {
-                    setDriveState(DriveState.AUTON);
-                    mPPDesiredSpeeds = speeds;
-                    mPathPlanningFF = ff;
-                },
-                drivePID,
-                mRobotConfig,
-                () -> DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red),
-                this);
+            path, this::getPoseEstimate,
+            this::getRobotChassisSpeeds,
+            (speeds, ff) -> {
+                setDriveState(DriveState.AUTON);
+                mPPDesiredSpeeds = speeds;
+                mPathPlanningFF = ff;
+            },
+            drivePID, mRobotConfig,
+            () -> DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red),
+            this);
     }
 
     public Command getGameDriveCommand(GameDriveStates pGameDriveStates) {
@@ -563,12 +561,12 @@ public class Drive extends SubsystemBase {
      */
     public Command setToGenericHeadingAlignAuton(Supplier<Rotation2d> pGoalRotation, TurnPointFeedforward pTurnPointFeedforward) {
         return new InstantCommand(() -> {
-                mGoalRotationSup = pGoalRotation;
-                mHeadingController.setHeadingGoal(mGoalRotationSup);
-                mHeadingController.reset(getPoseEstimate().getRotation(), mGyroInputs.iYawVelocityPS);
-                mHeadingController.setTurnPointFF(pTurnPointFeedforward);
-            })
-            .andThen(setDriveStateCommandContinued(DriveState.AUTON_HEADING_ALIGN));
+            mGoalRotationSup = pGoalRotation;
+            mHeadingController.setHeadingGoal(mGoalRotationSup);
+            mHeadingController.reset(getPoseEstimate().getRotation(), mGyroInputs.iYawVelocityPS);
+            mHeadingController.setTurnPointFF(pTurnPointFeedforward);
+        })
+        .andThen(setDriveStateCommandContinued(DriveState.AUTON_HEADING_ALIGN));
     }
 
     /* Accoutns for velocity of drive when turning */
@@ -634,9 +632,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Command setDriveProfile(DriverProfiles profile) {
-        return new InstantCommand(() -> {
-            mTeleopController.updateTuneablesWithProfiles(profile);
-        });
+        return new InstantCommand(() -> mTeleopController.updateTuneablesWithProfiles(profile));
     }
 
     ///////////////////////// GETTERS \\\\\\\\\\\\\\\\\\\\\\\\
@@ -682,9 +678,8 @@ public class Drive extends SubsystemBase {
     @AutoLogOutput(key = "Drive/Tolerance/HeadingController")
     public boolean inHeadingTolerance() {
         /* Accounts for angle wrapping issues with rotation 2D error */
-        return GeomUtil.getSmallestChangeInRotation(mRobotRotation, mGoalRotationSup.get())
-                        .getDegrees()
-                < HeadingController.mToleranceDegrees.get();
+        return GeomUtil.getSmallestChangeInRotation(mRobotRotation, mGoalRotationSup.get()).getDegrees()
+            < HeadingController.mToleranceDegrees.get();
     }
 
     public Module[] getModules() {
@@ -692,10 +687,8 @@ public class Drive extends SubsystemBase {
     }
 
     public void acceptJoystickInputs(
-            DoubleSupplier pXSupplier,
-            DoubleSupplier pYSupplier,
-            DoubleSupplier pThetaSupplier,
-            Supplier<Rotation2d> pPOVSupplier) {
+            DoubleSupplier pXSupplier, DoubleSupplier pYSupplier,
+            DoubleSupplier pThetaSupplier, Supplier<Rotation2d> pPOVSupplier) {
         mTeleopController.acceptJoystickInputs(pXSupplier, pYSupplier, pThetaSupplier, pPOVSupplier);
     }
 
