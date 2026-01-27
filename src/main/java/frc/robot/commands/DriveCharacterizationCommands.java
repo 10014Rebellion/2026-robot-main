@@ -14,13 +14,13 @@ public class DriveCharacterizationCommands {
         return pDrive.setToSysIDCharacterization()
                 .andThen(SysIDCharacterization.runDriveSysIDTests(
                         (voltage) -> {
-                            runLinearCharcterization(voltage, pDrive);
+                            runLinearCharacterization(voltage, pDrive);
                         },
                         pDrive));
     }
 
     /* Runs the robot forward at a voltage */
-    public void runLinearCharcterization(double volts, Drive pDrive) {
+    public void runLinearCharacterization(double volts, Drive pDrive) {
         pDrive.setToSysIDCharacterization().initialize();
         for (int i = 0; i < 4; i++) pDrive.getModules()[i].runCharacterization(volts);
     }
