@@ -131,7 +131,7 @@ public class GeomUtil {
     /**
      * Converts a Twist2d to a ChassisSpeeds by extracting two dimensions (Y and Z). chain
      *
-     * @param speeds The original translation
+     * @param twist The original translation
      * @return The resulting translation
      */
     public static ChassisSpeeds toChassisSpeeds(Twist2d twist, double dt) {
