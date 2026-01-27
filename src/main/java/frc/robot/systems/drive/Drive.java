@@ -134,7 +134,7 @@ public class Drive extends SubsystemBase {
     public static final LoggedTunableNumber tRotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
     public static final LoggedTunableNumber tLinearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
     public static final LoggedTunableNumber tAzimuthCharacterizationVoltage = new LoggedTunableNumber("Drive/AzimuthCharacterizationVoltage", 0);
-    public static final LoggedTunableNumber tDriveAggressiveness = new LoggedTunableNumber("Drive/Teleop/DriveAggresivenes", 0.0001);
+    public static final LoggedTunableNumber tDriveAggressiveness = new LoggedTunableNumber("Drive/Teleop/DriveAggresiveness", 0.0001);
     // private final LoggedTunableNumber tAzimuthDriveScalar = new LoggedTunableNumber("Drive/AzimuthDriveScalar", DriveConstants.kAzimuthDriveScalar);
 
     private final Debouncer mAutoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
