@@ -419,7 +419,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Command setToStop() {
-        return setDriveStateCommandContinued(DriveState.STOP);
+        return setDriveStateCommand(DriveState.STOP);
     }
 
     public Command setToDriftTest() {

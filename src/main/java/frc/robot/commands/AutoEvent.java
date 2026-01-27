@@ -6,6 +6,8 @@ package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -16,9 +18,11 @@ public class AutoEvent extends Command {
     private final EventLoop autoEventLoop = new EventLoop();
     private boolean isRunning = false; 
     private final Trigger isRunningTrigger = new Trigger(autoEventLoop, () -> isRunning);
+    private String mAutoName;
   
     /** Creates a new AutoEvent. */
-    public AutoEvent(Subsystem subsystem) {
+    public AutoEvent(String pAutoName, Subsystem subsystem) {
+        mAutoName = pAutoName;
         addRequirements(subsystem);
         // Use addRequirements() here to declare subsystem dependencies.
     }
@@ -56,7 +60,15 @@ public class AutoEvent extends Command {
         return isRunningTrigger;
     }
 
+    /* Available but heavinly un-reccomended compared to using loggedCondition() */
     public Trigger condition(BooleanSupplier condition) {
         return new Trigger(autoEventLoop, condition);
+    }
+
+    public Trigger loggedCondition(String key, BooleanSupplier condition) {
+        return new Trigger(autoEventLoop, () -> {
+            Logger.recordOutput("Auton/"+mAutoName+"/"+key, condition.getAsBoolean());
+            return condition.getAsBoolean();
+        });
     }
 }

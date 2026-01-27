@@ -1,5 +1,5 @@
 {
- "name":"NewPath",
+ "name":"FirstPath",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -16,7 +16,7 @@
   "waypoints":[
     {"x":{"exp":"4.099639892578125 m", "val":4.099639892578125}, "y":{"exp":"0.6628296971321106 m", "val":0.6628296971321106}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":23, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"5.731671333312988 m", "val":5.731671333312988}, "y":{"exp":"0.7418155074119568 m", "val":0.7418155074119568}, "heading":{"exp":"0.4636476090008061 rad", "val":0.4636476090008061}, "intervals":23, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"7.2180399894714355 m", "val":7.2180399894714355}, "y":{"exp":"1.5398796796798706 m", "val":1.5398796796798706}, "heading":{"exp":"0.8902747502234521 rad", "val":0.8902747502234521}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"T1.x", "val":7.2180399894714355}, "y":{"exp":"T1.y", "val":1.5398796796798706}, "heading":{"exp":"T1.heading", "val":0.8902747502234521}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
