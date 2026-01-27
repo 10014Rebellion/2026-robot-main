@@ -14,7 +14,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
+import frc.lib.hardware.HardwareRecords.RotationLimitMotorHardware;
 
 public class ClimbIOKrakenx44 implements ClimbIO {
     private final TalonFX mClimbMotor;
@@ -28,7 +28,7 @@ public class ClimbIOKrakenx44 implements ClimbIO {
     private final StatusSignal<Temperature> mClimbTempCelsius;
     private final StatusSignal<AngularAcceleration> mClimbAccelerationMPSS;
 
-    public ClimbIOKrakenx44(BasicMotorHardware pConfig) {
+    public ClimbIOKrakenx44(RotationLimitMotorHardware pConfig) {
         mClimbMotor = new TalonFX(pConfig.motorID(), pConfig.canBus());
         var ClimbConfig = new TalonFXConfiguration();
 
