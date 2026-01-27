@@ -200,7 +200,6 @@ public class Drive extends SubsystemBase {
                 mPrevPositions = SwerveUtils.zeroPositions();
             }
 
-        
             for (Module module : mModules) module.periodic();
 
             /* GYRO */
