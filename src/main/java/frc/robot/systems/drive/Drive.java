@@ -560,7 +560,7 @@ public class Drive extends SubsystemBase {
             .andThen(setDriveStateCommandContinued(DriveState.HEADING_ALIGN));
     }
 
-    /* Accoutns for velocity of drive when turning */
+    /* Accounts for velocity of drive when turning */
     public Command setToGenericHeadingAlign(Supplier<Rotation2d> pGoalRotation) {
         return setToGenericHeadingAlign(
             pGoalRotation, 
