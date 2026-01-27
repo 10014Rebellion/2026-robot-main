@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auton.AutonCommands;
 import frc.robot.bindings.BindingsConstants;
 import frc.robot.bindings.ButtonBindings;
+import frc.robot.game.StateTracker;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
 import frc.robot.systems.drive.gyro.GyroIO;
@@ -22,6 +23,11 @@ import frc.robot.systems.apriltag.AprilTag;
 import frc.robot.systems.apriltag.AprilTagConstants;
 import frc.robot.systems.apriltag.AprilTagConstants.Orientation;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import frc.robot.systems.apriltag.AprilTag;
+import frc.robot.systems.apriltag.AprilTagConstants;
+import frc.robot.systems.apriltag.AprilTagIO;
+
 
 public class RobotContainer {
     private final Drive mDrive;
@@ -42,16 +48,26 @@ public class RobotContainer {
                             new Module("BR", new ModuleIOKraken(kBackRightHardware))
                         },
                         new GyroIOPigeon2(),
-                        new AprilTag(new AprilTagIO[] {
-                            // new AprilTagIO() {},
-                            // new AprilTagIO() {}
+                        new AprilTag(new AprilTagIO[]{
                             new AprilTagIOPVTag(
-                                    AprilTagConstants.kRightCamName,
-                                    AprilTagConstants.kRightCamTransform,
-                                    Orientation.BACK),
+                                AprilTagConstants.kFrontLeftCamName, 
+                                AprilTagConstants.kFrontLeftCamTransform, 
+                                AprilTagConstants.kFrontLeftCamOrientation),
+
                             new AprilTagIOPVTag(
-                                    AprilTagConstants.kLeftCamName, AprilTagConstants.kLeftCamTransform, Orientation.BACK)
-                        }));
+                                AprilTagConstants.kFrontRightCamName, 
+                                AprilTagConstants.kFrontRightCamTransform, 
+                                AprilTagConstants.kFrontRightCamOrientation),
+
+                            new AprilTagIOPVTag(
+                                AprilTagConstants.kBackLeftCamName, 
+                                AprilTagConstants.kBackLeftCamTransform, 
+                                AprilTagConstants.kBackLeftCamOrientation),
+                                
+                            new AprilTagIOPVTag(
+                                AprilTagConstants.kBackRightCamName, 
+                                AprilTagConstants.kBackRightCamTransform, 
+                                AprilTagConstants.kBackRightCamOrientation)}));
                 break;
 
             case SIM:
@@ -63,16 +79,27 @@ public class RobotContainer {
                             new Module("BR", new ModuleIOSim())
                         },
                         new GyroIO() {},
-                        new AprilTag(new AprilTagIO[] {
-                            new AprilTagIO() {},
-                            new AprilTagIO() {},
+                        new AprilTag(new AprilTagIO[]{
                             new AprilTagIOPVTag(
-                                    AprilTagConstants.kRightCamName,
-                                    AprilTagConstants.kRightCamTransform,
-                                    Orientation.BACK),
+                                AprilTagConstants.kFrontRightCamName, 
+                                AprilTagConstants.kFrontRightCamTransform, 
+                                AprilTagConstants.kFrontRightCamOrientation),
+
                             new AprilTagIOPVTag(
-                                    AprilTagConstants.kLeftCamName, AprilTagConstants.kLeftCamTransform, Orientation.BACK)
-                        }));
+                                AprilTagConstants.kFrontLeftCamName, 
+                                AprilTagConstants.kFrontLeftCamTransform, 
+                                AprilTagConstants.kFrontLeftCamOrientation),
+
+                            new AprilTagIOPVTag(
+                                AprilTagConstants.kBackLeftCamName, 
+                                AprilTagConstants.kBackLeftCamTransform, 
+                                AprilTagConstants.kBackLeftCamOrientation),
+
+                            new AprilTagIOPVTag(
+                                AprilTagConstants.kBackRightCamName, 
+                                AprilTagConstants.kBackRightCamTransform, 
+                                AprilTagConstants.kBackRightCamOrientation)
+                            }));
                 break;
 
             default:
@@ -84,7 +111,7 @@ public class RobotContainer {
                             new Module("BR", new ModuleIO() {})
                         },
                         new GyroIO() {},
-                        new AprilTag(new AprilTagIO[] {new AprilTagIO() {}, new AprilTagIO() {}}));
+                        new AprilTag(new AprilTagIO[] {new AprilTagIO() {}, new AprilTagIO() {}, new AprilTagIO() {}, new AprilTagIO() {}}));
                 break;
         }
 

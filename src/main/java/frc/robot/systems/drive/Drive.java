@@ -42,6 +42,9 @@ import frc.lib.telemetry.Telemetry;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.game.GameDriveManager;
 import frc.robot.game.GameDriveManager.GameDriveStates;
+import frc.robot.game.GameGoalPoseChooser;
+import frc.robot.systems.apriltag.AprilTag;
+import frc.robot.systems.apriltag.AprilTag.VisionObservation;
 import frc.robot.systems.drive.controllers.HeadingController;
 import frc.robot.systems.drive.controllers.HolonomicController;
 import frc.robot.systems.drive.controllers.LineController;
@@ -51,8 +54,6 @@ import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles
 import frc.robot.systems.drive.gyro.GyroIO;
 import frc.robot.systems.drive.gyro.GyroInputsAutoLogged;
 import frc.robot.systems.drive.modules.Module;
-import frc.robot.systems.apriltag.AprilTag;
-import frc.robot.systems.apriltag.AprilTag.VisionObservation;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
