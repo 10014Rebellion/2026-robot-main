@@ -237,7 +237,7 @@ public class Drive extends SubsystemBase {
                 observation.pose(), observation.timeStamp(), 
                 observation.stdDevs().times(1.0 / visionFactor));
 
-            Telemetry.logVisionObservatinStdDevs(observation);
+            Telemetry.logVisionObservationStdDevs(observation);
         }
 
         mField.setRobotPose(getPoseEstimate());
