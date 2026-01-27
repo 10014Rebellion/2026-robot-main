@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 
 public class IntakeIOKrakenx44 implements IntakeIO{
     private final TalonFX mIntakeMotor;
@@ -25,7 +25,7 @@ public class IntakeIOKrakenx44 implements IntakeIO{
     private final StatusSignal<Temperature> mIntakeTempCelsius;
     private final StatusSignal<AngularAcceleration> mIntakeAccelerationMPSS;
     
-    public IntakeIOKrakenx44(InternalMotorHardware pConfig) {
+    public IntakeIOKrakenx44(BasicMotorHardware pConfig) {
         mIntakeMotor = new TalonFX(pConfig.motorID(), pConfig.canBus());
         var IntakeConfig = new TalonFXConfiguration();
 

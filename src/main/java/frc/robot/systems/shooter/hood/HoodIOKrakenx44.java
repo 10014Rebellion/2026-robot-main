@@ -8,34 +8,39 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
+import frc.lib.hardware.HardwareRecords.RotationLimitMotorHardware;
 
 public class HoodIOKrakenx44 implements HoodIO{
     private final TalonFX mHoodMotor;
     private final VoltageOut mHoodVoltageControl = new VoltageOut(0.0);
     private final PositionDutyCycle mHoodPositionControl = new PositionDutyCycle(0.0);
     private final StatusSignal<ControlModeValue> mHoodControlMode;
+    private final StatusSignal<Angle> mHoodPosition;
     private final StatusSignal<AngularVelocity> mHoodVelocityRPS;
+    private final StatusSignal<AngularAcceleration> mHoodAccelerationRPSS;
     private final StatusSignal<Voltage> mHoodVoltage;
     private final StatusSignal<Current> mHoodSupplyCurrent;
     private final StatusSignal<Current> mHoodStatorCurrent;
     private final StatusSignal<Temperature> mHoodTempCelsius;
-    private final StatusSignal<AngularAcceleration> mHoodAccelerationRPSS;
 
-    public HoodIOKrakenx44(InternalMotorHardware pHardware) {
+    public HoodIOKrakenx44(RotationLimitMotorHardware pHardware) {
         this.mHoodMotor = new TalonFX(pHardware.motorID(), pHardware.canBus());
 
         TalonFXConfiguration HoodConfig = new TalonFXConfiguration();
 
         HoodConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        HoodConfig.CurrentLimits.SupplyCurrentLimit = pHardware.supplyCurrentLimit();
+        HoodConfig.CurrentLimits.SupplyCurrentLimit = pHardware.currentLimit().supplyCurrentLimit();
         HoodConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        HoodConfig.CurrentLimits.StatorCurrentLimit = pHardware.statorCurrentLimit();
+        HoodConfig.CurrentLimits.StatorCurrentLimit = pHardware.currentLimit().statorCurrentLimit();
 
         HoodConfig.MotorOutput.NeutralMode = pHardware.neutralMode();
         HoodConfig.MotorOutput.Inverted = pHardware.direction();
@@ -46,6 +51,7 @@ public class HoodIOKrakenx44 implements HoodIO{
         mHoodMotor.getConfigurator().apply(HoodConfig);
 
         mHoodControlMode = mHoodMotor.getControlMode();
+        mHoodPosition = mHoodMotor.getPosition();
         mHoodVelocityRPS = mHoodMotor.getVelocity();
         mHoodAccelerationRPSS = mHoodMotor.getAcceleration();
         mHoodVoltage = mHoodMotor.getMotorVoltage();
@@ -59,6 +65,7 @@ public class HoodIOKrakenx44 implements HoodIO{
     public void updateInputs(HoodInputs pInputs) {
         pInputs.iIsHoodConnected = BaseStatusSignal.refreshAll(
             mHoodControlMode,
+            mHoodPosition,
             mHoodVelocityRPS,
             mHoodAccelerationRPSS,
             mHoodVoltage,
@@ -67,6 +74,7 @@ public class HoodIOKrakenx44 implements HoodIO{
             mHoodTempCelsius
         ).isOK();
         pInputs.iHoodControlMode = mHoodControlMode.getValue().toString();
+        pInputs.iHoodAngle = Rotation2d.fromRotations(mHoodPosition.getValueAsDouble());
         pInputs.iHoodVelocityRPS = mHoodVelocityRPS.getValueAsDouble();
         pInputs.iHoodAccelerationRPSS = mHoodAccelerationRPSS.getValueAsDouble();
         pInputs.iHoodMotorVolts = mHoodVoltage.getValueAsDouble();

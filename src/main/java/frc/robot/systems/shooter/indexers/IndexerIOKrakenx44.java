@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
-import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 
 public class IndexerIOKrakenx44 implements IndexerIO{
     private final TalonFX mIndexerMotor;
@@ -37,11 +37,11 @@ public class IndexerIOKrakenx44 implements IndexerIO{
     }
     
     // LEADER CONSTRUCTOR
-    public IndexerIOKrakenx44(InternalMotorHardware pLeaderConfig) {
+    public IndexerIOKrakenx44(BasicMotorHardware pLeaderConfig) {
         this(pLeaderConfig.motorID(), pLeaderConfig, true);
     }
 
-    private IndexerIOKrakenx44(int pMotorID, InternalMotorHardware pHardware, boolean pIsLeader) {
+    private IndexerIOKrakenx44(int pMotorID, BasicMotorHardware pHardware, boolean pIsLeader) {
         this.mIndexerMotor = new TalonFX(pMotorID, pHardware.canBus());
         this.mIsLeader = pIsLeader;
 

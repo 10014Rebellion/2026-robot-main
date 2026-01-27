@@ -8,21 +8,59 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 public class HardwareRecords {
-    public static record InternalMotorHardware(
+    public static record CurrentLimits(
+        double supplyCurrentLimit,
+        double statorCurrentLimit
+    ) {}
+
+    public static record PositionSoftLimits(
+        double forwardLimitM,
+        double backwardLimitM
+    ) {}
+
+    public static record RotationSoftLimits(
+        Rotation2d forwardLimit,
+        Rotation2d backwardLimit
+    ) {}
+
+    public static record BasicMotorHardware(
+        int motorID, 
+        CANBus canBus, 
+        double rotorToMechanismRatio, 
+        double supplyCurrentLimit,
+        double statorCurrentLimit,
+        InvertedValue direction,
+        NeutralModeValue neutralMode,
+        CurrentLimits currentLimit
+    ) {}
+
+    public static record PositionLimitMotorHardware(
         int motorID, 
         CANBus canBus, 
         double rotorToMechanismRatio, 
         InvertedValue direction,
         NeutralModeValue neutralMode,
-        int supplyCurrentLimit,
-        int statorCurrentLimit
+        CurrentLimits currentLimit,
+        PositionSoftLimits positionLimit
+    ) {}
+
+    public static record RotationLimitMotorHardware(
+        int motorID, 
+        CANBus canBus, 
+        double rotorToMechanismRatio, 
+        InvertedValue direction,
+        NeutralModeValue neutralMode,
+        CurrentLimits currentLimit,
+        RotationSoftLimits rotationLimit 
     ) {}
 
     public static record FollowerMotorHardware(
         int motorID,
-        InternalMotorHardware leaderConfig,
+        BasicMotorHardware leaderConfig,
         MotorAlignmentValue alignmentValue
     ) {}
 
@@ -31,46 +69,26 @@ public class HardwareRecords {
         double cancoderToMechanismRatio
     ) {}
 
-    public static record ClosedSimpleMotorHardware(
-        InternalMotorHardware internalMotor,
-        CANCoderHardware feedbackSensor,
-        SimpleController controller
-    ) {}
-
-    public static record ClosedElevatorMotorHardware(
-        InternalMotorHardware internalMotor,
-        CANCoderHardware feedbackSensor,
-        SimpleController controller,
-        double forwardLimitM,
-        double backwardLimitM
-    ) {}
-
-    public static record ClosedArmMotorHardware(
-        InternalMotorHardware internalMotor,
-        CANCoderHardware feedbackSensor,
-        SimpleController controller,
-        double forwardLimitDeg,
-        double backwardLimitDeg
-    ) {}
-
     public static record ElevatorController(
-        double slot,
-        double kP,
-        double kD,
+        int slot,
+        PDConstants pdController,
         ElevatorFeedforward kFeedforward
     ) {}
 
     public static record ArmController(
-        double slot,
-        double kP,
-        double kD,
+        int slot,
+        PDConstants pdController,
         ArmFeedforward kFeedforward
     ) {}
 
     public static record SimpleController(
-        double slot,
-        double kP,
-        double kD,
+        int slot,
+        PDConstants pdController,
         SimpleMotorFeedforward kFeedforward
     ) {}
+
+    public static record PDConstants(
+        double kP,
+        double kD
+    ) {} 
 }

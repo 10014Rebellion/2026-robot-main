@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
-import frc.lib.hardware.HardwareRecords.InternalMotorHardware;
+import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 
 public class FlywheelIOKrakenx44 implements FlywheelIO{
     private final TalonFX mFlywheelMotor;
@@ -37,11 +37,11 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
     }
     
     // LEADER CONSTRUCTOR
-    public FlywheelIOKrakenx44(InternalMotorHardware pLeaderConfig) {
+    public FlywheelIOKrakenx44(BasicMotorHardware pLeaderConfig) {
         this(pLeaderConfig.motorID(), pLeaderConfig, true);
     }
 
-    private FlywheelIOKrakenx44(int pMotorID, InternalMotorHardware pHardware, boolean pIsLeader) {
+    private FlywheelIOKrakenx44(int pMotorID, BasicMotorHardware pHardware, boolean pIsLeader) {
         this.mFlywheelMotor = new TalonFX(pMotorID, pHardware.canBus());
         this.mIsLeader = pIsLeader;
 
