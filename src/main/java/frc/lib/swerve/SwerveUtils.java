@@ -211,6 +211,7 @@ public class SwerveUtils {
         return moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
     }
 
+    /* Intended as a brute force sign conversion, not technically correct if  if velocity change is zero as FF can occure even if vel = 0 */
     public static double correctAmpFFDirection(SwerveModuleState optimizedState, SwerveModuleState prevOptimizedState, double driveAmps, int modNumber) {
         double directionOfVelChange = Math.signum(
             optimizedState.speedMetersPerSecond - prevOptimizedState.speedMetersPerSecond);
