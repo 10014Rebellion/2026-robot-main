@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auton.AutonCommands;
 import frc.robot.bindings.BindingsConstants;
 import frc.robot.bindings.ButtonBindings;
-import frc.robot.game.StateTracker;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
 import frc.robot.systems.drive.gyro.GyroIO;
@@ -21,12 +20,7 @@ import frc.robot.systems.apriltag.AprilTagIO;
 import frc.robot.systems.apriltag.AprilTagIOPVTag;
 import frc.robot.systems.apriltag.AprilTag;
 import frc.robot.systems.apriltag.AprilTagConstants;
-import frc.robot.systems.apriltag.AprilTagConstants.Orientation;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import frc.robot.systems.apriltag.AprilTag;
-import frc.robot.systems.apriltag.AprilTagConstants;
-import frc.robot.systems.apriltag.AprilTagIO;
 
 
 public class RobotContainer {
@@ -36,8 +30,6 @@ public class RobotContainer {
     private final AutonCommands autos;
 
     public RobotContainer() {
-        // new StateTracker();
-
         switch (Constants.kCurrentMode) {
             case REAL:
                 mDrive = new Drive(

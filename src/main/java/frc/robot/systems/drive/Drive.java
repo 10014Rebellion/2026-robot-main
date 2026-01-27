@@ -37,12 +37,10 @@ import frc.lib.optimizations.PPRobotConfigLoader;
 import frc.lib.pathplanner.AzimuthFeedForward;
 import frc.lib.pathplanner.SwerveSetpoint;
 import frc.lib.pathplanner.SwerveSetpointGenerator;
-import frc.lib.swerve.SwerveUtils;
 import frc.lib.telemetry.Telemetry;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.game.GameDriveManager;
 import frc.robot.game.GameDriveManager.GameDriveStates;
-import frc.robot.game.GameGoalPoseChooser;
 import frc.robot.systems.apriltag.AprilTag;
 import frc.robot.systems.apriltag.AprilTag.VisionObservation;
 import frc.robot.systems.drive.controllers.HeadingController;
@@ -95,7 +93,7 @@ public class Drive extends SubsystemBase {
     public static RobotConfig mRobotConfig;
     private final SwerveSetpointGenerator mSetpointGenerator;
     private SwerveSetpoint mPreviousSetpoint =
-            new SwerveSetpoint(new ChassisSpeeds(), SwerveUtils.zeroStates(), DriveFeedforwards.zeros(4), AzimuthFeedForward.zeros());
+            new SwerveSetpoint(new ChassisSpeeds(), SwerveHelper.zeroStates(), DriveFeedforwards.zeros(4), AzimuthFeedForward.zeros());
 
     private ChassisSpeeds mDesiredSpeeds = new ChassisSpeeds();
     private ChassisSpeeds mPPDesiredSpeeds = new ChassisSpeeds();
@@ -103,7 +101,7 @@ public class Drive extends SubsystemBase {
     private final PathConstraints mDriveConstraints = DriveConstants.kAutoConstraints;
 
     // private SwerveModuleState[] mPrevSetpointStates = SwerveUtils.zeroStates();
-    private SwerveModulePosition[] mPrevPositions = SwerveUtils.zeroPositions();
+    private SwerveModulePosition[] mPrevPositions = SwerveHelper.zeroPositions();
     private double[] mPrevDriveAmps = new double[] {0.0, 0.0, 0.0, 0.0};
 
     private final boolean kUseGenerator = true;
@@ -158,7 +156,7 @@ public class Drive extends SubsystemBase {
             new PPHolonomicDriveController(kPPTranslationPID, kPPRotationPID),
             mRobotConfig, () -> AllianceFlipUtil.shouldFlip(), this);
 
-        SwerveUtils.setUpPathPlanner();
+        SwerveHelper.setUpPathPlanner();
         SmartDashboard.putData(mField);
         mHeadingController.setHeadingGoal(mGoalRotationSup);
     }
@@ -191,8 +189,8 @@ public class Drive extends SubsystemBase {
         // Telemetry.reportException(new Exception("SAMPLE COUNT:" + sampleCount));
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
-            SwerveModulePosition[] modulePositions = SwerveUtils.zeroPositions();
-            SwerveModulePosition[] moduleDeltas = SwerveUtils.zeroPositions();
+            SwerveModulePosition[] modulePositions = SwerveHelper.zeroPositions();
+            SwerveModulePosition[] moduleDeltas = SwerveHelper.zeroPositions();
             for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
                 // System.out.println("\n\n\n\n\n\n\n\n"+mModules[moduleIndex].getOdometryPositions().length+"\n\n\n\n\n\n\n\n\n\n");
                 modulePositions[moduleIndex] = mModules[moduleIndex].getOdometryPositions()[i];
@@ -203,7 +201,7 @@ public class Drive extends SubsystemBase {
             }
 
             Twist2d robotTwist = kKinematics.toTwist2d(moduleDeltas);
-            if(kSkidRatioCap < SwerveUtils.skidRatio(GeomUtil.toChassisSpeeds(robotTwist, 1.0 / kOdometryFrequency))) skidCount++;
+            if(kSkidRatioCap < SwerveHelper.skidRatio(GeomUtil.toChassisSpeeds(robotTwist, 1.0 / kOdometryFrequency))) skidCount++;
 
             // Update gyro angle
             if (mGyroInputs.iConnected) {
@@ -311,10 +309,10 @@ public class Drive extends SubsystemBase {
     /* Sets the desired swerve module states to the robot */
     public void runSwerve(ChassisSpeeds speeds) {
         if(speeds == null) return;
-        mDesiredSpeeds = SwerveUtils.discretize(speeds, tDriftRate.get());
+        mDesiredSpeeds = SwerveHelper.discretize(speeds, tDriftRate.get());
 
         /* Logs all the possible drive states, great for debugging */
-        SwerveUtils.logPossibleDriveStates(
+        SwerveHelper.logPossibleDriveStates(
                 kDoExtraLogging, mDesiredSpeeds, getModuleStates(), mPreviousSetpoint, mRobotRotation);
 
         SwerveModuleState[] unOptimizedSetpointStates = new SwerveModuleState[4];
@@ -327,22 +325,22 @@ public class Drive extends SubsystemBase {
             mPreviousSetpoint, mDesiredSpeeds, (DriverStation.isTeleop()) ? mDriveConstraints : kAutoConstraints, 0.02);
 
         /* Only for logging purposes */
-        SwerveModuleState[] moduleTorques = SwerveUtils.zeroStates();
+        SwerveModuleState[] moduleTorques = SwerveHelper.zeroStates();
 
         // Telemetry.log("Drive/Odometry/generatedFieldSpeeds",
         // ChassisSpeeds.fromRobotRelativeSpeeds(previousSetpoint.robotRelativeSpeeds(), robotRotation));
         for (int i = 0; i < 4; i++) {
             if (kUseGenerator) {
                 /* Logs the drive feedforward stuff */
-                SwerveUtils.logDriveFeedforward(mPreviousSetpoint.feedforwards(), i);
+                SwerveHelper.logDriveFeedforward(mPreviousSetpoint.feedforwards(), i);
 
                 setpointStates[i] = new SwerveModuleState(
                     mPreviousSetpoint.moduleStates()[i].speedMetersPerSecond,
                     /* setpointAngle = currentAngle if the speed is less than 0.01 */
-                    SwerveUtils.removeAzimuthJitter(
+                    SwerveHelper.removeAzimuthJitter(
                         mPreviousSetpoint.moduleStates()[i], mModules[i].getCurrentState()));
 
-                unOptimizedSetpointStates[i] = SwerveUtils.copyState(setpointStates[i]);
+                unOptimizedSetpointStates[i] = SwerveHelper.copyState(setpointStates[i]);
                 setpointStates[i].optimize(mModules[i].getCurrentState().angle);
 
                 /* Feedforward cases based on driveState */
@@ -363,7 +361,7 @@ public class Drive extends SubsystemBase {
                     (driveAmps * kMaxLinearSpeedMPS / kDriveFOCAmpLimit), optimizedSetpointStates[i].angle);
             } else {
                 setpointStates[i] = new SwerveModuleState(setpointStates[i].speedMetersPerSecond,
-                    SwerveUtils.removeAzimuthJitter(setpointStates[i], mModules[i].getCurrentState()));
+                    SwerveHelper.removeAzimuthJitter(setpointStates[i], mModules[i].getCurrentState()));
 
                 setpointStates[i].optimize(mModules[i].getCurrentState().angle);
                 setpointStates[i].cosineScale(mModules[i].getCurrentState().angle);
@@ -389,17 +387,17 @@ public class Drive extends SubsystemBase {
         switch (mDriveState) {
             /* No need to optimize for Choreo, as it handles it under the hood */
             case AUTON:
-                driveAmps = SwerveUtils.convertChoreoNewtonsToAmps(currentState, mPathPlanningFF, i);
+                driveAmps = SwerveHelper.convertChoreoNewtonsToAmps(currentState, mPathPlanningFF, i);
                 break;
             case AUTO_ALIGN:
             default:
                 driveAmps = setpoint.feedforwards().torqueCurrentsAmps()[i];
         }
 
-        driveAmps = SwerveUtils.optimizeTorque(unoptimizedState, optimizedState, driveAmps, currentState, i);
+        driveAmps = SwerveHelper.optimizeTorque(unoptimizedState, optimizedState, driveAmps, currentState, i);
 
         if(!mDriveState.equals(DriveState.AUTON) && !mDriveState.equals(DriveState.AUTO_ALIGN)) 
-            driveAmps = SwerveUtils.lowPassFilter(mPrevDriveAmps[i], driveAmps, tDriveFFAggressiveness.get());
+            driveAmps = SwerveHelper.lowPassFilter(mPrevDriveAmps[i], driveAmps, tDriveFFAggressiveness.get());
 
         mPrevDriveAmps[i] = driveAmps;
         return driveAmps;
