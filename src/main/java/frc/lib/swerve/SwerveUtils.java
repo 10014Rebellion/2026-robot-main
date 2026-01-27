@@ -8,6 +8,7 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import static frc.robot.systems.drive.DriveConstants.kDriveMotorGearing;
 import static frc.robot.systems.drive.DriveConstants.kKinematics;
 import static frc.robot.systems.drive.DriveConstants.kMaxLinearSpeedMPS;
+import static frc.robot.systems.drive.DriveConstants.kSkidRatioCap;
 import static frc.robot.systems.drive.DriveConstants.kWheelRadiusMeters;
 
 import java.util.Arrays;
@@ -200,7 +201,8 @@ public class SwerveUtils {
 
         double ratio = moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
 
-        if(Double.isNaN(ratio) || Double.isInfinite(ratio)) return 0.0;
+        if(moduleTranslationMagnitudes[0] == 0.0 || moduleTranslationMagnitudes[3] == 0.0) return 0.0;
+        if(Double.isNaN(ratio) || Double.isInfinite(ratio)) return kSkidRatioCap+1.0;
 
         return moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
     }
