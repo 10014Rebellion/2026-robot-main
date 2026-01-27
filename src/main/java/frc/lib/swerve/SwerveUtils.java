@@ -173,6 +173,10 @@ public class SwerveUtils {
 
         Arrays.sort(moduleTranslationMagnitudes);
 
+        double ratio = moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
+
+        if(Double.isNaN(ratio) || Double.isInfinite(ratio)) return 0.0;
+
         return moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
     }
 
@@ -193,6 +197,10 @@ public class SwerveUtils {
         }
 
         Arrays.sort(moduleTranslationMagnitudes);
+
+        double ratio = moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
+
+        if(Double.isNaN(ratio) || Double.isInfinite(ratio)) return 0.0;
 
         return moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
     }
