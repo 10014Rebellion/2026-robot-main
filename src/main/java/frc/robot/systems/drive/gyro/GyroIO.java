@@ -22,4 +22,8 @@ public interface GyroIO {
     public default void updateInputs(GyroInputs inputs) {}
 
     public default void resetGyro(Rotation2d rotation) {}
+
+    public default double getAccMagG() {
+        return 0.0;
+    }
 }

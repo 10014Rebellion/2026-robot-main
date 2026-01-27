@@ -89,6 +89,8 @@ public class Drive extends SubsystemBase {
     private final SwerveDriveOdometry mOdometry;
     private final SwerveDrivePoseEstimator mPoseEstimator;
     private final Field2d mField = new Field2d();
+    private final Debouncer mSkidFactorDebouncer = new Debouncer(0.25, DebounceType.kFalling);
+    private final Debouncer mCollisionDebouncer = new Debouncer(0.25, DebounceType.kFalling);
 
     public static RobotConfig mRobotConfig;
     private final SwerveSetpointGenerator mSetpointGenerator;
@@ -217,9 +219,8 @@ public class Drive extends SubsystemBase {
 
         mOdometry.update(mRobotRotation, getModulePositions());
 
-        double skidFactor = skidCount * kSkidScalar;
-        double gyroFactor = (GeomUtil.hypot(mGyroInputs.iAccXG, mGyroInputs.iAccYG, mGyroInputs.iAccZG) > kCollisionCapG) 
-                ? kCollisionScalar : 1.0;
+        double skidFactor = mSkidFactorDebouncer.calculate(skidCount > 0) ? skidCount * kSkidScalar : 0;
+        double gyroFactor = mCollisionDebouncer.calculate(mGyro.getAccMagG() > kCollisionCapG) ? kCollisionScalar : 1.0;
         
         double visionFactor = skidFactor + gyroFactor;
 

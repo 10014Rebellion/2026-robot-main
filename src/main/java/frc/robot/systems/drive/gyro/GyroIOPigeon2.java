@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
+import frc.lib.math.GeomUtil;
 import frc.robot.systems.drive.DriveConstants;
 import frc.robot.systems.drive.PhoenixOdometryThread;
 
@@ -26,6 +27,10 @@ public class GyroIOPigeon2 implements GyroIO {
 
     private final Queue<Double> yawPositionQueue;
     private final Queue<Double> yawTimestampQueue;
+
+    private double mYawAccX = 0.0;
+    private double mYawAccY = 0.0;
+    private double mYawAccZ = 0.0;
 
     public GyroIOPigeon2() {
         mGyro.getConfigurator().apply(new Pigeon2Configuration());
@@ -42,12 +47,21 @@ public class GyroIOPigeon2 implements GyroIO {
 
     @Override
     public void updateInputs(GyroInputs pInputs) {
-        pInputs.iConnected = BaseStatusSignal.refreshAll(mYaw, mYawVelocity).equals(StatusCode.OK);
+        pInputs.iConnected = BaseStatusSignal.refreshAll(
+            mYaw, 
+            mYawVelocity,
+            mYawAccelerationX,
+            mYawAccelerationY,
+            mYawAccelerationZ).equals(StatusCode.OK);
         pInputs.iYawPosition = Rotation2d.fromDegrees(mYaw.getValueAsDouble());
         pInputs.iYawVelocityPS = Rotation2d.fromDegrees(mYawVelocity.getValueAsDouble());
         pInputs.iAccXG = mYawAccelerationX.getValueAsDouble();
         pInputs.iAccZG = mYawAccelerationY.getValueAsDouble();
         pInputs.iAccYG = mYawAccelerationZ.getValueAsDouble();
+
+        mYawAccX = pInputs.iAccXG;
+        mYawAccY = pInputs.iAccYG;
+        mYawAccZ = pInputs.iAccZG;
 
         pInputs.odometryYawTimestamps =
             yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
@@ -63,5 +77,10 @@ public class GyroIOPigeon2 implements GyroIO {
     @Override
     public void resetGyro(Rotation2d pRotation) {
         mGyro.setYaw(pRotation.getDegrees());
+    }
+
+    @Override
+    public double getAccMagG() {
+        return GeomUtil.hypot(mYawAccX, mYawAccY, mYawAccZ);
     }
 }
