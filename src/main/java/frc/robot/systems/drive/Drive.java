@@ -336,8 +336,9 @@ public class Drive extends SubsystemBase {
             case WHEEL_CHARACTERIZATION:
                 /* If null, then PID isn't set, so characterization can set motors w/o interruption */
                 mDesiredSpeeds = null;
+                break;
             case STOP:
-                for (int i = 0; i < mModules.length; i++) mDesiredSpeeds = new ChassisSpeeds();
+                mDesiredSpeeds = new ChassisSpeeds();
                 break;
             default:
                 /* Defaults to Teleop control if no other cases are run*/
