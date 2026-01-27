@@ -48,9 +48,9 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
         TalonFXConfiguration FlywheelConfig = new TalonFXConfiguration();
 
         FlywheelConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        FlywheelConfig.CurrentLimits.SupplyCurrentLimit = pHardware.supplyCurrentLimit();
+        FlywheelConfig.CurrentLimits.SupplyCurrentLimit = pHardware.currentLimit().supplyCurrentLimit();
         FlywheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        FlywheelConfig.CurrentLimits.StatorCurrentLimit = pHardware.statorCurrentLimit();
+        FlywheelConfig.CurrentLimits.StatorCurrentLimit = pHardware.currentLimit().statorCurrentLimit();
 
         FlywheelConfig.MotorOutput.NeutralMode = pHardware.neutralMode();
         FlywheelConfig.MotorOutput.Inverted = pHardware.direction();

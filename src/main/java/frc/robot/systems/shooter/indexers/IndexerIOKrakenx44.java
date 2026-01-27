@@ -48,9 +48,9 @@ public class IndexerIOKrakenx44 implements IndexerIO{
         TalonFXConfiguration IndexerConfig = new TalonFXConfiguration();
 
         IndexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        IndexerConfig.CurrentLimits.SupplyCurrentLimit = pHardware.supplyCurrentLimit();
+        IndexerConfig.CurrentLimits.SupplyCurrentLimit = pHardware.currentLimit().supplyCurrentLimit();
         IndexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        IndexerConfig.CurrentLimits.StatorCurrentLimit = pHardware.statorCurrentLimit();
+        IndexerConfig.CurrentLimits.StatorCurrentLimit = pHardware.currentLimit().statorCurrentLimit();
 
         IndexerConfig.MotorOutput.NeutralMode = pHardware.neutralMode();
         IndexerConfig.MotorOutput.Inverted = pHardware.direction();

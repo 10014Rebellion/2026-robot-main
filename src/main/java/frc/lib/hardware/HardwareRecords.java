@@ -9,7 +9,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 
 public class HardwareRecords {
     public static record CurrentLimits(
@@ -30,9 +29,7 @@ public class HardwareRecords {
     public static record BasicMotorHardware(
         int motorID, 
         CANBus canBus, 
-        double rotorToMechanismRatio, 
-        double supplyCurrentLimit,
-        double statorCurrentLimit,
+        double rotorToMechanismRatio,
         InvertedValue direction,
         NeutralModeValue neutralMode,
         CurrentLimits currentLimit

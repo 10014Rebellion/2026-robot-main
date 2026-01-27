@@ -30,9 +30,9 @@ public class IntakeIOKrakenx44 implements IntakeIO{
         var IntakeConfig = new TalonFXConfiguration();
 
         IntakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        IntakeConfig.CurrentLimits.SupplyCurrentLimit = pConfig.supplyCurrentLimit();
+        IntakeConfig.CurrentLimits.SupplyCurrentLimit = pConfig.currentLimit().supplyCurrentLimit();
         IntakeConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        IntakeConfig.CurrentLimits.StatorCurrentLimit = pConfig.statorCurrentLimit();
+        IntakeConfig.CurrentLimits.StatorCurrentLimit = pConfig.currentLimit().statorCurrentLimit();
 
         IntakeConfig.MotorOutput.NeutralMode = pConfig.neutralMode();
         IntakeConfig.MotorOutput.Inverted = pConfig.direction();

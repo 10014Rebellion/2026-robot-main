@@ -33,9 +33,9 @@ public class ClimbIOKrakenx44 implements ClimbIO {
         var ClimbConfig = new TalonFXConfiguration();
 
         ClimbConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        ClimbConfig.CurrentLimits.SupplyCurrentLimit = pConfig.supplyCurrentLimit();
+        ClimbConfig.CurrentLimits.SupplyCurrentLimit = pConfig.currentLimit().supplyCurrentLimit();
         ClimbConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        ClimbConfig.CurrentLimits.StatorCurrentLimit = pConfig.statorCurrentLimit();
+        ClimbConfig.CurrentLimits.StatorCurrentLimit = pConfig.currentLimit().statorCurrentLimit();
 
         ClimbConfig.Voltage.PeakForwardVoltage = 12;
         ClimbConfig.Voltage.PeakReverseVoltage = -12;

@@ -9,7 +9,6 @@ import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 import frc.lib.hardware.HardwareRecords.CurrentLimits;
 import frc.lib.hardware.HardwareRecords.PDConstants;
-import frc.lib.hardware.HardwareRecords.RotationLimitMotorHardware;
 import frc.lib.hardware.HardwareRecords.SimpleController;
 
 public class ShooterConstants {
@@ -25,8 +24,6 @@ public class ShooterConstants {
             54,
             Constants.kSubsystemsCANBus,
             1,
-            0,
-            0,
             InvertedValue.CounterClockwise_Positive,
             NeutralModeValue.Coast,
             new CurrentLimits(40, 50)

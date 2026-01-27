@@ -31,9 +31,9 @@ public class ConveyorIOKrakenx44 implements ConveyorIO {
         var ConveyorConfig = new TalonFXConfiguration();
 
         ConveyorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-        ConveyorConfig.CurrentLimits.SupplyCurrentLimit = pConfig.supplyCurrentLimit();
+        ConveyorConfig.CurrentLimits.SupplyCurrentLimit = pConfig.currentLimit().supplyCurrentLimit();
         ConveyorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        ConveyorConfig.CurrentLimits.StatorCurrentLimit = pConfig.statorCurrentLimit();
+        ConveyorConfig.CurrentLimits.StatorCurrentLimit = pConfig.currentLimit().statorCurrentLimit();
 
         ConveyorConfig.Voltage.PeakForwardVoltage = 12;
         ConveyorConfig.Voltage.PeakReverseVoltage = -12;
