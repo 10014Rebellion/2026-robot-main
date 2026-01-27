@@ -184,8 +184,7 @@ public class ModuleIOKraken implements ModuleIO {
             mDriveSupplyCurrent,
             mDriveStatorCurrent,
             mDriveTorqueCurrent,
-            mDriveTempCelsius
-        ).isOK();
+            mDriveTempCelsius).isOK();
         pInputs.iDrivePositionM = (mDrivePositionM.getValueAsDouble());
         pInputs.iDriveVelocityMPS = (mDriveVelocityMPS.getValueAsDouble());
         pInputs.iDriveAppliedVolts = mDriveAppliedVolts;
@@ -197,13 +196,12 @@ public class ModuleIOKraken implements ModuleIO {
         pInputs.iDriveAccelerationMPSS = mDriveAccelerationMPSS.getValueAsDouble();
 
         pInputs.iIsAzimuthConnected = BaseStatusSignal.refreshAll(
-                        mAzimuthVelocity,
-                        mAzimuthVoltage,
-                        mAzimuthStatorCurrent,
-                        mAzimuthSupplyCurrent,
-                        mAzimuthTemp,
-                        mAzimuthPosition)
-                .isOK();
+            mAzimuthVelocity,
+            mAzimuthVoltage,
+            mAzimuthStatorCurrent,
+            mAzimuthSupplyCurrent,
+            mAzimuthTemp,
+            mAzimuthPosition).isOK();
         pInputs.iAzimuthPosition = Rotation2d.fromRotations(mAzimuthPosition.getValueAsDouble());
         pInputs.iAzimuthVelocity = Rotation2d.fromRotations(mAzimuthVelocity.getValueAsDouble());
         pInputs.iAzimuthAppliedVolts = mAzimuthAppliedVolts;
