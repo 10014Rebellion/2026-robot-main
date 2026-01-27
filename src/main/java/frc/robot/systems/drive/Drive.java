@@ -212,6 +212,7 @@ public class Drive extends SubsystemBase {
             kOdometryLock.unlock();
         }
 
+        double skidCount = 0;
         double[] sampleTimestamps =
             mModules[0].getOdometryTimeStamps(); // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
@@ -233,6 +234,9 @@ public class Drive extends SubsystemBase {
 
             Logger.recordOutput("Drive/ModulePositions250", modulePositions);
 
+            Twist2d robotTwist = kKinematics.toTwist2d(moduleDeltas);
+            if(kSkidRatioCap < SwerveUtils.skidRatio(GeomUtil.toChassisSpeeds(robotTwist, 1.0 / kOdometryFrequency))) skidCount++;
+
             // Update gyro angle
             if (mGyroInputs.iConnected) {
                 // Use the real gyro angle
@@ -245,14 +249,30 @@ public class Drive extends SubsystemBase {
 
             mPoseEstimator.updateWithTime(sampleTimestamps[i], mRobotRotation, modulePositions);
         }
+
         mOdometry.update(mRobotRotation, getModulePositions());
 
+        double skidFactor = skidCount * kSkidScalar;
+        double gyroFactor = (Math.hypot(
+            Math.hypot(mGyroInputs.iAccelerationXG, mGyroInputs.iAccelerationYG), 
+            mGyroInputs.iAccelerationZG) > kCollisionCapG) 
+                ? kCollisionScalar : 1.0;
+        
+        double visionFactor = skidFactor + gyroFactor;
+
+        Logger.recordOutput("Drive/Odometry/SkidFactor", skidFactor);
+        Logger.recordOutput("Drive/Odometry/SkidCount", skidCount);
+        Logger.recordOutput("Drive/Odometry/VisionFactor", gyroFactor);
+        Logger.recordOutput("Drive/Odometry/VisionFactor", visionFactor);
+        
         /* VISION */
         mVision.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
         VisionObservation[] observations = mVision.getVisionObservations();
         for (VisionObservation observation : observations) {
             if (observation.hasObserved())
-                mPoseEstimator.addVisionMeasurement(observation.pose(), observation.timeStamp(), observation.stdDevs());
+                mPoseEstimator.addVisionMeasurement(
+                    observation.pose(), observation.timeStamp(), 
+                    observation.stdDevs().times(1.0 / visionFactor));
 
             Telemetry.log(
                     observation.camName() + "/stdDevX", observation.stdDevs().get(0));
@@ -415,12 +435,8 @@ public class Drive extends SubsystemBase {
 
     /* Calculates DriveFeedforward based off state */
     public double calculateDriveFeedforward(
-            SwerveSetpoint setpoint,
-            SwerveModuleState currentState,
-            SwerveModuleState unoptimizedState,
-            SwerveModuleState optimizedState,
-            int i) {
-        
+            SwerveSetpoint setpoint, SwerveModuleState currentState,
+            SwerveModuleState unoptimizedState, SwerveModuleState optimizedState, int i) {
         double driveAmps = 0.0;
         switch (mDriveState) {
             case AUTON:

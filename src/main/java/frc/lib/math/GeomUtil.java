@@ -128,6 +128,16 @@ public class GeomUtil {
         return new Twist2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
     }
 
+    /**
+     * Converts a Twist2d to a ChassisSpeeds by extracting two dimensions (Y and Z). chain
+     *
+     * @param speeds The original translation
+     * @return The resulting translation
+     */
+    public static ChassisSpeeds toChassisSpeeds(Twist2d twist, double dt) {
+        return new ChassisSpeeds(twist.dx / dt, twist.dy / dt, twist.dtheta / dt);
+    }
+
     public static Rotation2d getSmallestChangeInRotation(Rotation2d rotation1, Rotation2d rotation2) {
         Rotation2d smallestRotMagnitude = Rotation2d.fromRadians(Math.min(
                 Math.min(

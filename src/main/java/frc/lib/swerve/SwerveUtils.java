@@ -9,6 +9,9 @@ import static frc.robot.systems.drive.DriveConstants.kDriveMotorGearing;
 import static frc.robot.systems.drive.DriveConstants.kKinematics;
 import static frc.robot.systems.drive.DriveConstants.kMaxLinearSpeedMPS;
 import static frc.robot.systems.drive.DriveConstants.kWheelRadiusMeters;
+
+import java.util.Arrays;
+
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -150,5 +153,47 @@ public class SwerveUtils {
 
     public static double lowPassFilter(double previous, double input, double alpha) {
         return alpha * input + (1 - alpha) * previous;
+    }
+
+    public static double skidRatio(SwerveModuleState[] deltas) {
+        ChassisSpeeds speeds = kKinematics.toChassisSpeeds(deltas);
+        ChassisSpeeds rotationalSpeeds = new ChassisSpeeds(0.0, 0.0, speeds.omegaRadiansPerSecond);
+        SwerveModuleState[] rotationalModuleStates = kKinematics.toSwerveModuleStates(rotationalSpeeds);
+
+        double[] moduleTranslationMagnitudes = new double[4];
+        for(int i = 0; i < 4; i++) {
+            moduleTranslationMagnitudes[i] = Math.hypot(
+                (deltas[i].speedMetersPerSecond * deltas[i].angle.getCos())
+                    -
+                (rotationalModuleStates[i].speedMetersPerSecond * rotationalModuleStates[i].angle.getCos()),
+                (deltas[i].speedMetersPerSecond * deltas[i].angle.getSin())
+                    -
+                (rotationalModuleStates[i].speedMetersPerSecond * rotationalModuleStates[i].angle.getSin()));
+        }
+
+        Arrays.sort(moduleTranslationMagnitudes);
+
+        return moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
+    }
+
+    public static double skidRatio(ChassisSpeeds speeds) {
+        SwerveModuleState[] deltas = kKinematics.toSwerveModuleStates(speeds);
+        ChassisSpeeds rotationalSpeeds = new ChassisSpeeds(0.0, 0.0, speeds.omegaRadiansPerSecond);
+        SwerveModuleState[] rotationalModuleStates = kKinematics.toSwerveModuleStates(rotationalSpeeds);
+
+        double[] moduleTranslationMagnitudes = new double[4];
+        for(int i = 0; i < 4; i++) {
+            moduleTranslationMagnitudes[i] = Math.hypot(
+                (deltas[i].speedMetersPerSecond * deltas[i].angle.getCos())
+                    -
+                (rotationalModuleStates[i].speedMetersPerSecond * rotationalModuleStates[i].angle.getCos()),
+                (deltas[i].speedMetersPerSecond * deltas[i].angle.getSin())
+                    -
+                (rotationalModuleStates[i].speedMetersPerSecond * rotationalModuleStates[i].angle.getSin()));
+        }
+
+        Arrays.sort(moduleTranslationMagnitudes);
+
+        return moduleTranslationMagnitudes[0] / moduleTranslationMagnitudes[3];
     }
 }
