@@ -14,10 +14,12 @@ public interface ClimbIO {
       public double iClimbSupplyCurrentAmps = 0.0;
       public double iClimbStatorCurrentAmps = 0.0;
       public double iClimbTempCelsius = 0.0;
+      public double iClimbPositionMeters = 0.0;
     }
 
     public default void updateInputs(ClimbInputs pInputs) {}
     public default void setMotorVolts(double pVolts) {}
     public default void setMotorPosition(double pPositionM, double pFeedforward) {}
+    public default void setPIDConstants(int pSlot, double kP, double kI, double kD) {};
     public default void stopMotor() {}
 }

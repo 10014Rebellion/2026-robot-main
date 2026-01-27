@@ -4,11 +4,16 @@ package frc.robot.systems.climb;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicExpoDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -16,11 +21,14 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 import frc.lib.hardware.HardwareRecords.PositionSoftLimits;
+import frc.lib.hardware.HardwareRecords.ElevatorController;
 
 public class ClimbIOKrakenx44 implements ClimbIO {
     private final TalonFX mClimbMotor;
     private final VoltageOut mClimbVoltageControl = new VoltageOut(0.0);
-    private final PositionDutyCycle mClimbPositionControl = new PositionDutyCycle(0.0);
+    private final MotionMagicExpoDutyCycle mClimbPositionControl = new MotionMagicExpoDutyCycle(0.0);
+
+    private final ElevatorController mController;
 
     private final StatusSignal<AngularVelocity> mClimbVelocityMPS;
     private final StatusSignal<Voltage> mClimbVoltage;
@@ -28,8 +36,9 @@ public class ClimbIOKrakenx44 implements ClimbIO {
     private final StatusSignal<Current> mClimbStatorCurrent;
     private final StatusSignal<Temperature> mClimbTempCelsius;
     private final StatusSignal<AngularAcceleration> mClimbAccelerationMPSS;
+    private final StatusSignal<Angle> mClimbPosition;
 
-    public ClimbIOKrakenx44(BasicMotorHardware pConfig, PositionSoftLimits pSoftLimits) {
+    public ClimbIOKrakenx44(BasicMotorHardware pConfig, PositionSoftLimits pSoftLimits, ElevatorController pController) {
         mClimbMotor = new TalonFX(pConfig.motorID(), pConfig.canBus());
         var ClimbConfig = new TalonFXConfiguration();
 
@@ -53,8 +62,22 @@ public class ClimbIOKrakenx44 implements ClimbIO {
         mClimbSupplyCurrent = mClimbMotor.getSupplyCurrent();
         mClimbStatorCurrent = mClimbMotor.getStatorCurrent();
         mClimbTempCelsius = mClimbMotor.getDeviceTemp();
+        mClimbPosition = mClimbMotor.getPosition();
 
         mClimbMotor.getConfigurator().apply(ClimbConfig);
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            50.0, 
+            mClimbVelocityMPS, 
+            mClimbAccelerationMPSS,
+            mClimbVoltage,
+            mClimbSupplyCurrent,
+            mClimbStatorCurrent,
+            mClimbTempCelsius,
+            mClimbPosition);
+        mClimbMotor.optimizeBusUtilization();
+
+        this.mController = pController;
     }
 
     @Override
@@ -73,6 +96,7 @@ public class ClimbIOKrakenx44 implements ClimbIO {
         pInputs.iClimbSupplyCurrentAmps = mClimbSupplyCurrent.getValueAsDouble();
         pInputs.iClimbStatorCurrentAmps = mClimbStatorCurrent.getValueAsDouble();
         pInputs.iClimbTempCelsius = mClimbTempCelsius.getValueAsDouble();
+        pInputs.iClimbPositionMeters = mClimbPosition.getValueAsDouble();
     }
 
     @Override
@@ -83,6 +107,17 @@ public class ClimbIOKrakenx44 implements ClimbIO {
     @Override
     public void setMotorPosition(double pPositionM, double pFeedforward) {
         mClimbMotor.setControl(mClimbPositionControl.withPosition(pPositionM).withFeedForward(pFeedforward));
+    }
+
+    @Override
+    public void setPIDConstants(int pSlot, double pKP, double pKI, double pKD){
+        var slotConfigs = new SlotConfigs();
+        slotConfigs.SlotNumber = pSlot;
+        slotConfigs.kP = pKP;
+        slotConfigs.kI = pKI;
+        slotConfigs.kD = pKD;
+
+        mClimbMotor.getConfigurator().apply(slotConfigs);
     }
 
     @Override

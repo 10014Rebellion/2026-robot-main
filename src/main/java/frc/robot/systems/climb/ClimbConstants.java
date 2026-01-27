@@ -3,9 +3,13 @@ package frc.robot.systems.climb;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import frc.robot.Constants;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 import frc.lib.hardware.HardwareRecords.CurrentLimits;
+import frc.lib.hardware.HardwareRecords.ElevatorController;
+import frc.lib.hardware.HardwareRecords.PDConstants;
+
 
 public class ClimbConstants {
     public static final BasicMotorHardware kClimbMotorConstants = new BasicMotorHardware(
@@ -16,4 +20,28 @@ public class ClimbConstants {
         NeutralModeValue.Coast,
         new CurrentLimits(30, 40)
     );
+
+    public static final ElevatorController kController0 = new ElevatorController(
+        0, 
+        new PDConstants(0, 0), 
+        new ElevatorFeedforward(
+            0, 
+            0, 
+            0));
+
+    public static final ElevatorController kController1 = new ElevatorController(
+        0, 
+        new PDConstants(0, 0), 
+        new ElevatorFeedforward(
+            0, 
+            0, 
+            0));
+
+    public static final ElevatorController kController2 = new ElevatorController(
+        0, 
+        new PDConstants(0, 0), 
+        new ElevatorFeedforward(
+            0, 
+            0, 
+            0));
 }
