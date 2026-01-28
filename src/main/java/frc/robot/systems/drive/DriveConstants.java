@@ -45,7 +45,15 @@ public class DriveConstants {
     public static final PathConstraints kAutoConstraints = new PathConstraints(
             kMaxLinearSpeedMPS, kMaxLinearAccelerationMPSS, kMaxRotationSpeedRadiansPS, kMaxRotationAccelRadiansPS);
 
-    /* MISC */
+    public static final PIDConstants kPPTranslationPID = new PIDConstants(1.0, 0.0, 0.01); // TODO: TUNE ME
+    public static final PIDConstants kPPRotationPID = new PIDConstants(0.8, 0.0, 0.0); // TODO: TUNE ME
+
+    /* DRIVEBASE TUNING / ODOMETRY / MISC*/
+    public static final CANBus kCANBus = new CANBus("rebeldrive"); // TODO: TUNE ME
+    public static final boolean isCANFD = true; 
+    public static final double kOdometryFrequency = isCANFD ? 250.0 : 100.0;
+    static final Lock kOdometryLock = new ReentrantLock(); 
+
     public static final double kDriftRate = RobotBase.isReal() ? 2.5 : 5.57; // TODO: TUNE ME
     public static final double kDriveFFAggressiveness = RobotBase.isReal() ? 0.0001 : 0.5;
     public static final double kAzimuthDriveScalar = RobotBase.isReal() ? 0.0 : 0.0;
@@ -55,9 +63,6 @@ public class DriveConstants {
     public static final double kCollisionScalar = 1.0; // TODO: TUNE ME
 
     public static final boolean kDoExtraLogging = false;
-
-    public static final PIDConstants kPPTranslationPID = new PIDConstants(1.0, 0.0, 0.01); // TODO: TUNE ME
-    public static final PIDConstants kPPRotationPID = new PIDConstants(0.8, 0.0, 0.0); // TODO: TUNE ME
 
     ///////////////////// MODULES \\\\\\\\\\\\\\\\\\\\\\\
     /* GENERAL SWERVE MODULE CONSTANTS */
@@ -82,23 +87,18 @@ public class DriveConstants {
     public static final double kAzimuthFOCAmpLimit = 40.0;
 
     public static final ModuleControlConfig kModuleControllerConfigs = RobotBase.isReal()
-            ? new ModuleControlConfig(
-                    new PIDController(100.0, 0.0, 0.0), new SimpleMotorFeedforward(1.0, 0.0, 1.0), // DRIVE // TODO: TUNE ME
-                    new PIDController(3.5, 0.0, 0.0), new SimpleMotorFeedforward(0.3, 1.0 / 2.25, 0.0)) // AZIMUTH // TODO: TUNE ME
-            : new ModuleControlConfig(
-                    new PIDController(0.1, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 2.36, 0.005), // TODO: TUNE ME
-                    new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.5)); // TODO: TUNE ME
+        ? new ModuleControlConfig(
+            new PIDController(100.0, 0.0, 0.0), new SimpleMotorFeedforward(1.0, 0.0, 1.0), // DRIVE // TODO: TUNE ME
+            new PIDController(3.5, 0.0, 0.0), new SimpleMotorFeedforward(0.3, 1.0 / 2.25, 0.0)) // AZIMUTH // TODO: TUNE ME
+        : new ModuleControlConfig(
+            new PIDController(0.1, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 2.36, 0.005), // TODO: TUNE ME
+            new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.5)); // TODO: TUNE ME
 
     /* MODULE SPECIFIC CONSTANTS */
-    /* If 180 was added, the person who got the offset had the bevel gears on the wrong side when they did it */
-    // BEVEL FACING LEFT (it shoulda been facing right tho)
-    public static final CANBus kCANBus = new CANBus("rebeldrive"); // TODO: TUNE ME
-    public static final boolean isCANFD = true; 
-    public static final double kOdometryFrequency = isCANFD ? 250.0 : 100.0;
-    static final Lock kOdometryLock = new ReentrantLock(); 
-
     public static final int kPigeonCANID = 5; // TODO: TUNE ME
 
+    /* If 180 was added, the person who got the offset had the bevel gears on the wrong side when they did it */
+    // BEVEL FACING LEFT (it shoulda been facing right tho)
     public static final ModuleHardwareConfig kFrontLeftHardware = new ModuleHardwareConfig(31, 21, 11, -0.350 + 0.5);
 
     public static final ModuleHardwareConfig kFrontRightHardware = new ModuleHardwareConfig(32, 22, 12, 0.259766 + 0.5);
@@ -107,11 +107,13 @@ public class DriveConstants {
 
     public static final ModuleHardwareConfig kBackRightHardware = new ModuleHardwareConfig(34, 24, 14, -0.368 + 0.5);
 
+
+    ////////////////////////// RECORDS \\\\\\\\\\\\\\\\\\\\\\\\
     public static record ModuleHardwareConfig(int driveID, int azimuthID, int encoderID, double offset) {}
 
     public static record ModuleControlConfig(
-            PIDController driveController,
-            SimpleMotorFeedforward driveFF,
-            PIDController azimuthController,
-            SimpleMotorFeedforward azimuthFF) {}
+        PIDController driveController,
+        SimpleMotorFeedforward driveFF,
+        PIDController azimuthController,
+        SimpleMotorFeedforward azimuthFF) {}
 }
