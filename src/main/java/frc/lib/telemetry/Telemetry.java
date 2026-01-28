@@ -4,7 +4,7 @@ package frc.lib.telemetry;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.lib.telemetry.TelemetryConstants.Severity;
-import frc.robot.systems.apriltag.AprilTag.VisionObservation;
+import frc.robot.systems.apriltag.ATagVision.VisionObservation;
 
 import java.util.HashSet;
 import java.util.Set;

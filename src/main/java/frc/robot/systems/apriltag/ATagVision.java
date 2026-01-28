@@ -14,24 +14,24 @@ import frc.lib.telemetry.Telemetry;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.game.FieldConstants;
 
-import static frc.robot.systems.apriltag.AprilTagConstants.KUseSingleTagTransform;
-import static frc.robot.systems.apriltag.AprilTagConstants.kAmbiguityThreshold;
-import static frc.robot.systems.apriltag.AprilTagConstants.kMultiStdDevs;
-import static frc.robot.systems.apriltag.AprilTagConstants.kSingleStdDevs;
+import static frc.robot.systems.apriltag.ATagVisionConstants.KUseSingleTagTransform;
+import static frc.robot.systems.apriltag.ATagVisionConstants.kAmbiguityThreshold;
+import static frc.robot.systems.apriltag.ATagVisionConstants.kMultiStdDevs;
+import static frc.robot.systems.apriltag.ATagVisionConstants.kSingleStdDevs;
 
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
-public class AprilTag {
-    private AprilTagIO[] mCameras;
+public class ATagVision {
+    private ATagCameraIO[] mCameras;
     private AprilTagIOInputsAutoLogged[] mCamerasData;
 
     private static final LoggedTunableNumber tSingleXYStdev =
-            new LoggedTunableNumber("Vision/kSingleXYStdev", kSingleStdDevs.get(0));
+        new LoggedTunableNumber("Vision/kSingleXYStdev", kSingleStdDevs.get(0));
     private static final LoggedTunableNumber tMultiXYStdev =
-            new LoggedTunableNumber("Vision/kMultiXYStdev", kMultiStdDevs.get(0));
+        new LoggedTunableNumber("Vision/kMultiXYStdev", kMultiStdDevs.get(0));
 
-    public AprilTag(AprilTagIO[] pCameras) {
+    public ATagVision(ATagCameraIO[] pCameras) {
         this.mCameras = pCameras;
         this.mCamerasData = new AprilTagIOInputsAutoLogged[pCameras.length];
 
@@ -90,7 +90,7 @@ public class AprilTag {
 
     private VisionObservation processSingleTagObservation(
             AprilTagIOInputsAutoLogged pCamData, double pAvgDist, double pXYScalar) {
-        if (pAvgDist > AprilTagConstants.kMaxTrustDistanceMSingletag) {
+        if (pAvgDist > ATagVisionConstants.kMaxTrustDistanceMSingletag) {
             return makeUntrustedObservation(pCamData);
         }
 
@@ -102,13 +102,13 @@ public class AprilTag {
                 return makeUntrustedObservation(pCamData);
             }
             pose = tagPoseOpt
-                    .get()
-                    .toPose2d()
-                    .plus(new Transform2d(
-                            pCamData.iCameraToApriltag.getX(),
-                            pCamData.iCameraToApriltag.getY(),
-                            pCamData.iCameraToApriltag.getRotation().toRotation2d()))
-                    .plus(toTransform2d(pCamData.iCameraToRobot.inverse()));
+                .get()
+                .toPose2d()
+                .plus(new Transform2d(
+                    pCamData.iCameraToApriltag.getX(),
+                    pCamData.iCameraToApriltag.getY(),
+                    pCamData.iCameraToApriltag.getRotation().toRotation2d()))
+                .plus(toTransform2d(pCamData.iCameraToRobot.inverse()));
         } else {
             pose = pCamData.iLatestEstimatedRobotPose.toPose2d();
         }
@@ -118,7 +118,7 @@ public class AprilTag {
 
     private Transform2d toTransform2d(Transform3d pTransform) {
         return new Transform2d(
-                pTransform.getX(), pTransform.getY(), pTransform.getRotation().toRotation2d());
+            pTransform.getX(), pTransform.getY(), pTransform.getRotation().toRotation2d());
     }
 
     public void logVisionObservation(VisionObservation pObservation, String pState) {
@@ -131,31 +131,31 @@ public class AprilTag {
 
     private VisionObservation makeVisionObservation(Pose2d pPose, double pXYStdev, AprilTagIOInputsAutoLogged pCamData) {
         return new VisionObservation(
-                true,
-                pPose,
-                VecBuilder.fill(pXYStdev, pXYStdev, Double.MAX_VALUE),
-                pCamData.iLatestTimestamp,
-                pCamData.iCamName);
+            true,
+            pPose,
+            VecBuilder.fill(pXYStdev, pXYStdev, Double.MAX_VALUE),
+            pCamData.iLatestTimestamp,
+            pCamData.iCamName);
     }
 
     private VisionObservation makeUntrustedObservation(AprilTagIOInputsAutoLogged pCamData) {
         return new VisionObservation(
-                true,
-                pCamData.iLatestEstimatedRobotPose.toPose2d(),
-                VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE),
-                pCamData.iLatestTimestamp,
-                pCamData.iCamName);
+            true,
+            pCamData.iLatestEstimatedRobotPose.toPose2d(),
+            VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE),
+            pCamData.iLatestTimestamp,
+            pCamData.iCamName);
     }
 
     private VisionObservation makeInvalidObservation(AprilTagIOInputsAutoLogged pCamData) {
         return new VisionObservation(
-                false,
-                new Pose2d(),
-                VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE),
-                pCamData.iLatestTimestamp,
-                pCamData.iCamName);
+            false,
+            new Pose2d(),
+            VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE),
+            pCamData.iLatestTimestamp,
+            pCamData.iCamName);
     }
 
     public record VisionObservation(
-            boolean hasObserved, Pose2d pose, Vector<N3> stdDevs, double timeStamp, String camName) {}
+        boolean hasObserved, Pose2d pose, Vector<N3> stdDevs, double timeStamp, String camName) {}
 }

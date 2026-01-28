@@ -12,8 +12,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.game.FieldConstants;
-import frc.robot.systems.apriltag.AprilTagConstants.CameraSimConfigs;
-import frc.robot.systems.apriltag.AprilTagConstants.Orientation;
+import frc.robot.systems.apriltag.ATagVisionConstants.ATagCameraHardware;
+import frc.robot.systems.apriltag.ATagVisionConstants.CameraSimConfigs;
+import frc.robot.systems.apriltag.ATagVisionConstants.Orientation;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import frc.lib.math.GeomUtil;
 
-public class AprilTagIOPVTag implements AprilTagIO {
+public class ATagCameraIOPV implements ATagCameraIO {
     private String mCamName;
     private PhotonCamera mPhotonCam;
     private PhotonPoseEstimator mPoseEstimator;
@@ -38,7 +39,11 @@ public class AprilTagIOPVTag implements AprilTagIO {
     private VisionSystemSim mVisionSim;
     private PhotonCameraSim mCameraSim;
 
-    public AprilTagIOPVTag(String pName, Transform3d pCameraTransform, Orientation pOrientation) {
+    public ATagCameraIOPV(ATagCameraHardware camHardware) {
+        this(camHardware.name(), camHardware.camTransform(), camHardware.orientation());
+    }
+
+    public ATagCameraIOPV(String pName, Transform3d pCameraTransform, Orientation pOrientation) {
         this.mCamName = pName;
         this.mPhotonCam = new PhotonCamera(mCamName);
         this.mCameraTransform = pCameraTransform;
@@ -46,9 +51,7 @@ public class AprilTagIOPVTag implements AprilTagIO {
 
         mPoseEstimator = new PhotonPoseEstimator(FieldConstants.kApriltagLayout, pCameraTransform);
 
-        if (Constants.kCurrentMode == Mode.SIM) {
-            setupSimulation();
-        }
+        if (Constants.kCurrentMode == Mode.SIM) setupSimulation();
     }
 
     private void setupSimulation() {
@@ -75,9 +78,7 @@ public class AprilTagIOPVTag implements AprilTagIO {
         pInputs.iCameraToRobot = mCameraTransform;
 
         try {
-            if (Constants.kCurrentMode == Mode.SIM) {
-                mVisionSim.update(pSimOdomPose);
-            }
+            if (Constants.kCurrentMode == Mode.SIM) mVisionSim.update(pSimOdomPose);
             
             pInputs.iIsConnected = mPhotonCam.isConnected();
             List<PhotonPipelineResult> unreadResults = mPhotonCam.getAllUnreadResults();
@@ -91,13 +92,8 @@ public class AprilTagIOPVTag implements AprilTagIO {
             if (latestEstimatedRobotPose.isEmpty()){
                 DriverStation.reportWarning("Multi Tag CoProcessor Failed for: " + mCamName, true);
 
-                if (Constants.kCurrentMode == Mode.REAL){
-                    latestEstimatedRobotPose = mPoseEstimator.estimateClosestToReferencePose(latestValidResult, GeomUtil.toPose3d(pLastRobotPose));
-                }
-                
-                else{
-                    latestEstimatedRobotPose = mPoseEstimator.estimateClosestToReferencePose(latestValidResult, GeomUtil.toPose3d(pSimOdomPose));
-                }
+                latestEstimatedRobotPose = mPoseEstimator.estimateClosestToReferencePose(
+                    latestValidResult, GeomUtil.toPose3d((Constants.kCurrentMode == Mode.REAL) ? pLastRobotPose : pSimOdomPose));
             }
 
             if (latestValidResult == null || !latestValidResult.hasTargets()) {

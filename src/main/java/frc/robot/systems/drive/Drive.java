@@ -41,8 +41,8 @@ import frc.lib.telemetry.Telemetry;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.game.GameDriveManager;
 import frc.robot.game.GameDriveManager.GameDriveStates;
-import frc.robot.systems.apriltag.AprilTag;
-import frc.robot.systems.apriltag.AprilTag.VisionObservation;
+import frc.robot.systems.apriltag.ATagVision;
+import frc.robot.systems.apriltag.ATagVision.VisionObservation;
 import frc.robot.systems.drive.controllers.HeadingController;
 import frc.robot.systems.drive.controllers.HolonomicController;
 import frc.robot.systems.drive.controllers.LineController;
@@ -81,7 +81,7 @@ public class Drive extends SubsystemBase {
     private final Module[] mModules;
     private final GyroIO mGyro;
     private final GyroInputsAutoLogged mGyroInputs = new GyroInputsAutoLogged();
-    private final AprilTag mVision;
+    private final ATagVision mVision;
 
     private Rotation2d mRobotRotation;
     private final SwerveDriveOdometry mOdometry;
@@ -131,7 +131,7 @@ public class Drive extends SubsystemBase {
     public static final LoggedTunableNumber tAzimuthCharacterizationVoltage = new LoggedTunableNumber("Drive/AzimuthCharacterizationVoltage", 0);
     public static final LoggedTunableNumber tDriveFFAggressiveness = new LoggedTunableNumber("Drive/Teleop/DriveFFAggressiveness", kDriveFFAggressiveness);
     
-    public Drive(Module[] modules, GyroIO gyro, AprilTag vision) {
+    public Drive(Module[] modules, GyroIO gyro, ATagVision vision) {
         this.mModules = modules;
         this.mGyro = gyro;
         this.mVision = vision;
