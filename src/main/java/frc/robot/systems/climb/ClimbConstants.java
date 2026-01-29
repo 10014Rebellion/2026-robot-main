@@ -22,27 +22,122 @@ public class ClimbConstants {
         new CurrentLimits(30, 40)
     );
 
-    public static final ElevatorController kController0 = new ElevatorController(
-        0, 
-        new PDConstants(0, 0), 
-        new ElevatorFeedforward(0, 0, 0),
-        new MotionConstraints(0, 0, 0));
+    public static final ElevatorController kController0 = 
 
-    public static final ElevatorController kController1 = new ElevatorController(
-        1, 
-        new PDConstants(0, 0), 
-        new ElevatorFeedforward(0, 0, 0),
-        new MotionConstraints(0, 0, 0));
+        switch(Constants.kCurrentMode){
+        
+            case REAL -> 
+                new ElevatorController(
+                    0, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
 
-    public static final ElevatorController kController2 = new ElevatorController(
-        2, 
-        new PDConstants(0, 0), 
-        new ElevatorFeedforward(0, 0, 0),
-        new MotionConstraints(0, 0, 0));
+            case SIM -> 
+                new ElevatorController(
+                    0, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
 
-    public static final ElevatorController kController3 = new ElevatorController(
-        3, 
-        new PDConstants(0, 0), 
-        new ElevatorFeedforward(0, 0, 0),
-        new MotionConstraints(0, 0, 0));
+            default -> 
+                new ElevatorController(
+                    0, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+        };
+
+    public static final ElevatorController kController1 = 
+
+        switch(Constants.kCurrentMode){
+        
+            case REAL -> 
+                new ElevatorController(
+                    1, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+
+            case SIM -> 
+                new ElevatorController(
+                    1, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+
+            default -> 
+                new ElevatorController(
+                    1, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+        };
+
+
+    public static final ElevatorController kController2 = 
+
+        switch(Constants.kCurrentMode){
+        
+            case REAL -> 
+                new ElevatorController(
+                    2, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+
+            case SIM -> 
+                new ElevatorController(
+                    2, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+
+            default -> 
+                new ElevatorController(
+                    2, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+        };
+
+    public static final ElevatorController kController3 = 
+
+        switch(Constants.kCurrentMode){
+        
+            case REAL -> 
+                new ElevatorController(
+                    3, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+
+            case SIM -> 
+                new ElevatorController(
+                    3, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+
+            default -> 
+                new ElevatorController(
+                    3, 
+                    new PDConstants(0, 0), 
+                    new ElevatorFeedforward(0, 0, 0),
+                    new MotionConstraints(0, 0, 0));
+            
+        };
+        
+
 }

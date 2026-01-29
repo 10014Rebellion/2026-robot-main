@@ -13,7 +13,7 @@ import frc.lib.hardware.HardwareRecords.ElevatorController;
 public class ClimbIOSim implements ClimbIO{
 
     private final DCMotorSim mClimbMotor;
-    private final ElevatorSim mElevatorSim;
+    // private final ElevatorSim mElevatorSim;
     private double mAppliedVolts;
     private PIDController mClimbPID;
 
@@ -36,7 +36,7 @@ public class ClimbIOSim implements ClimbIO{
             0.0
         );
 
-        mElevatorSim = new ElevatorSim()
+        // mElevatorSim = new ElevatorSim()
 
         mClimbPID = new PIDController(0.0, 0.0, 0.0);
 
