@@ -1,7 +1,6 @@
 package frc.lib.hardware;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -27,6 +26,12 @@ public class HardwareRecords {
         Rotation2d backwardLimit
     ) {}
 
+    public static record MotionConstraints(
+        double maxVelocity,
+        double maxAcceleration,
+        double maxJerk
+    ) {}
+
     public static record BasicMotorHardware(
         int motorID, 
         CANBus canBus, 
@@ -50,7 +55,8 @@ public class HardwareRecords {
     public static record ElevatorController(
         int slot,
         PDConstants pdController,
-        ElevatorFeedforward kFeedforward
+        ElevatorFeedforward feedforward,
+        MotionConstraints constraints
     ) {}
 
     public static record ArmController(

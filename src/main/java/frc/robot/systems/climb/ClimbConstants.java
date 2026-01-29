@@ -8,6 +8,7 @@ import frc.robot.Constants;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 import frc.lib.hardware.HardwareRecords.CurrentLimits;
 import frc.lib.hardware.HardwareRecords.ElevatorController;
+import frc.lib.hardware.HardwareRecords.MotionConstraints;
 import frc.lib.hardware.HardwareRecords.PDConstants;
 
 
@@ -24,24 +25,24 @@ public class ClimbConstants {
     public static final ElevatorController kController0 = new ElevatorController(
         0, 
         new PDConstants(0, 0), 
-        new ElevatorFeedforward(
-            0, 
-            0, 
-            0));
+        new ElevatorFeedforward(0, 0, 0),
+        new MotionConstraints(0, 0, 0));
 
     public static final ElevatorController kController1 = new ElevatorController(
-        0, 
+        1, 
         new PDConstants(0, 0), 
-        new ElevatorFeedforward(
-            0, 
-            0, 
-            0));
+        new ElevatorFeedforward(0, 0, 0),
+        new MotionConstraints(0, 0, 0));
 
     public static final ElevatorController kController2 = new ElevatorController(
-        0, 
+        2, 
         new PDConstants(0, 0), 
-        new ElevatorFeedforward(
-            0, 
-            0, 
-            0));
+        new ElevatorFeedforward(0, 0, 0),
+        new MotionConstraints(0, 0, 0));
+
+    public static final ElevatorController kController3 = new ElevatorController(
+        3, 
+        new PDConstants(0, 0), 
+        new ElevatorFeedforward(0, 0, 0),
+        new MotionConstraints(0, 0, 0));
 }

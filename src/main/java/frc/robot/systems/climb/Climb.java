@@ -9,9 +9,12 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.hardware.HardwareRecords.ElevatorController;
+import frc.lib.hardware.HardwareRecords.PositionSoftLimits;
 import frc.lib.tuning.LoggedTunableNumber;
 
 public class Climb extends SubsystemBase {
@@ -35,12 +38,16 @@ public class Climb extends SubsystemBase {
   }
 
   private final ClimbIO mClimbIO;
+  private final PositionSoftLimits mSoftLimits;
   private final ClimbInputsAutoLogged mClimbInputs = new ClimbInputsAutoLogged();
   private ClimbGoal mCurrentGoal = null;
   private double mCurrentClimbGoalPositionMeters = 0.0;
+  private ElevatorFeedforward mFeedforward;
 
-  public Climb(ClimbIO pClimbIO) {
+  public Climb(ClimbIO pClimbIO, PositionSoftLimits pSoftLimits, ElevatorController pController) {
     this.mClimbIO = pClimbIO;
+    this.mSoftLimits = pSoftLimits;
+    this.mFeedforward = pController.feedforward();
   }
   
   @Override
@@ -60,6 +67,11 @@ public class Climb extends SubsystemBase {
   }
 
   public void setClimbVolts(double pVolts) {
+
+    if (mClimbInputs.iClimbMotorVolts > 0 && mClimbInputs.iClimbPositionMeters > mSoftLimits.forwardLimitM()){return;}
+
+    else if (mClimbInputs.iClimbMotorVolts < 0 && mClimbInputs.iClimbPositionMeters < mSoftLimits.backwardLimitM()){return;}
+
     mClimbIO.setMotorVolts(pVolts);
   }
 
@@ -71,15 +83,13 @@ public class Climb extends SubsystemBase {
     mCurrentGoal = pGoal;
   }
 
-  public void setVoltage(){}
-
-  public void setPosition(double meters){}
+  public void setPosition(double meters){
+    mClimbIO.setMotorPosition(meters, mFeedforward.calculate(mClimbInputs.iClimbVelocityMPS, mClimbInputs.iClimbAccelerationMPSS));
+  }
 
   @AutoLogOutput(key = "Climb/Goal")
   public ClimbGoal getGoal(){
     return mCurrentGoal;
   }
-
-
 
 }

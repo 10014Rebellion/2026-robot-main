@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -116,6 +117,7 @@ public class ClimbIOKrakenx44 implements ClimbIO {
         slotConfigs.kP = pKP;
         slotConfigs.kI = pKI;
         slotConfigs.kD = pKD;
+        slotConfigs.GravityType = GravityTypeValue.Elevator_Static;
 
         mClimbMotor.getConfigurator().apply(slotConfigs);
     }
