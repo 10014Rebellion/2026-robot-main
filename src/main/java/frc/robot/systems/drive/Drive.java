@@ -204,14 +204,10 @@ public class Drive extends SubsystemBase {
             if(kSkidRatioCap < SwerveHelper.skidRatio(GeomUtil.toChassisSpeeds(robotTwist, 1.0 / kOdometryFrequency))) skidCount++;
 
             // Update gyro angle
-            if (mGyroInputs.iConnected) {
-                // Use the real gyro angle
-                mRobotRotation = mGyroInputs.odometryYawPositions[i];
-            } else {
-                // Use the angle delta from the kinematics and module deltas
-                Twist2d twist = kKinematics.toTwist2d(moduleDeltas);
-                mRobotRotation = mRobotRotation.plus(new Rotation2d(twist.dtheta));
-            }
+            // Use the real gyro angle
+            if (mGyroInputs.iConnected) mRobotRotation = mGyroInputs.odometryYawPositions[i];
+            // Use the angle delta from the kinematics and module deltas
+            else mRobotRotation = mRobotRotation.plus(new Rotation2d(robotTwist.dtheta));
 
             mPoseEstimator.updateWithTime(sampleTimestamps[i], mRobotRotation, modulePositions);
         }
