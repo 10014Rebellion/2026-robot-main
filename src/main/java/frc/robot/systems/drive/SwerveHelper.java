@@ -241,6 +241,6 @@ public class SwerveHelper {
         double distM = deadReckoningTurnToDriveConv(angleDelta, gearing, wheelRadiusM);
         double accelerationRad = (2 * distM) / (dt * dt);
 
-        return kKrakenFOCModel.getCurrent(accelerationRad * MOI);
+        return -kKrakenFOCModel.getCurrent(accelerationRad * MOI);
     }
 }
