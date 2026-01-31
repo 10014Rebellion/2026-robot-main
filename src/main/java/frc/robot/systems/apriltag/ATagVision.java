@@ -102,13 +102,9 @@ public class ATagVision {
                 return makeUntrustedObservation(pCamData);
             }
             pose = tagPoseOpt
-                .get()
-                .toPose2d()
-                .plus(new Transform2d(
-                    pCamData.iCameraToApriltag.getX(),
-                    pCamData.iCameraToApriltag.getY(),
-                    pCamData.iCameraToApriltag.getRotation().toRotation2d()))
-                .plus(toTransform2d(pCamData.iCameraToRobot.inverse()));
+                .get().toPose2d()
+                .plus(toTransform2d(pCamData.iCameraToApriltag.inverse()))
+                .plus(toTransform2d(pCamData.iCameraToRobot));
         } else {
             pose = pCamData.iLatestEstimatedRobotPose.toPose2d();
         }
