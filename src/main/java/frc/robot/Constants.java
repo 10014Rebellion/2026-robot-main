@@ -15,7 +15,7 @@ public final class Constants {
     public static final boolean kTuningMode = !DriverStation.isFMSAttached();
 
     public static final boolean isSim() {
-        return !(kCurrentMode.equals(Mode.REAL) || kCurrentMode.equals(Mode.REAL)); 
+        return !(kCurrentMode.equals(Mode.REAL) || kCurrentMode.equals(Mode.REPLAY)); 
     }
 
     public static enum Mode {

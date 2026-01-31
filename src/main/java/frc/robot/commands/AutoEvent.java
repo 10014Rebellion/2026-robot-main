@@ -66,8 +66,9 @@ public class AutoEvent extends Command {
 
     public Trigger loggedCondition(String key, BooleanSupplier condition) {
         return new Trigger(autoEventLoop, () -> {
-            Telemetry.log("Auton/"+mAutoName+"/"+key, condition.getAsBoolean());
-            return condition.getAsBoolean();
+            boolean cond = condition.getAsBoolean();
+            Telemetry.log("Auton/"+mAutoName+"/"+key, cond);
+            return cond;
         });
     }
 }
