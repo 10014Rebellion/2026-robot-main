@@ -10,7 +10,7 @@ import frc.robot.systems.drive.Drive;
 
 public class DriveCharacterizationCommands {
         /* LINEAR CHARACTERIZATION: The x-y movement of the drivetrain(basically drive motor feedforward) */
-    public Command characterizeLinearMotion(Drive pDrive) {
+    public static Command characterizeLinearMotion(Drive pDrive) {
         return pDrive.setToSysIDCharacterization()
             .andThen(SysIDCharacterization.runDriveSysIDTests(
                 (voltage) -> {
@@ -19,12 +19,12 @@ public class DriveCharacterizationCommands {
     }
 
     /* Runs the robot forward at a voltage */
-    public void runLinearCharacterization(double volts, Drive pDrive) {
+    public static void runLinearCharacterization(double volts, Drive pDrive) {
         pDrive.setToSysIDCharacterization().initialize();
         for (int i = 0; i < 4; i++) pDrive.getModules()[i].runCharacterization(volts);
     }
 
-    public void setDriveAmperagesForAllModules(double amps, Drive pDrive) {
+    public static void setDriveAmperagesForAllModules(double amps, Drive pDrive) {
         for (int i = 0; i < 4; i++) {
             pDrive.getModules()[i].setDesiredVelocity(null);
             pDrive.getModules()[i].setDriveAmperage(amps);
@@ -36,14 +36,14 @@ public class DriveCharacterizationCommands {
      * ANGULAR CHARACTERIZATION: The angular movement of the drivetrain(basically used to get drivebase MOI)
      * https://choreo.autos/usage/estimating-moi/
      */
-    public Command characterizeAngularMotion(Drive pDrive) {
+    public static Command characterizeAngularMotion(Drive pDrive) {
         return pDrive.setToSysIDCharacterization()
             .andThen(SysIDCharacterization.runDriveSysIDTests(
                 (voltage) -> runAngularCharacterization(voltage, pDrive), pDrive));
     }
 
     /* Runs the rotate's robot at a voltage */
-    public void runAngularCharacterization(double volts, Drive pDrive) {
+    public static void runAngularCharacterization(double volts, Drive pDrive) {
         pDrive.setToSysIDCharacterization().initialize();
         pDrive.getModules()[0].runCharacterization(volts, Rotation2d.fromDegrees(-45.0));
         pDrive.getModules()[1].runCharacterization(-volts, Rotation2d.fromDegrees(45.0));
@@ -51,7 +51,7 @@ public class DriveCharacterizationCommands {
         pDrive.getModules()[3].runCharacterization(-volts, Rotation2d.fromDegrees(-45.0));
     }
 
-    public Command characterizeAzimuths(int pModNumber, Drive pDrive) {
+    public static Command characterizeAzimuths(int pModNumber, Drive pDrive) {
         return pDrive.setToSysIDCharacterization()
             .andThen(SysIDCharacterization.runDriveSysIDTests(
                 (voltage) -> {
@@ -61,11 +61,11 @@ public class DriveCharacterizationCommands {
             }, pDrive));
     }
 
-    public Command testAzimuths(int pModNumber, Drive pDrive) {
+    public static Command testAzimuths(int pModNumber, Drive pDrive) {
         return characterizeAzimuths(pModNumber, Drive.tAzimuthCharacterizationVoltage, pDrive);
     }
 
-    public Command characterizeAzimuths(int pModNumber, DoubleSupplier voltage, Drive pDrive) {
+    public static Command characterizeAzimuths(int pModNumber, DoubleSupplier voltage, Drive pDrive) {
         return new FunctionalCommand(
             () -> pDrive.setToSysIDCharacterization().initialize(), 
             () -> {

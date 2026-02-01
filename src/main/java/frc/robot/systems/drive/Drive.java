@@ -349,7 +349,7 @@ public class Drive extends SubsystemBase {
                     mPreviousSetpoint, mModules[i].getCurrentState(),
                     unOptimizedSetpointStates[i], setpointStates[i], i);
                 driveAmps += SwerveHelper.deadReckoningFeedforward(
-                    mAngleDeltas[i], kDriveMotorGearing, kWheelRadiusMeters, DriveConstants.kWheelMOI)
+                    mAngleDeltas[i], kDriveMotorGearing, kWheelRadiusMeters, DriveConstants.kWheelInertia)
                         * kAzimuthDriveScalar;
                 double desiredAzimuthVelocityRadPS = 
                     mPreviousSetpoint.azimuthFeedforwards().azimuthSpeedRadiansPS()[i];

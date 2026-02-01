@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.controllers.FlydigiApex4;
 import frc.robot.game.GameGoalPoseChooser;
 import frc.robot.systems.drive.Drive;
+import frc.robot.commands.DriveCharacterizationCommands;
 
 public class ButtonBindings {
     private final Drive mDriveSS;
@@ -43,17 +44,21 @@ public class ButtonBindings {
                 mDriveSS.setToGenericHeadingAlign(() -> GameGoalPoseChooser.turnFromHub(mDriveSS.getPoseEstimate())))
             .onFalse(mDriveSS.setToTeleop());
             
-       mDriverController.b()
-            .onTrue(mDriveSS.setToGenericLineAlign(
-                () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
-                () -> Rotation2d.fromDegrees(45),
-                () -> 1.0,
-                () -> false
-            ))
-            .onFalse(mDriveSS.setToTeleop());
+    //    mDriverController.b()
+    //         .onTrue(mDriveSS.setToGenericLineAlign(
+    //             () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
+    //             () -> Rotation2d.fromDegrees(45),
+    //             () -> 1.0,
+    //             () -> false
+    //         ))
+    //         .onFalse(mDriveSS.setToTeleop());
 
         mDriverController.x()
-            .onTrue(mDriveSS.setToLinearTest())
+            .onTrue(DriveCharacterizationCommands.testAzimuths(2, mDriveSS))
+            .onFalse(mDriveSS.setToTeleop());
+
+        mDriverController.b()
+            .onTrue(DriveCharacterizationCommands.testAzimuths(1, mDriveSS))
             .onFalse(mDriveSS.setToTeleop());
 
         // mDriverController.a()
