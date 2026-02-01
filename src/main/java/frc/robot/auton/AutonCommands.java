@@ -43,8 +43,8 @@ public class AutonCommands extends SubsystemBase {
         return new InstantCommand();
     }
 
-    public Command firstPathTest(String autoName, String pName, Rotation2d rot) {
-        AutoEvent auto = new AutoEvent(autoName, this);
+    public Command firstPathTest(String pAutoName, String pName, Rotation2d rot) {
+        AutoEvent auto = new AutoEvent(pAutoName, this);
         SequentialEndingCommandGroup autoPath = followFirstChoreoPath(pName, rot);
 
         auto.getIsRunningTrigger()
@@ -56,8 +56,8 @@ public class AutonCommands extends SubsystemBase {
         return auto;
     }
 
-    public Command autoTest(String autoName, String pName1, Rotation2d pInitRot, String pName2) {
-        AutoEvent auto = new AutoEvent(autoName, this);
+    public Command autoTest(String pAutoName, String pName1, Rotation2d pInitRot, String pName2) {
+        AutoEvent auto = new AutoEvent(pAutoName, this);
         SequentialEndingCommandGroup autoPath1 = followFirstChoreoPath(pName1, pInitRot);
         SequentialEndingCommandGroup autoPath2 = followChoreoPath(pName2);
 
@@ -95,8 +95,8 @@ public class AutonCommands extends SubsystemBase {
     }
 
     ///////////////// DRIVE COMMANDS AND DATA \\\\\\\\\\\\\\\\\\\\\\
-    public SequentialEndingCommandGroup followFirstChoreoPath(String pathName, Rotation2d startingRotation) {
-        PathPlannerPath path = getTraj(pathName).get();
+    public SequentialEndingCommandGroup followFirstChoreoPath(String pPathName, Rotation2d startingRotation) {
+        PathPlannerPath path = getTraj(pPathName).get();
         double totalTimeSeconds = path.getIdealTrajectory(Drive.mRobotConfig).get().getTotalTimeSeconds();
 
         return new SequentialEndingCommandGroup(
@@ -110,8 +110,8 @@ public class AutonCommands extends SubsystemBase {
             mRobotDrive.setToStop());
     }
 
-    public SequentialEndingCommandGroup followChoreoPath(String pathName) {
-        PathPlannerPath path = getTraj(pathName).get();
+    public SequentialEndingCommandGroup followChoreoPath(String pPathName) {
+        PathPlannerPath path = getTraj(pPathName).get();
         double totalTimeSeconds = path.getIdealTrajectory(Drive.mRobotConfig).get().getTotalTimeSeconds();
         return new SequentialEndingCommandGroup(
             mRobotDrive.customFollowPathCommand(path).withTimeout(totalTimeSeconds),
@@ -119,18 +119,18 @@ public class AutonCommands extends SubsystemBase {
         );
     }
 
-    public SequentialEndingCommandGroup followChoreoPath(String pathName, PPHolonomicDriveController PID) {
-        PathPlannerPath path = getTraj(pathName).get();
+    public SequentialEndingCommandGroup followChoreoPath(String pPathName, PPHolonomicDriveController pPID) {
+        PathPlannerPath path = getTraj(pPathName).get();
         double totalTimeSeconds = path.getIdealTrajectory(Drive.mRobotConfig).get().getTotalTimeSeconds();
         return new SequentialEndingCommandGroup(
-            mRobotDrive.customFollowPathCommand(path, PID).withTimeout(totalTimeSeconds),
+            mRobotDrive.customFollowPathCommand(path, pPID).withTimeout(totalTimeSeconds),
             mRobotDrive.setToStop()
         );
     }
 
-    public Optional<PathPlannerPath> getTraj(String pathName) {
+    public Optional<PathPlannerPath> getTraj(String pPathName) {
         try {
-            return Optional.of(PathPlannerPath.fromChoreoTrajectory(pathName));
+            return Optional.of(PathPlannerPath.fromChoreoTrajectory(pPathName));
         } catch(Exception e) {
             e.printStackTrace();
             return Optional.empty();
