@@ -231,6 +231,13 @@ public class Module {
         mIO.setAzimuthVolts(pAzimuthVolts);
     }
 
+    /* Sets drive motor's voltage
+     * @param azimuthVolts: -kAzimuthFOCAmpLimit to kAzimuthFOCAmpLimit amps
+     */
+    public void setAzimuthAmps(double pAzimuthAmps) {
+        mIO.setAzimuthAmps(pAzimuthAmps);
+    }
+
     /* Stops modules by setting voltage to zero */
     public void stop() {
         setDriveVoltage(0.0);

@@ -51,7 +51,7 @@ public class DriveCharacterizationCommands {
         pDrive.getModules()[3].runCharacterization(-volts, Rotation2d.fromDegrees(-45.0));
     }
 
-    public static Command characterizeAzimuths(int pModNumber, Drive pDrive) {
+    public static Command characterizeAzimuthsVoltage(int pModNumber, Drive pDrive) {
         return pDrive.setToSysIDCharacterization()
             .andThen(SysIDCharacterization.runDriveSysIDTests(
                 (voltage) -> {
@@ -61,17 +61,38 @@ public class DriveCharacterizationCommands {
             }, pDrive));
     }
 
-    public static Command testAzimuths(int pModNumber, Drive pDrive) {
-        return characterizeAzimuths(pModNumber, Drive.tAzimuthCharacterizationVoltage, pDrive);
+    public static Command testAzimuthsVoltage(Drive pDrive, int... pModNumber) {
+        return characterizeAzimuthsVoltage(Drive.tAzimuthCharacterizationVoltage, pDrive, pModNumber);
     }
 
-    public static Command characterizeAzimuths(int pModNumber, DoubleSupplier voltage, Drive pDrive) {
+    public static Command characterizeAzimuthsVoltage(DoubleSupplier voltage, Drive pDrive, int... pModNumbers) {
         return new FunctionalCommand(
             () -> pDrive.setToSysIDCharacterization().initialize(), 
             () -> {
-                pDrive.getModules()[pModNumber].setDesiredRotation(null);
-                pDrive.getModules()[pModNumber].setDesiredVelocity(0.0);
-                pDrive.getModules()[pModNumber].setAzimuthVoltage(voltage.getAsDouble());
+                for(int moduleNumber : pModNumbers) {
+                    pDrive.getModules()[moduleNumber].setDesiredRotation(null);
+                    pDrive.getModules()[moduleNumber].setDesiredVelocity(0.0);
+                    pDrive.getModules()[moduleNumber].setAzimuthVoltage(voltage.getAsDouble());
+                }
+            }, 
+            (interrupted) -> {}, 
+            () -> false, 
+            pDrive);
+    }
+
+    public static Command testAzimuthsAmps(Drive pDrive, int... pModNumber) {
+        return characterizeAzimuthsAmps(Drive.tAzimuthCharacterizationAmps, pDrive, pModNumber);
+    }
+
+    public static Command characterizeAzimuthsAmps(DoubleSupplier amps, Drive pDrive, int... pModNumbers) {
+        return new FunctionalCommand(
+            () -> pDrive.setToSysIDCharacterization().initialize(), 
+            () -> {
+                for(int moduleNumber : pModNumbers) {
+                    pDrive.getModules()[moduleNumber].setDesiredRotation(null);
+                    pDrive.getModules()[moduleNumber].setDesiredVelocity(0.0);
+                    pDrive.getModules()[moduleNumber].setAzimuthAmps(amps.getAsDouble());
+                }
             }, 
             (interrupted) -> {}, 
             () -> false, 

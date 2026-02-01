@@ -93,7 +93,7 @@ public class DriveConstants {
         // kV is generally 0 for FOC control, so double check in ModuleIOKraken to see whether kV should be applied
         ? new ModuleControlConfig(
             new PIDController(100.0, 0.0, 0.0), new SimpleMotorFeedforward(1.0, 0.0, 1.0), // DRIVE // TODO: TUNE ME
-            new PIDController(4000, 0.0, 0.0), new SimpleMotorFeedforward(0.03, 0.0, 0.0)) // AZIMUTH // TODO: TUNE ME
+            new PIDController(100.0, 0.0, 0.0), new SimpleMotorFeedforward(0.03, 0.0, 0.0)) // AZIMUTH // TODO: TUNE ME
         : new ModuleControlConfig(
             new PIDController(0.1, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 2.36, 0.005), // TODO: TUNE ME
             new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.5)); // TODO: TUNE ME
