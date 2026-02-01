@@ -50,8 +50,8 @@ public class DriveConstants {
     public static final PIDConstants kPPRotationPID = new PIDConstants(0.8, 0.0, 0.0); // TODO: TUNE ME
 
     /* DRIVEBASE TUNING / ODOMETRY / MISC*/
-    public static final CANBus kCANBus = new CANBus("rio"); // TODO: TUNE ME
-    public static final boolean isCANFD = false; 
+    public static final CANBus kCANBus = new CANBus("rebeldrive"); // TODO: TUNE ME
+    public static final boolean isCANFD = true; 
     public static final double kOdometryFrequency = isCANFD ? 250.0 : 100.0;
     static final Lock kOdometryLock = new ReentrantLock(); 
 
