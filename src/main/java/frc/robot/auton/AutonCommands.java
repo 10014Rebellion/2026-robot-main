@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.lib.telemetry.Telemetry;
 
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -161,6 +162,7 @@ public class AutonCommands extends SubsystemBase {
             pPathAdding.run();
         } catch(Exception e) {
             mAutoChooser.addOption("Failed: "+pPathName, backUpAuton());
+            Telemetry.reportException(e);
         }
     }
 }

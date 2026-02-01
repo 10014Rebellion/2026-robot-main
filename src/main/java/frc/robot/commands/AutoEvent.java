@@ -14,9 +14,9 @@ import frc.lib.telemetry.Telemetry;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoEvent extends Command {
-    private final EventLoop autoEventLoop = new EventLoop();
-    private boolean isRunning = false; 
-    private final Trigger isRunningTrigger = new Trigger(autoEventLoop, () -> isRunning);
+    private final EventLoop mAutoEventLoop = new EventLoop();
+    private boolean mIsRunning = false; 
+    private final Trigger mIsRunningTrigger = new Trigger(mAutoEventLoop, () -> mIsRunning);
     private String mAutoName;
   
     /** Creates a new AutoEvent. */
@@ -29,20 +29,20 @@ public class AutoEvent extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        isRunning = true;
-        autoEventLoop.poll();
+        mIsRunning = true;
+        mAutoEventLoop.poll();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        autoEventLoop.poll();   
+        mAutoEventLoop.poll();   
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        isRunning = false;
+        mIsRunning = false;
     }
 
     // Returns true when the command should end.
@@ -52,20 +52,20 @@ public class AutoEvent extends Command {
     }
 
     public boolean getIsRunning() {
-        return isRunning;
+        return mIsRunning;
     }
 
     public Trigger getIsRunningTrigger() {
-        return isRunningTrigger;
+        return mIsRunningTrigger;
     }
 
     /* Available but heavinly un-reccomended compared to using loggedCondition() */
     public Trigger condition(BooleanSupplier condition) {
-        return new Trigger(autoEventLoop, condition);
+        return new Trigger(mAutoEventLoop, condition);
     }
 
     public Trigger loggedCondition(String key, BooleanSupplier condition) {
-        return new Trigger(autoEventLoop, () -> {
+        return new Trigger(mAutoEventLoop, () -> {
             boolean cond = condition.getAsBoolean();
             Telemetry.log("Auton/"+mAutoName+"/"+key, cond);
             return cond;
