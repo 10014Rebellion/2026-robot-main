@@ -19,8 +19,8 @@ import frc.robot.Constants;
 public class DriveConstants {
 
     ///////////////////// DRIVE BASE \\\\\\\\\\\\\\\\\\\\\\\
-    public static final double kRobotWidthXMeters = Units.inchesToMeters(35); // TODO: TUNE ME
-    public static final double kRobotWidthYMeters = Units.inchesToMeters(37); // TODO: TUNE ME
+    public static final double kRobotWidthXMeters = Units.inchesToMeters(19.505); // TODO: TUNE ME
+    public static final double kRobotWidthYMeters = Units.inchesToMeters(24.5); // TODO: TUNE ME
     public static final double kTrackWidthXMeters = Units.inchesToMeters(25.5); // Track Width (front to front / back to back) // TODO: TUNE ME
     public static final double kTrackWidthYMeters = Units.inchesToMeters(27); // Wheelbase (Left to left / right to right) // TODO: TUNE ME
     public static final Translation2d[] kModuleTranslations = new Translation2d[] {

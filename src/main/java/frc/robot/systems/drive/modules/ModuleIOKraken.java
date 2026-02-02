@@ -61,6 +61,7 @@ public class ModuleIOKraken implements ModuleIO {
     private final StatusSignal<Voltage> mAzimuthVoltage;
     private final StatusSignal<Current> mAzimuthStatorCurrent;
     private final StatusSignal<Current> mAzimuthSupplyCurrent;
+    private final StatusSignal<Current> mAzimuthTorqueCurrent;
     private final StatusSignal<Temperature> mAzimuthTemp;
 
     private final CANcoder mAbsoluteEncoder;
@@ -129,6 +130,7 @@ public class ModuleIOKraken implements ModuleIO {
         turnConfig.CurrentLimits.SupplyCurrentLimit = kAzimuthSupplyAmpLimit;
         turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = kAzimuthFOCAmpLimit;
         turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -kAzimuthFOCAmpLimit;
+        driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
 
         turnConfig.Voltage.PeakForwardVoltage = kPeakVoltage;
         turnConfig.Voltage.PeakReverseVoltage = -kPeakVoltage;
@@ -152,6 +154,8 @@ public class ModuleIOKraken implements ModuleIO {
         mAzimuthVoltage = mAzimuthMotor.getMotorVoltage();
         mAzimuthStatorCurrent = mAzimuthMotor.getStatorCurrent();
         mAzimuthSupplyCurrent = mAzimuthMotor.getSupplyCurrent();
+        mAzimuthTorqueCurrent = mAzimuthMotor.getTorqueCurrent();
+
         mAzimuthTemp = mAzimuthMotor.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(
@@ -208,13 +212,15 @@ public class ModuleIOKraken implements ModuleIO {
             mAzimuthStatorCurrent,
             mAzimuthSupplyCurrent,
             mAzimuthTemp,
-            mAzimuthPosition).isOK();
+            mAzimuthPosition,
+            mAzimuthTorqueCurrent).isOK();
         pInputs.iAzimuthPosition = Rotation2d.fromRotations(mAzimuthPosition.getValueAsDouble());
         pInputs.iAzimuthVelocity = Rotation2d.fromRotations(mAzimuthVelocity.getValueAsDouble());
         pInputs.iAzimuthAppliedVolts = mAzimuthAppliedVolts;
         pInputs.iAzimuthMotorVolts = mAzimuthVoltage.getValueAsDouble();
         pInputs.iAzimuthStatorCurrentAmps = mAzimuthStatorCurrent.getValueAsDouble();
         pInputs.iAzimuthSupplyCurrentAmps = mAzimuthSupplyCurrent.getValueAsDouble();
+        pInputs.iAzimuthTorqueCurrentAmps = mAzimuthTorqueCurrent.getValueAsDouble();
         pInputs.iAzimuthTemperatureCelsius = mAzimuthTemp.getValueAsDouble();
 
         pInputs.iIsCancoderConnected = BaseStatusSignal.refreshAll(mAbsolutePositionSignal).isOK();
