@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
     public static final Mode kCurrentMode = RobotBase.isReal() ? Mode.REAL : Mode.SIM;
     public static final boolean kTuningMode = !DriverStation.isFMSAttached();
-    public static final CANBus kSubsystemsCANBus = new CANBus("subsystems");
+    public static final CANBus kSubsystemsCANBus = new CANBus("rebeldrive");
 
     public static final boolean isSim() {
         return !(kCurrentMode.equals(Mode.REAL) || kCurrentMode.equals(Mode.REPLAY)); 
