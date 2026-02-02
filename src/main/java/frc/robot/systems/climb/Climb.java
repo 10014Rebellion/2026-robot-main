@@ -134,8 +134,7 @@ public class Climb extends SubsystemBase {
   public void setPosition(double pMeters){
     mClimbIO.setMotorPosition(
       pMeters, 
-      mControllers.getSlot(mSlot, ElevatorController.class)
-      .feedforward().calculate(mClimbInputs.iClimbVelocityMPS, mClimbInputs.iClimbAccelerationMPSS));
+      mCurrentFF.calculate(mClimbInputs.iClimbVelocityMPS));
   }
 
   @AutoLogOutput(key = "Climb/Goal")
