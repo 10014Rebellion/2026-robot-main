@@ -20,7 +20,7 @@ public interface ClimbIO {
     public default void updateInputs(ClimbInputs pInputs) {}
     public default void setMotorVolts(double pVolts) {}
     public default void setMotorPosition(double pPositionM, double pFeedforward) {}
-    public default void setPIDConstants(double kP, double kI, double kD) {};
+    public default void setPIDConstants(double pKP, double pKI, double pKD) {};
     public default void setSlot(int pSlot) {};
     public default void setConstraintConstants(double kMaxVelocity, double kMaxAcceleration, double kMaxJerk) {};
     public default void stopMotor() {}

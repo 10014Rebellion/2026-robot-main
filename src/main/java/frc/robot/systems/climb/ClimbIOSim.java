@@ -70,7 +70,7 @@ public class ClimbIOSim implements ClimbIO{
     }
 
     @Override
-    public void setPIDConstants(double pKP, double pKI, double pKD){
+    public void setPIDConstants(double pKP, double pKI, double pKDs){
 
     }
 

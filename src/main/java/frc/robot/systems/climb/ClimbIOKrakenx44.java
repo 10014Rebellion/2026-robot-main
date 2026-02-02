@@ -122,6 +122,15 @@ public class ClimbIOKrakenx44 implements ClimbIO {
         mClimbMotor.getConfigurator().apply(slotConfigs);
     }
 
+    @Override
+    public void setConstraintConstants(double kMaxVelocity, double kMaxAcceleration, double kMaxJerk){
+        var ClimbConfig = new TalonFXConfiguration();
+        ClimbConfig.MotionMagic.MotionMagicAcceleration = kMaxAcceleration;
+        ClimbConfig.MotionMagic.MotionMagicCruiseVelocity = kMaxVelocity;
+        ClimbConfig.MotionMagic.MotionMagicJerk = kMaxJerk;
+        mClimbMotor.getConfigurator().apply(ClimbConfig);
+    }
+
     @Override   
     public void setSlot(int pSlot){
         mCurrentSlot = pSlot;
