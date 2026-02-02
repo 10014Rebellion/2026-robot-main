@@ -67,7 +67,7 @@ public class ButtonBindings {
         //             .andThen(mDriveSS.setToGenericLineAlign(() -> new Pose2d(2.5, 2.5, Rotation2d.fromDegrees(45.0)), () -> Rotation2d.fromDegrees(45.0))));
     
         mDriverController.leftTrigger()
-            .onTrue(new InstantCommand(() -> mFlywheelsSS.setFlywheelSpeeds(80)))
+            .onTrue(new InstantCommand(() -> mFlywheelsSS.setFlywheelSpeeds(100)))
             .onFalse(new InstantCommand(() -> mFlywheelsSS.setFlywheelSpeeds(0)));
 
         mDriverController.rightTrigger()

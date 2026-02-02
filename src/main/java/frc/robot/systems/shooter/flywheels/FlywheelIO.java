@@ -16,6 +16,7 @@ public interface FlywheelIO {
       public double iFlywheelSupplyCurrentAmps = 0.0;
       public double iFlywheelStatorCurrentAmps = 0.0;
       public double iFlywheelTempCelsius = 0.0;
+      public double iFlywheelClosedLoopReference = 0.0;
     }
 
     public default void updateInputs(FlywheelInputs pInputs) {}

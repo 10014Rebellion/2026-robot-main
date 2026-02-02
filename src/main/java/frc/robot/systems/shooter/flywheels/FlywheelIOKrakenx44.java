@@ -30,6 +30,7 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
     private final StatusSignal<Current> mFlywheelStatorCurrent;
     private final StatusSignal<Temperature> mFlywheelTempCelsius;
     private final StatusSignal<AngularAcceleration> mFlywheelAccelerationRPSS;
+    private final StatusSignal<Double> mFlywheelClosedLoopReference;
     private Follower mFollowerController = null;
 
     // FOLLOWER CONSTRUCTOR
@@ -77,6 +78,7 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
         mFlywheelSupplyCurrent = mFlywheelMotor.getSupplyCurrent();
         mFlywheelStatorCurrent = mFlywheelMotor.getStatorCurrent();
         mFlywheelTempCelsius = mFlywheelMotor.getDeviceTemp();
+        mFlywheelClosedLoopReference = mFlywheelMotor.getClosedLoopReference();
 
         BaseStatusSignal.setUpdateFrequencyForAll(
             50.0, 
@@ -86,7 +88,8 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
             mFlywheelVoltage,
             mFlywheelSupplyCurrent,
             mFlywheelStatorCurrent,
-            mFlywheelTempCelsius
+            mFlywheelTempCelsius,
+            mFlywheelClosedLoopReference
         );
 
         mFlywheelMotor.optimizeBusUtilization();
@@ -101,7 +104,8 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
             mFlywheelVoltage,
             mFlywheelSupplyCurrent,
             mFlywheelStatorCurrent,
-            mFlywheelTempCelsius
+            mFlywheelTempCelsius,
+            mFlywheelClosedLoopReference
         ).isOK();
         pInputs.iIsLeader = isLeader();
         pInputs.iFlywheelControlMode = mFlywheelControlMode.getValue().toString();
@@ -111,6 +115,7 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
         pInputs.iFlywheelSupplyCurrentAmps = mFlywheelSupplyCurrent.getValueAsDouble();
         pInputs.iFlywheelStatorCurrentAmps = mFlywheelStatorCurrent.getValueAsDouble();
         pInputs.iFlywheelTempCelsius = mFlywheelTempCelsius.getValueAsDouble();
+        pInputs.iFlywheelClosedLoopReference = mFlywheelClosedLoopReference.getValueAsDouble();
     }
 
     public boolean isLeader() {
