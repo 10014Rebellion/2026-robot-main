@@ -16,6 +16,11 @@ import frc.robot.systems.drive.modules.Module;
 import frc.robot.systems.drive.modules.ModuleIO;
 import frc.robot.systems.drive.modules.ModuleIOKraken;
 import frc.robot.systems.drive.modules.ModuleIOSim;
+import frc.robot.systems.intake.Intake;
+import frc.robot.systems.intake.IntakeConstants;
+import frc.robot.systems.intake.IntakeIO;
+import frc.robot.systems.intake.IntakeIOKrakenx44;
+import frc.robot.systems.intake.IntakeIOSim;
 import frc.robot.systems.shooter.ShooterConstants;
 import frc.robot.systems.shooter.ShooterConstants.IndexerConstants;
 import frc.robot.systems.shooter.flywheels.FlywheelIOKrakenx44;
@@ -33,6 +38,7 @@ public class RobotContainer {
     private final Drive mDrive;
     private final Flywheels mFlywheels;
     private final Indexers mIndexers;
+    private final Intake mIntake;
     private final LoggedDashboardChooser<Command> mDriverProfileChooser = new LoggedDashboardChooser<>("DriverProfile");
     private final ButtonBindings mButtonBindings;
     private final AutonCommands autos;
@@ -54,6 +60,8 @@ public class RobotContainer {
                         new ATagCameraIOPV(ATagVisionConstants.kBLATagCamHardware),
                         new ATagCameraIOPV(ATagVisionConstants.kBRATagCamHardware)
                     }));
+
+                mIntake = new Intake(new IntakeIOKrakenx44(IntakeConstants.kIntakeMotorConstants));
                 break;
 
             case SIM:
@@ -71,6 +79,8 @@ public class RobotContainer {
                         new ATagCameraIOPV(ATagVisionConstants.kBLATagCamHardware),
                         new ATagCameraIOPV(ATagVisionConstants.kBRATagCamHardware)
                     }));
+
+                mIntake = new Intake(new IntakeIOSim(IntakeConstants.kIntakeMotorConstants));
                 break;
 
             default:
@@ -88,6 +98,7 @@ public class RobotContainer {
                         new ATagCameraIO() {}, 
                         new ATagCameraIO() {}
                     }));
+                mIntake = new Intake(new IntakeIO() {});
                 break;
         }
         
@@ -100,7 +111,7 @@ public class RobotContainer {
         mIndexers = new Indexers(
             new IndexerIOKrakenx44(IndexerConstants.kIndexerLeaderConfig), new IndexerIOKrakenx44(IndexerConstants.kIndexerFollowerConfig));
 
-        mButtonBindings = new ButtonBindings(mDrive, mFlywheels, mIndexers);
+        mButtonBindings = new ButtonBindings(mDrive, mFlywheels, mIndexers, mIntake);
 
         initBindings();
 

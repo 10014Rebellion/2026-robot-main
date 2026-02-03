@@ -48,6 +48,17 @@ public class IntakeIOKrakenx44 implements IntakeIO{
         mIntakeTempCelsius = mIntakeMotor.getDeviceTemp();
         
         mIntakeMotor.getConfigurator().apply(IntakeConfig);
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            50.0, 
+            mIntakeAccelerationMPSS,
+            mIntakeVelocityMPS,
+            mIntakeVoltage,
+            mIntakeSupplyCurrent,
+            mIntakeStatorCurrent,
+            mIntakeTempCelsius);
+
+        mIntakeMotor.optimizeBusUtilization();
     }
 
     @Override

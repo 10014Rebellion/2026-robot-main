@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.controllers.FlydigiApex4;
 import frc.robot.game.GameGoalPoseChooser;
 import frc.robot.systems.drive.Drive;
+import frc.robot.systems.intake.Intake;
+import frc.robot.systems.intake.Intake.IntakeGoal;
 import frc.robot.systems.shooter.flywheels.Flywheels;
 import frc.robot.systems.shooter.indexers.Indexers;
 import frc.robot.commands.DriveCharacterizationCommands;
@@ -17,12 +19,14 @@ public class ButtonBindings {
     private final Drive mDriveSS;
     private final Flywheels mFlywheelsSS;
     private final Indexers mIndexers;
+    private final Intake mIntake;
     private final FlydigiApex4 mDriverController = new FlydigiApex4(BindingsConstants.kDriverControllerPort);
 
-    public ButtonBindings(Drive pDriveSS, Flywheels pFlywheelsSS, Indexers pIndexersSS) {
+    public ButtonBindings(Drive pDriveSS, Flywheels pFlywheelsSS, Indexers pIndexersSS, Intake pIntakeSS) {
         this.mFlywheelsSS = pFlywheelsSS;
         this.mIndexers = pIndexersSS;
         this.mDriveSS = pDriveSS;
+        this.mIntake = pIntakeSS;
         this.mDriveSS.setDefaultCommand(mDriveSS.setToTeleop());
     }
 
@@ -73,6 +77,14 @@ public class ButtonBindings {
         mDriverController.leftTrigger()
             .onTrue(new InstantCommand(() -> mIndexers.setIndexerVolts(12)))
             .onFalse(new InstantCommand(() -> mIndexers.setIndexerVolts(0)));
+
+        mDriverController.a()
+            .onTrue(new InstantCommand(() -> mIntake.setGoal(IntakeGoal.kIntake)))
+            .onFalse(new InstantCommand(() -> mIntake.setGoal(IntakeGoal.kStop)));
+
+        mDriverController.b()
+            .onTrue(new InstantCommand(() -> mIntake.setGoal(IntakeGoal.kOuttake)))
+            .onFalse(new InstantCommand(() -> mIntake.setGoal(IntakeGoal.kStop)));
 
     }
 }
