@@ -2,6 +2,8 @@ package frc.robot.systems.shooter.flywheels;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
@@ -121,6 +123,23 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
 
     public boolean isLeader() {
         return (mFollowerController == null);
+    }
+
+    @Override 
+    public void setPDConstants(double pKP, double pKD) {
+        Slot0Configs slotConfig = new Slot0Configs();
+        slotConfig.kP = pKP;
+        slotConfig.kD = pKD;
+        mFlywheelMotor.getConfigurator().apply(slotConfig);
+    }
+
+    @Override 
+    public void setMotionMagicConstants(double pCruiseVel, double pMaxAccel, double pMaxJerk) {
+        MotionMagicConfigs motionMagicConfig = new MotionMagicConfigs();
+        motionMagicConfig.MotionMagicCruiseVelocity = pCruiseVel;
+        motionMagicConfig.MotionMagicAcceleration = pMaxAccel;
+        motionMagicConfig.MotionMagicJerk = pMaxJerk;
+        mFlywheelMotor.getConfigurator().apply(motionMagicConfig);
     }
 
     @Override 
