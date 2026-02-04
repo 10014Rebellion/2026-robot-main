@@ -37,6 +37,7 @@ public class FlywheelIOKrakenx44 implements FlywheelIO{
     public FlywheelIOKrakenx44(FollowerMotorHardware pFollowerConfig) {
         this(pFollowerConfig.motorID(), pFollowerConfig.leaderConfig());
         this.mFollowerController = new Follower(pFollowerConfig.leaderConfig().motorID(), pFollowerConfig.alignmentValue()); 
+        enforceFollower();
     }
     
     // LEADER CONSTRUCTOR
