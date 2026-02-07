@@ -49,7 +49,7 @@ public class ShotCalculator {
       double flywheelSpeed) {}
 
   private ShootingParameters mLatestParameters = null;
-  private static final double mPhaseDelay = 0.03;
+  private static final double kPhaseDelay = 0.03;
 
   private static final InterpolatingTreeMap<Double, Rotation2d> mShotHoodAngleMap = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
   private static final InterpolatingDoubleTreeMap mShotFlywheelSpeedMap = new InterpolatingDoubleTreeMap();
@@ -67,15 +67,12 @@ public class ShotCalculator {
   }
 
   /**
-   * shooterYawOffset is the fixed yaw of shooter relative to robot forward.
-   * Example: shooter points forward -> Rotation2d.kZero
-   * Example: shooter points left -> Rotation2d.fromDegrees(90)
+   
    */
   public ShootingParameters getParameters(
     Pose2d pEstimatedPose,
     ChassisSpeeds pRobotVelocityRobotRelative,
-    ChassisSpeeds pFieldVelocityFieldRelative,
-    Rotation2d pShooterYawOffset) {
+    ChassisSpeeds pFieldVelocityFieldRelative) {
         if (mLatestParameters != null) return mLatestParameters;
 
         Pose2d estimatedPose = predictPoseAfterDelay(pEstimatedPose, pRobotVelocityRobotRelative);
@@ -89,7 +86,7 @@ public class ShotCalculator {
         LookaheadResult lookahead = solveLookahead(shooterPose, target, shooterVel);
 
         Rotation2d shooterAimField = computeAimFieldAngle(target, lookahead.lookaheadPose());
-        mDesiredHeadingField = computeDesiredRobotHeadingField(shooterAimField, pShooterYawOffset);
+        mDesiredHeadingField = computeDesiredRobotHeadingField(shooterAimField, ShooterConstants.kShooterYawOffset);
 
         mHeadingError = computeHeadingError(mDesiredHeadingField, estimatedPose.getRotation());
 
@@ -127,9 +124,9 @@ public class ShotCalculator {
     private Pose2d predictPoseAfterDelay(Pose2d pose, ChassisSpeeds robotRelativeVel) {
         return pose.exp(
             new Twist2d(
-                robotRelativeVel.vxMetersPerSecond * mPhaseDelay,
-                robotRelativeVel.vyMetersPerSecond * mPhaseDelay,
-                robotRelativeVel.omegaRadiansPerSecond * mPhaseDelay));
+                robotRelativeVel.vxMetersPerSecond * kPhaseDelay,
+                robotRelativeVel.vyMetersPerSecond * kPhaseDelay,
+                robotRelativeVel.omegaRadiansPerSecond * kPhaseDelay));
     }
 
     /** Returns the hub target location in field coordinates (alliance-correct). */

@@ -20,7 +20,6 @@ public class BindingsConstants {
         );
 
     public static DriverProfiles[] kProfiles = {
-        kDefaultProfile, 
         new DriverProfiles(
             "Bosco", // Name
             1, // Linear Scalar

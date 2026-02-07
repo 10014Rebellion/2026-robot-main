@@ -44,6 +44,11 @@ public class ShooterConstants {
     public static final double kMinTofDistanceMeters = 1.38; // TODO: TUNE ME
     public static final double kMaxTofDistanceMeters = 5.68; // TODO: TUNE ME
 
+   // ShooterYawOffset is the fixed yaw of shooter relative to robot forward.
+   // Example: shooter points forward -> Rotation2d.kZero
+   // Example: shooter points left -> Rotation2d.fromDegrees(90)
+   public static final Rotation2d kShooterYawOffset = Rotation2d.kZero;
+
 
     // Hood angle tuning table (distance -> hood pitch)
     public static final HoodAngleSample[] kHoodAngleSamples = {
