@@ -129,6 +129,8 @@ public class Drive extends SubsystemBase {
 
     private final GameDriveManager mGameDriveManager = new GameDriveManager(this);
 
+    private DriveManager mDriveManager;
+
     public static final LoggedTunableNumber tDriftRate = new LoggedTunableNumber("Drive/DriftRate", DriveConstants.kDriftRate);
     public static final LoggedTunableNumber tRotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
     public static final LoggedTunableNumber tLinearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
@@ -164,13 +166,15 @@ public class Drive extends SubsystemBase {
         SwerveHelper.setUpPathPlanner();
         SmartDashboard.putData(mField);
         mHeadingController.setHeadingGoal(mGoalRotationSup);
+
+        mDriveManager = new DriveManager(this);
     }
 
     ///// ENTRY POINT TO THE DRIVE \\\\\
     @Override
     public void periodic() {
         updateSensorsAndOdometry();
-        runSwerve(computeDesiredSpeeds());
+        runSwerve(mDriveManager.computeDesiredSpeeds());
     }
 
     private void updateSensorsAndOdometry() {
@@ -611,6 +615,11 @@ public class Drive extends SubsystemBase {
         return mRobotRotation;
     }
 
+    @AutoLogOutput(key = "Drive/Odometry/RobotRotation")
+    public Rotation2d getRobotRotationVelocity() {
+        return mGyroInputs.iYawVelocityPS;
+    }
+
     @AutoLogOutput(key = "Drive/Odometry/RobotChassisSpeeds")
     public ChassisSpeeds getRobotChassisSpeeds() {
         return kKinematics.toChassisSpeeds(getModuleStates());
@@ -619,6 +628,15 @@ public class Drive extends SubsystemBase {
     @AutoLogOutput(key = "Drive/Odometry/DesiredChassisSpeeds")
     public ChassisSpeeds getDesiredChassisSpeeds() {
         return mDesiredSpeeds;
+    }
+
+    @AutoLogOutput(key = "Drive/Odometry/DesiredChassisSpeeds")
+    public ChassisSpeeds getPPDesiredChassisSpeeds() {
+        return mPPDesiredSpeeds;
+    }
+
+    public void setPPDesiredSpeeds(ChassisSpeeds speeds) {
+        setPPDesiredSpeeds(speeds);
     }
 
     public BooleanSupplier waitUntilHeadingAlignFinishes() {
@@ -634,6 +652,18 @@ public class Drive extends SubsystemBase {
         /* Accounts for angle wrapping issues with rotation 2D error */
         return GeomUtil.getSmallestChangeInRotation(mRobotRotation, mGoalRotationSup.get()).getDegrees()
             < HeadingController.mToleranceDegrees.get();
+    }
+
+    public RobotConfig getPPRobotConfig() {
+        return mRobotConfig;
+    }
+
+    public DriveFeedforwards getDriveFeedforwards() {
+        return mPathPlanningFF;
+    }
+
+    public void setDriveFeedforwards(DriveFeedforwards ffs) {
+        mPathPlanningFF = ffs;
     }
 
     public Module[] getModules() {
