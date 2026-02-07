@@ -9,9 +9,8 @@ import frc.lib.telemetry.Telemetry;
 
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -35,8 +34,8 @@ public class AutonCommands extends SubsystemBase {
         mAutoChooser = new SendableChooser<>();
 
         mAutoChooser.setDefaultOption("Stationary", () -> backUpAuton());
-        tryToAddPathToChooser("FirstTestPath", () -> firstPathTest("FirstPathTest", "FirstPath", Rotation2d.kZero));
-        tryToAddPathToChooser("FirstAuto", () -> autoTest("FirstAuto","FirstPath", Rotation2d.kZero, "SecondPath"));
+        tryToAddPathToChooser("FirstTestPath", () -> firstPathTest("FirstPathTest", "FirstPath"));
+        tryToAddPathToChooser("FirstAuto", () -> autoTest("FirstAuto","FirstPath", "SecondPath"));
         
         mAutoChooserLogged = new LoggedDashboardChooser<>("Autos", mAutoChooser);
     }
@@ -46,9 +45,9 @@ public class AutonCommands extends SubsystemBase {
         return new InstantCommand();
     }
 
-    public Command firstPathTest(String pAutoName, String pName, Rotation2d pInitRot) {
+    public Command firstPathTest(String pAutoName, String pName) {
         AutoEvent auto = new AutoEvent(pAutoName, this);
-        SequentialEndingCommandGroup autoPath1 = followFirstChoreoPath(pName, pInitRot);
+        SequentialEndingCommandGroup autoPath1 = followChoreoPath(pName, true);
 
         Trigger autoActivted = auto.getIsRunningTrigger();
 
@@ -64,23 +63,23 @@ public class AutonCommands extends SubsystemBase {
         return auto;
     }
 
-    public Command autoTest(String pAutoName, String pName1, Rotation2d pInitRot, String pName2) {
+    public Command autoTest(String pAutoName, String pName1, String pName2) {
         AutoEvent auto = new AutoEvent(pAutoName, this);
-        SequentialEndingCommandGroup autoPath1 = followFirstChoreoPath(pName1, pInitRot);
-        SequentialEndingCommandGroup autoPath2 = followChoreoPath(pName2);
+        SequentialEndingCommandGroup autoPath1 = followChoreoPath(pName1, true);
+        SequentialEndingCommandGroup autoPath2 = followChoreoPath(pName2, false);
 
         Trigger autoActivted = auto.getIsRunningTrigger();
 
-        Trigger isPath1Running = auto.loggedCondition(pName1+"IsRunning", () -> autoPath1.isRunning(), true);
-        Trigger hasPath1Ended = auto.loggedCondition(pName1+"HasEnded", () -> autoPath1.hasEnded(), true);
+        Trigger isPath1Running = auto.loggedCondition(pName1+"IsRunning", autoPath1::isRunning, true);
+        Trigger hasPath1Ended = auto.loggedCondition(pName1+"HasEnded", autoPath1::hasEnded, true);
 
-        Trigger isPath2Running = auto.loggedCondition(pName2+"IsRunning", () -> autoPath2.isRunning(), true);
-        Trigger hasPath2Ended = auto.loggedCondition(pName2+"HasEnded", () -> autoPath2.hasEnded(), true);
+        Trigger isPath2Running = auto.loggedCondition(pName2+"IsRunning", autoPath2::isRunning, true);
+        Trigger hasPath2Ended = auto.loggedCondition(pName2+"HasEnded", autoPath2::hasEnded, true);
 
-        Trigger inScoringRange = auto.loggedCondition("InScoringRange", inScoringRange(), true);
-        Trigger inIntakeRange = auto.loggedCondition("InIntakeRange", inIntakeRange(), true);
-        Trigger flywheelsReady = auto.loggedCondition("FlywheelsReady", flywheelsReady(), true);
-        Trigger hoodReady = auto.loggedCondition("HoodReady", flywheelsReady(), true);
+        Trigger inScoringRange = inScoringRange(auto);
+        Trigger inIntakeRange = inIntakeRange(auto);
+        Trigger flywheelsReady = flywheelsReady(auto);
+        Trigger hoodReady = hoodReady(auto);
 
         autoActivted
             .onTrue(autoPath1);
@@ -135,36 +134,55 @@ public class AutonCommands extends SubsystemBase {
         return () -> false;
     }
 
-    ///////////////// DRIVE COMMANDS AND DATA \\\\\\\\\\\\\\\\\\\\\\
-    public SequentialEndingCommandGroup followFirstChoreoPath(String pPathName, Rotation2d startingRotation) {
-        PathPlannerPath path = getTraj(pPathName).get();
-        double totalTimeSeconds = path.getIdealTrajectory(Drive.mRobotConfig).get().getTotalTimeSeconds();
-
-        return new SequentialEndingCommandGroup(
-            new InstantCommand(() -> {
-                mRobotDrive.setPose(AllianceFlipUtil.apply(
-                    new Pose2d(
-                        path.getPathPoses().get(0).getTranslation(), 
-                        startingRotation)));
-            }), 
-            mRobotDrive.customFollowPathCommand(path).withTimeout(totalTimeSeconds), 
-            mRobotDrive.setToStop());
+    public Trigger inScoringRange(AutoEvent auto) {
+        return auto.loggedCondition("InScoringRange", inScoringRange(), true);
     }
 
+    public Trigger inIntakeRange(AutoEvent auto) {
+        return auto.loggedCondition("inIntakeRange", inIntakeRange(), true);
+    }
+
+    public Trigger flywheelsReady(AutoEvent auto) {
+        return auto.loggedCondition("flywheelsReady", flywheelsReady(), true);
+    }
+
+    public Trigger hoodReady(AutoEvent auto) {
+        return auto.loggedCondition("hoodReady", hoodReady(), true);
+    }
+
+    ///////////////// DRIVE COMMANDS AND DATA \\\\\\\\\\\\\\\\\\\\\\
     public SequentialEndingCommandGroup followChoreoPath(String pPathName) {
+        return followChoreoPath(pPathName, false);
+    }
+
+    public SequentialEndingCommandGroup followChoreoPath(String pPathName, boolean pIsFirst) {
         PathPlannerPath path = getTraj(pPathName).get();
-        double totalTimeSeconds = path.getIdealTrajectory(Drive.mRobotConfig).get().getTotalTimeSeconds();
+        PathPlannerTrajectory ideaTraj = path.getIdealTrajectory(Drive.mRobotConfig).get();
         return new SequentialEndingCommandGroup(
-            mRobotDrive.customFollowPathCommand(path).withTimeout(totalTimeSeconds),
+            new InstantCommand(() -> {
+                if(pIsFirst) {
+                    mRobotDrive.setPose(AllianceFlipUtil.apply(ideaTraj.sample(0).pose));
+                }
+            }),
+            mRobotDrive.customFollowPathCommand(path).withTimeout(ideaTraj.getTotalTimeSeconds()),
             mRobotDrive.setToStop()
         );
     }
 
     public SequentialEndingCommandGroup followChoreoPath(String pPathName, PPHolonomicDriveController pPID) {
+        return followChoreoPath(pPathName, pPID, false);
+    }
+
+    public SequentialEndingCommandGroup followChoreoPath(String pPathName, PPHolonomicDriveController pPID, boolean pIsFirst) {
         PathPlannerPath path = getTraj(pPathName).get();
-        double totalTimeSeconds = path.getIdealTrajectory(Drive.mRobotConfig).get().getTotalTimeSeconds();
+        PathPlannerTrajectory ideaTraj = path.getIdealTrajectory(Drive.mRobotConfig).get();
         return new SequentialEndingCommandGroup(
-            mRobotDrive.customFollowPathCommand(path, pPID).withTimeout(totalTimeSeconds),
+            new InstantCommand(() -> {
+                if(pIsFirst) {
+                    mRobotDrive.setPose(AllianceFlipUtil.apply(ideaTraj.sample(0).pose));
+                }
+            }),
+            mRobotDrive.customFollowPathCommand(path, pPID).withTimeout(ideaTraj.getTotalTimeSeconds()),
             mRobotDrive.setToStop()
         );
     }
