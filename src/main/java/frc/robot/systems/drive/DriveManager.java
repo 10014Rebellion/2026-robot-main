@@ -75,6 +75,8 @@ public class DriveManager {
     private Supplier<Pose2d> mGoalPoseSup = () -> new Pose2d();
     private final Debouncer mAutoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
 
+    private ChassisSpeeds mPPDesiredSpeeds = new ChassisSpeeds();
+
     private GameDriveManager mGameDriveManager;
 
     public DriveManager(Drive pDrive) {
@@ -109,8 +111,8 @@ public class DriveManager {
                 break;
             case AUTON_HEADING_ALIGN:
                 desiredSpeeds = new ChassisSpeeds(
-                    mDrive.getPPDesiredChassisSpeeds().vxMetersPerSecond, 
-                    mDrive.getPPDesiredChassisSpeeds().vyMetersPerSecond,
+                    mPPDesiredSpeeds.vxMetersPerSecond, 
+                    mPPDesiredSpeeds.vyMetersPerSecond,
                     mHeadingController.getSnapOutputRadians(mDrive.getPoseEstimate().getRotation()));
                 break;
             case HEADING_ALIGN:
@@ -131,7 +133,7 @@ public class DriveManager {
                     mDrive.getPoseEstimate());
                 break;
             case AUTON:
-                desiredSpeeds = mDrive.getPPDesiredChassisSpeeds();
+                desiredSpeeds = mPPDesiredSpeeds;
                 break;
             case DRIFT_TEST:
                 desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -263,7 +265,7 @@ public class DriveManager {
             mDrive::getRobotChassisSpeeds,
             (speeds, ff) -> {
                 setDriveState(DriveState.AUTON);
-                mDrive.setPPDesiredSpeeds(speeds);
+                mPPDesiredSpeeds = speeds;
                 mDrive.setDriveFeedforwards(ff);
             }, 
             drivePID, 
@@ -369,13 +371,13 @@ public class DriveManager {
         return new InstantCommand(() -> mTeleopController.updateTuneablesWithProfiles(profile));
     }
 
+    public void setPPDesiredSpeeds(ChassisSpeeds speeds) {
+        mPPDesiredSpeeds = speeds;
+    }
+
     ///////////// GETTERS \\\\\\\\\\\\\
     public BooleanSupplier waitUntilHeadingAlignFinishes() {
         return () -> mHeadingAlignTimeout.calculate(inHeadingTolerance());
-    }
-
-    public BooleanSupplier waitUntilAutoAlignFinishes() {
-        return () -> mAutoAlignTimeout.calculate(mAutoAlignController.atGoal());
     }
 
     @AutoLogOutput(key = "Drive/Tolerance/HeadingController")
@@ -385,6 +387,19 @@ public class DriveManager {
             mDrive.getPoseEstimate().getRotation(), 
             mGoalRotationSup.get()).getDegrees()
             < HeadingController.mToleranceDegrees.get();
+    }
+
+    public boolean validHeadingState(DriveState state) {
+        return state.equals(DriveState.AUTON_HEADING_ALIGN) || state.equals(DriveState.HEADING_ALIGN);
+    }
+
+    public BooleanSupplier waitUntilAutoAlignFinishes() {
+        return () -> mAutoAlignTimeout.calculate(mAutoAlignController.atGoal());
+    }
+
+    @AutoLogOutput(key = "Drive/OdometryPP/DesiredChassisSpeeds")
+    public ChassisSpeeds getPPDesiredChassisSpeeds() {
+        return mPPDesiredSpeeds;
     }
 
     public ManualTeleopController getTeleopController() {
@@ -401,9 +416,5 @@ public class DriveManager {
 
     public LineController getLineAlignController() {
         return mLineAlignController;
-    }
-
-    public boolean validHeadingState(DriveState state) {
-        return state.equals(DriveState.AUTON_HEADING_ALIGN) || state.equals(DriveState.HEADING_ALIGN);
     }
 }

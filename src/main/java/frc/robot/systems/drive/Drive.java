@@ -60,30 +60,26 @@ public class Drive extends SubsystemBase {
             new SwerveSetpoint(new ChassisSpeeds(), SwerveHelper.zeroStates(), DriveFeedforwards.zeros(4), AzimuthFeedForward.zeros());
 
     private ChassisSpeeds mDesiredSpeeds = new ChassisSpeeds();
-    private ChassisSpeeds mPPDesiredSpeeds = new ChassisSpeeds();
     private DriveFeedforwards mPathPlanningFF = DriveFeedforwards.zeros(4);
     private boolean mUseChoreoFeedForward = false;
     private boolean mFilterFeedForward = false;
     private final PathConstraints mDriveConstraints = DriveConstants.kAutoConstraints;
 
-    // private SwerveModuleState[] mPrevSetpointStates = SwerveUtils.zeroStates();
     private SwerveModulePosition[] mPrevPositions = SwerveHelper.zeroPositions();
     private Rotation2d[] mAngleDeltas = new Rotation2d[4];
     private double[] mPrevDriveAmps = new double[] {0.0, 0.0, 0.0, 0.0};
 
     private final boolean kUseGenerator = true;
 
-    @AutoLogOutput(key = "Drive/State")
-    private DriveState mDriveState = DriveState.TELEOP;
-
     private DriveManager mDriveManager;
 
     public static final LoggedTunableNumber tDriftRate = new LoggedTunableNumber("Drive/DriftRate", DriveConstants.kDriftRate);
+    public static final LoggedTunableNumber tDriveFFAggressiveness = new LoggedTunableNumber("Drive/Teleop/DriveFFAggressiveness", kDriveFFAggressiveness);
+
     public static final LoggedTunableNumber tRotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
     public static final LoggedTunableNumber tLinearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
     public static final LoggedTunableNumber tAzimuthCharacterizationVoltage = new LoggedTunableNumber("Drive/AzimuthCharacterizationVoltage", 0);
     public static final LoggedTunableNumber tAzimuthCharacterizationAmps = new LoggedTunableNumber("Drive/AzimuthCharacterizationAmps", 0);
-    public static final LoggedTunableNumber tDriveFFAggressiveness = new LoggedTunableNumber("Drive/Teleop/DriveFFAggressiveness", kDriveFFAggressiveness);
     
     public Drive(Module[] modules, GyroIO gyro, ATagVision vision) {
         this.mModules = modules;
@@ -102,14 +98,18 @@ public class Drive extends SubsystemBase {
         PhoenixOdometryThread.getInstance().start();
 
         AutoBuilder.configure(
-            this::getPoseEstimate, this::setPose,this::getRobotChassisSpeeds,
+            this::getPoseEstimate, 
+            this::setPose, 
+            this::getRobotChassisSpeeds,
             (speeds, ff) -> {
                 mDriveManager.setDriveState(DriveState.AUTON);
-                mPPDesiredSpeeds = speeds;
+                mDriveManager.setPPDesiredSpeeds(speeds);
                 mPathPlanningFF = ff;
             },
             new PPHolonomicDriveController(kPPTranslationPID, kPPRotationPID),
-            mRobotConfig, () -> AllianceFlipUtil.shouldFlip(), this);
+            mRobotConfig, 
+            () -> AllianceFlipUtil.shouldFlip(), 
+            this);
 
         SwerveHelper.setUpPathPlanner();
         SmartDashboard.putData(mField);
@@ -144,14 +144,11 @@ public class Drive extends SubsystemBase {
             mModules[0].getOdometryTimeStamps(); // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
         mAngleDeltas = SwerveHelper.zeroRotations();
-        // System.out.println("\n\n\n\n\n\n\n\n"+sampleCount+"\n\n\n\n\n\n\n\n\n\n");
-        // Telemetry.reportException(new Exception("SAMPLE COUNT:" + sampleCount));
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = SwerveHelper.zeroPositions();
             SwerveModulePosition[] moduleDeltas = SwerveHelper.zeroPositions();
             for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
-                // System.out.println("\n\n\n\n\n\n\n\n"+mModules[moduleIndex].getOdometryPositions().length+"\n\n\n\n\n\n\n\n\n\n");
                 modulePositions[moduleIndex] = mModules[moduleIndex].getOdometryPositions()[i];
                 mAngleDeltas[moduleIndex] = mAngleDeltas[moduleIndex].plus(
                     GeomUtil.getSmallestChangeInRotation(modulePositions[moduleIndex].angle, mPrevPositions[moduleIndex].angle));
@@ -292,10 +289,6 @@ public class Drive extends SubsystemBase {
         mPathPlanningFF = ffs;
     }
 
-    public void setPPDesiredSpeeds(ChassisSpeeds speeds) {
-        mPPDesiredSpeeds = speeds;
-    }
-
     ////////////// LOCALIZATION(MAINLY RESETING LOGIC) \\\\\\\\\\\\\\\\
     public void resetGyro() {
         /* Robot is usually facing the other way(relative to field) when doing cycles on red side, so gyro is reset to 180 */
@@ -364,11 +357,6 @@ public class Drive extends SubsystemBase {
     @AutoLogOutput(key = "Drive/Odometry/DesiredChassisSpeeds")
     public ChassisSpeeds getDesiredChassisSpeeds() {
         return mDesiredSpeeds;
-    }
-
-    @AutoLogOutput(key = "Drive/Odometry/DesiredChassisSpeeds")
-    public ChassisSpeeds getPPDesiredChassisSpeeds() {
-        return mPPDesiredSpeeds;
     }
 
     public RobotConfig getPPRobotConfig() {
