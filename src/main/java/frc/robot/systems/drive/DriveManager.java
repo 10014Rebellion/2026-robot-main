@@ -43,10 +43,10 @@ public class DriveManager {
         TELEOP_SNIPER,
         POV_SNIPER,
         HEADING_ALIGN,
-        AUTON_HEADING_ALIGN,
         AUTO_ALIGN,
         LINE_ALIGN,
         AUTON,
+        AUTON_HEADING_ALIGN,
         STOP,
 
         // TUNING
@@ -109,12 +109,6 @@ public class DriveManager {
                    mDrive.getPoseEstimate().getRotation(), 
                    false);
                 break;
-            case AUTON_HEADING_ALIGN:
-                desiredSpeeds = new ChassisSpeeds(
-                    mPPDesiredSpeeds.vxMetersPerSecond, 
-                    mPPDesiredSpeeds.vyMetersPerSecond,
-                    mHeadingController.getSnapOutputRadians(mDrive.getPoseEstimate().getRotation()));
-                break;
             case HEADING_ALIGN:
                 desiredSpeeds = new ChassisSpeeds(
                     teleopSpeeds.vxMetersPerSecond, 
@@ -134,6 +128,12 @@ public class DriveManager {
                 break;
             case AUTON:
                 desiredSpeeds = mPPDesiredSpeeds;
+                break;
+            case AUTON_HEADING_ALIGN:
+                desiredSpeeds = new ChassisSpeeds(
+                    mPPDesiredSpeeds.vxMetersPerSecond, 
+                    mPPDesiredSpeeds.vyMetersPerSecond,
+                    mHeadingController.getSnapOutputRadians(mDrive.getPoseEstimate().getRotation()));
                 break;
             case DRIFT_TEST:
                 desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
