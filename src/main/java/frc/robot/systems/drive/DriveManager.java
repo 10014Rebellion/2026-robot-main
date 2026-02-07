@@ -31,12 +31,31 @@ import frc.robot.systems.drive.controllers.HolonomicController;
 import frc.robot.systems.drive.controllers.HolonomicController.ConstraintType;
 import frc.robot.systems.drive.controllers.LineController;
 import frc.robot.systems.drive.controllers.ManualTeleopController;
+import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
 import frc.robot.errors.DriveErrors;
 import frc.robot.game.GameDriveManager;
 import frc.robot.game.GameDriveManager.GameDriveStates;
-import frc.robot.systems.drive.Drive.DriveState;;
 
 public class DriveManager {
+    public static enum DriveState {
+        // TELEOP AND AUTON CONTROLS
+        TELEOP,
+        TELEOP_SNIPER,
+        POV_SNIPER,
+        HEADING_ALIGN,
+        AUTON_HEADING_ALIGN,
+        AUTO_ALIGN,
+        LINE_ALIGN,
+        AUTON,
+        STOP,
+
+        // TUNING
+        DRIFT_TEST,
+        LINEAR_TEST,
+        SYSID_CHARACTERIZATION,
+        WHEEL_CHARACTERIZATION
+    }
+
     public Drive mDrive;
 
     @AutoLogOutput(key = "Drive/State")
@@ -61,6 +80,7 @@ public class DriveManager {
     public DriveManager(Drive pDrive) {
         mDrive = pDrive;
         mGameDriveManager = new GameDriveManager(mDrive);
+        mHeadingController.setHeadingGoal(mGoalRotationSup);
     }
 
     public ChassisSpeeds computeDesiredSpeeds() {
@@ -69,46 +89,65 @@ public class DriveManager {
         mLineAlignController.updateControllers();
 
         ChassisSpeeds teleopSpeeds = mTeleopController.computeChassisSpeeds(
-            mDrive.getPoseEstimate().getRotation(), false, true);
+            mDrive.getPoseEstimate().getRotation(), 
+            false, 
+            true);
         ChassisSpeeds desiredSpeeds = teleopSpeeds;
         switch (mDriveState) {
             case TELEOP:
                 break;
             case TELEOP_SNIPER:
                 desiredSpeeds = mTeleopController.computeChassisSpeeds(
-                   mDrive.getPoseEstimate().getRotation(), true, true);
+                   mDrive.getPoseEstimate().getRotation(), 
+                   true, 
+                   true);
                 break;
             case POV_SNIPER:
                 desiredSpeeds = mTeleopController.computeSniperPOVChassisSpeeds(
-                   mDrive.getPoseEstimate().getRotation(), false);
+                   mDrive.getPoseEstimate().getRotation(), 
+                   false);
                 break;
             case AUTON_HEADING_ALIGN:
                 desiredSpeeds = new ChassisSpeeds(
-                    mDrive.getPPDesiredChassisSpeeds().vxMetersPerSecond, mDrive.getPPDesiredChassisSpeeds().vyMetersPerSecond,
+                    mDrive.getPPDesiredChassisSpeeds().vxMetersPerSecond, 
+                    mDrive.getPPDesiredChassisSpeeds().vyMetersPerSecond,
                     mHeadingController.getSnapOutputRadians(mDrive.getPoseEstimate().getRotation()));
                 break;
             case HEADING_ALIGN:
                 desiredSpeeds = new ChassisSpeeds(
-                    teleopSpeeds.vxMetersPerSecond, teleopSpeeds.vyMetersPerSecond,
+                    teleopSpeeds.vxMetersPerSecond, 
+                    teleopSpeeds.vyMetersPerSecond,
                     mHeadingController.getSnapOutputRadians(mDrive.getPoseEstimate().getRotation()));
                 break;
             case AUTO_ALIGN:
-                desiredSpeeds = mAutoAlignController.calculate(mGoalPoseSup.get(),mDrive.getPoseEstimate());
+                desiredSpeeds = mAutoAlignController.calculate(
+                    mGoalPoseSup.get(), 
+                    mDrive.getPoseEstimate());
                 break;
             case LINE_ALIGN:
-                desiredSpeeds = mLineAlignController.calculate(teleopSpeeds, mGoalPoseSup.get(),mDrive.getPoseEstimate());
+                desiredSpeeds = mLineAlignController.calculate(
+                    teleopSpeeds, 
+                    mGoalPoseSup.get(), 
+                    mDrive.getPoseEstimate());
                 break;
             case AUTON:
                 desiredSpeeds = mDrive.getPPDesiredChassisSpeeds();
                 break;
             case DRIFT_TEST:
-                desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-                    Drive.tLinearTestSpeedMPS.get(), 0.0, Math.toRadians(Drive.tRotationDriftTestSpeedDeg.get())),
+                desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                        Drive.tLinearTestSpeedMPS.get(), 
+                        0.0, 
+                        Math.toRadians(
+                            Drive.tRotationDriftTestSpeedDeg.get())),
                     mDrive.getPoseEstimate().getRotation());
                 break;
             case LINEAR_TEST:
-                desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(new ChassisSpeeds(
-                    Drive.tLinearTestSpeedMPS.get(), 0.0, 0.0), 
+                desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    new ChassisSpeeds(
+                        Drive.tLinearTestSpeedMPS.get(),
+                        0.0,
+                        0.0), 
                     mDrive.getPoseEstimate().getRotation());
                 break;
                 /* Set by characterization commands in the CHARACTERIZATION header. Wheel characterization is currently unimplemented */
@@ -127,7 +166,7 @@ public class DriveManager {
         return desiredSpeeds;
     }
 
-        ///////////////////////// STATE SETTING \\\\\\\\\\\\\\\\\\\\\\\\
+    ///////////////////////// STATE COMMANDS \\\\\\\\\\\\\\\\\\\\\\\\
     public Command setToTeleop() {
         return setDriveStateCommandContinued(DriveState.TELEOP);
     }
@@ -166,13 +205,17 @@ public class DriveManager {
 
     public Command customFollowPathCommand(PathPlannerPath path, PPHolonomicDriveController drivePID) {
         return new FollowPathCommand(
-            path, mDrive::getPoseEstimate, mDrive::getRobotChassisSpeeds,
+            path, mDrive::getPoseEstimate, 
+            mDrive::getRobotChassisSpeeds,
             (speeds, ff) -> {
                 setDriveState(DriveState.AUTON);
                 mDrive.setPPDesiredSpeeds(speeds);
                 mDrive.setDriveFeedforwards(ff);
-            }, drivePID, 
-            mDrive.getPPRobotConfig(), () -> AllianceFlipUtil.shouldFlip(), mDrive);
+            }, 
+            drivePID, 
+            mDrive.getPPRobotConfig(), 
+            () -> AllianceFlipUtil.shouldFlip(), 
+            mDrive);
     }
 
     public Command getGameDriveCommand(GameDriveStates pGameDriveStates) {
@@ -254,7 +297,7 @@ public class DriveManager {
             () -> new ChassisSpeeds());
     }
 
-    ////// BASE STATES \\\\\\
+    /* BASE STATE COMMANDS */
     public Command setDriveStateCommand(DriveState state) {
         return Commands.runOnce(() -> setDriveState(state), mDrive);
     }
@@ -264,6 +307,7 @@ public class DriveManager {
         return new FunctionalCommand(() -> setDriveState(state), () -> {}, (interrupted) -> {}, () -> false, mDrive);
     }
 
+    ///////////// SETTERS \\\\\\\\\\\\\
     /* Sets the drive state used in periodic(), and handles init condtions like resetting PID controllers */
     public void setDriveState(DriveState state) {
         mDriveState = state;
@@ -279,6 +323,17 @@ public class DriveManager {
         }
     }
 
+    public void acceptJoystickInputs(
+            DoubleSupplier pXSupplier, DoubleSupplier pYSupplier,
+            DoubleSupplier pThetaSupplier, Supplier<Rotation2d> pPOVSupplier) {
+        mTeleopController.acceptJoystickInputs(pXSupplier, pYSupplier, pThetaSupplier, pPOVSupplier);
+    }
+
+    public Command setDriveProfile(DriverProfiles profile) {
+        return new InstantCommand(() -> mTeleopController.updateTuneablesWithProfiles(profile));
+    }
+
+    ///////////// GETTERS \\\\\\\\\\\\\
     public BooleanSupplier waitUntilHeadingAlignFinishes() {
         return () -> mHeadingAlignTimeout.calculate(inHeadingTolerance());
     }
@@ -290,7 +345,25 @@ public class DriveManager {
     @AutoLogOutput(key = "Drive/Tolerance/HeadingController")
     public boolean inHeadingTolerance() {
         /* Accounts for angle wrapping issues with rotation 2D error */
-        return GeomUtil.getSmallestChangeInRotation(mDrive.getPoseEstimate().getRotation(), mGoalRotationSup.get()).getDegrees()
+        return GeomUtil.getSmallestChangeInRotation(
+            mDrive.getPoseEstimate().getRotation(), 
+            mGoalRotationSup.get()).getDegrees()
             < HeadingController.mToleranceDegrees.get();
+    }
+
+    public ManualTeleopController getTeleopController() {
+        return mTeleopController;
+    }
+
+    public HolonomicController getAutoAlignController() {
+        return mAutoAlignController;
+    }
+
+    public HeadingController getHeadingController() {
+        return mHeadingController;
+    }
+
+    public LineController getLineAlignController() {
+        return mLineAlignController;
     }
 }

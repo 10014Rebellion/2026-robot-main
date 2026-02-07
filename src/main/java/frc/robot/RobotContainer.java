@@ -91,9 +91,9 @@ public class RobotContainer {
         initBindings();
 
         mDriverProfileChooser.addDefaultOption(
-                BindingsConstants.kDefaultProfile.key(), mDrive.setDriveProfile(BindingsConstants.kDefaultProfile));
+                BindingsConstants.kDefaultProfile.key(), mDrive.getDriveManager().setDriveProfile(BindingsConstants.kDefaultProfile));
         for (DriverProfiles profile : BindingsConstants.kProfiles)
-            mDriverProfileChooser.addOption(profile.key(), mDrive.setDriveProfile(profile));
+            mDriverProfileChooser.addOption(profile.key(), mDrive.getDriveManager().setDriveProfile(profile));
 
         autos = new AutonCommands(mDrive);
     }

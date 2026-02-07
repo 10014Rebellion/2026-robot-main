@@ -29,37 +29,37 @@ public class GameDriveManager {
     public Command getSetGameDriveStateCmd(GameDriveStates pGameDriveState) {
         switch (pGameDriveState) {
             case HUB_HEADING_ALIGN:
-                return mDrive.setToGenericHeadingAlign(
+                return mDrive.getDriveManager().setToGenericHeadingAlign(
                     () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()));
             case AUTON_HUB_HEADING_ALIGN:
-                return mDrive.setToGenericHeadingAlignAuton(
+                return mDrive.getDriveManager().setToGenericHeadingAlignAuton(
                     () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()));
             case LINE_TO_TRENCH:
-                return mDrive.setToGenericLineAlign(
+                return mDrive.getDriveManager().setToGenericLineAlign(
                     () -> GameGoalPoseChooser.getClosestTrench(mDrive.getPoseEstimate()),
                     () -> Rotation2d.kZero,
                     () -> 1.0,
                     () -> false);
             case LINE_TO_BUMP:
-                return mDrive.setToGenericLineAlign(
+                return mDrive.getDriveManager().setToGenericLineAlign(
                     () -> GameGoalPoseChooser.getClosestBump(mDrive.getPoseEstimate()),
                     () -> Rotation2d.kZero,
                     () -> 1.0,
                     () -> false);
             case LINE_TO_O:
-                return mDrive.setToGenericLineAlign(
+                return mDrive.getDriveManager().setToGenericLineAlign(
                     () -> GameGoalPoseChooser.getO(),
                     () -> Rotation2d.kZero,
                     () -> 1.0,
                     () -> false);
             case LINE_TO_D:
-                return mDrive.setToGenericLineAlign(
+                return mDrive.getDriveManager().setToGenericLineAlign(
                     () -> GameGoalPoseChooser.getD(),
                     () -> Rotation2d.kZero,
                     () -> 1.0,
                     () -> false);
             case DRIVE_TO_SAFE_SCORE:
-                return mDrive.setToGenericAutoAlign(
+                return mDrive.getDriveManager().setToGenericAutoAlign(
                     () -> GameGoalPoseChooser.getSafeScoringPosition(), 
                     ConstraintType.LINEAR);
             default:

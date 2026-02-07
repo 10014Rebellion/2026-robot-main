@@ -2,6 +2,8 @@
 
 package frc.robot.bindings;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -16,14 +18,14 @@ public class ButtonBindings {
 
     public ButtonBindings(Drive pDriveSS) {
         this.mDriveSS = pDriveSS;
-        this.mDriveSS.setDefaultCommand(mDriveSS.setToTeleop());
+        this.mDriveSS.setDefaultCommand(mDriveSS.getDriveManager().setToTeleop());
     }
 
     public void initDriverButtonBindings() {
         new Trigger(() -> DriverStation.isTeleopEnabled())
-            .onTrue(mDriveSS.setToTeleop());
+            .onTrue(mDriveSS.getDriveManager().setToTeleop());
 
-        mDriveSS.acceptJoystickInputs(
+        mDriveSS.getDriveManager().acceptJoystickInputs(
                 () -> -mDriverController.getLeftY(),
                 () -> -mDriverController.getLeftX(),
                 () -> -mDriverController.getRightX(),
@@ -39,24 +41,20 @@ public class ButtonBindings {
 
         mDriverController.a()
             .onTrue(
-                mDriveSS.setToGenericHeadingAlign(() -> GameGoalPoseChooser.turnFromHub(mDriveSS.getPoseEstimate())))
-            .onFalse(mDriveSS.setToTeleop());
+                mDriveSS.getDriveManager().setToGenericHeadingAlign(() -> GameGoalPoseChooser.turnFromHub(mDriveSS.getPoseEstimate())))
+            .onFalse(mDriveSS.getDriveManager().setToTeleop());
             
-    //    mDriverController.b()
-    //         .onTrue(mDriveSS.setToGenericLineAlign(
-    //             () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
-    //             () -> Rotation2d.fromDegrees(45),
-    //             () -> 1.0,
-    //             () -> false
-    //         ))
-    //         .onFalse(mDriveSS.setToTeleop());
+       mDriverController.b()
+            .onTrue(mDriveSS.getDriveManager().setToGenericLineAlign(
+                () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
+                () -> Rotation2d.fromDegrees(45),
+                () -> 1.0,
+                () -> false
+            ))
+            .onFalse(mDriveSS.getDriveManager().setToTeleop());
 
         mDriverController.x()
             .onTrue(DriveCharacterizationCommands.testAzimuthsVoltage(mDriveSS, 0, 1, 2, 3))
-            .onFalse(mDriveSS.setToTeleop());
-
-        // mDriverController.a()
-        //     .onTrue(Commands.runOnce(() -> mDriveSS.setPose(new Pose2d()), mDriveSS)
-        //             .andThen(mDriveSS.setToGenericLineAlign(() -> new Pose2d(2.5, 2.5, Rotation2d.fromDegrees(45.0)), () -> Rotation2d.fromDegrees(45.0))));
+            .onFalse(mDriveSS.getDriveManager().setToTeleop());
     }
 }
