@@ -4,6 +4,13 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "Max":{
+    "dimension":"LinAcc",
+    "var":{
+     "exp":"8 m / s ^ 2",
+     "val":8.0
+    }
+   },
    "MaxV":{
     "dimension":"LinVel",
     "var":{
