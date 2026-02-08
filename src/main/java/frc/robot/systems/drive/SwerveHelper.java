@@ -31,9 +31,9 @@ import frc.lib.swerve.LocalADStarAK;
 import frc.lib.telemetry.Telemetry;
 
 public class SwerveHelper {
-    private static final double dt = 0.02;
-    private static final DCMotor kKrakenFOCModel = DCMotor.getKrakenX60Foc(1);
-    private static final double kJitterThreshold = 0.01;
+    public static final double dt = 0.02;
+    public static final DCMotor kKrakenFOCModel = DCMotor.getKrakenX60Foc(1);
+    public static final double kJitterThreshold = 0.01;
 
     /* 
      * Helps driftRate value helps account for translation drift while rotating and riving

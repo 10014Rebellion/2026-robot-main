@@ -69,7 +69,9 @@ public class Module {
 
         if (mVelocitySetpointMPS != null) {
             if(DriveConstants.kUseVoltageFeedforward) {
-                    mIO.setDriveVelocity(mVelocitySetpointMPS, mDriveFF.calculate(mVelocitySetpointMPS));
+                    mIO.setDriveVelocity(
+                        mVelocitySetpointMPS, 
+                        mDriveFF.calculate(mVelocitySetpointMPS));
             } else {
                 if (mAmperageFeedforward != null) {
                     double ffOutput =
@@ -88,8 +90,10 @@ public class Module {
         
             if (mAzimuthSetpointAngle != null) {
                 double ffOutput = mAzimuthFF.calculate(mAzimuthSetpointAngularVelocityRadPS);
-                Telemetry.log("Drive/" + kModuleName + "/SimpleFeedforwardAzimuth", ffOutput);
                 mIO.setAzimuthPosition(mAzimuthSetpointAngle, ffOutput);
+
+                Telemetry.log("Drive/" + kModuleName + "/SimpleFeedforwardAzimuth", ffOutput);
+                Telemetry.log("Drive/"+kModuleName+"DesiredAzimuthRotationSpeed", mAzimuthSetpointAngularVelocityRadPS);
             }
         }
 
@@ -98,7 +102,10 @@ public class Module {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             () -> {
-                mIO.setDrivePID(tDriveP.get(), 0.0, tDriveD.get());
+                mIO.setDrivePID(
+                    tDriveP.get(), 
+                    0.0, 
+                    tDriveD.get());
             },
             tDriveP,
             tDriveD
@@ -107,7 +114,10 @@ public class Module {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             () -> {
-                mDriveFF = new SimpleMotorFeedforward(tDriveS.get(), tDriveV.get(), tDriveA.get());
+                mDriveFF = new SimpleMotorFeedforward(
+                    tDriveS.get(), 
+                    tDriveV.get(), 
+                    tDriveA.get());
             },
             tDriveS,
             tDriveV,
@@ -117,7 +127,10 @@ public class Module {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             () -> {
-                mIO.setAzimuthPID(tTurnP.get(), 0.0, tTurnD.get());
+                mIO.setAzimuthPID(
+                    tTurnP.get(), 
+                    0.0, 
+                    tTurnD.get());
             },
             tTurnP,
             tTurnD
@@ -126,7 +139,10 @@ public class Module {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             () -> {
-                mAzimuthFF = new SimpleMotorFeedforward(tTurnS.get(), tTurnV.get(), 0.0);
+                mAzimuthFF = new SimpleMotorFeedforward(
+                    tTurnS.get(), 
+                    tTurnV.get(), 
+                    0.0);
             },
             tTurnS,
             tTurnV

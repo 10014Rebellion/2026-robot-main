@@ -274,6 +274,10 @@ public class DriveManager {
             mDrive);
     }
 
+    public void setToAuton() {
+        setDriveState(DriveState.AUTON);
+    }
+
     /*
      * GAME SPECIFIC SETPOINTS FOR HEADING, LINE AND AUTO CONTROLLER
      */

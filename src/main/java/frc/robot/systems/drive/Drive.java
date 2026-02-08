@@ -13,7 +13,6 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -39,7 +38,6 @@ import frc.robot.systems.drive.gyro.GyroInputsAutoLogged;
 import frc.robot.systems.drive.modules.Module;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.systems.drive.DriveManager.DriveState;
 
 public class Drive extends SubsystemBase {
     private final Module[] mModules;
@@ -102,7 +100,7 @@ public class Drive extends SubsystemBase {
             this::setPose, 
             this::getRobotChassisSpeeds,
             (speeds, ff) -> {
-                mDriveManager.setDriveState(DriveState.AUTON);
+                mDriveManager.setToAuton();;
                 mDriveManager.setPPDesiredSpeeds(speeds);
                 mPathPlanningFF = ff;
             },
@@ -140,26 +138,34 @@ public class Drive extends SubsystemBase {
         }
 
         double skidCount = 0;
-        double[] sampleTimestamps =
-            mModules[0].getOdometryTimeStamps(); // All signals are sampled together
+        double[] sampleTimestamps = mModules[0].getOdometryTimeStamps(); // All signals are sampled together
         int sampleCount = sampleTimestamps.length;
         mAngleDeltas = SwerveHelper.zeroRotations();
         for (int i = 0; i < sampleCount; i++) {
             // Read wheel positions and deltas from each module
             SwerveModulePosition[] modulePositions = SwerveHelper.zeroPositions();
             SwerveModulePosition[] moduleDeltas = SwerveHelper.zeroPositions();
+
             for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
                 modulePositions[moduleIndex] = mModules[moduleIndex].getOdometryPositions()[i];
+
                 mAngleDeltas[moduleIndex] = mAngleDeltas[moduleIndex].plus(
-                    GeomUtil.getSmallestChangeInRotation(modulePositions[moduleIndex].angle, mPrevPositions[moduleIndex].angle));
+                    GeomUtil.getSmallestChangeInRotation(
+                        modulePositions[moduleIndex].angle, 
+                        mPrevPositions[moduleIndex].angle));
+
                 moduleDeltas[moduleIndex] = new SwerveModulePosition(
-                    modulePositions[moduleIndex].distanceMeters - mPrevPositions[moduleIndex].distanceMeters,
+                    modulePositions[moduleIndex].distanceMeters 
+                        - mPrevPositions[moduleIndex].distanceMeters,
                     modulePositions[moduleIndex].angle);
+
                 mPrevPositions[moduleIndex] = modulePositions[moduleIndex];
             }
 
             Twist2d robotTwist = kKinematics.toTwist2d(moduleDeltas);
-            if(kSkidRatioCap < SwerveHelper.skidRatio(GeomUtil.toChassisSpeeds(robotTwist, 1.0 / kOdometryFrequency))) skidCount++;
+            double skidRatio = SwerveHelper.skidRatio(GeomUtil.toChassisSpeeds(robotTwist, 1.0 / kOdometryFrequency));
+
+            if(kSkidRatioCap < skidRatio) skidCount++;
 
             // Update gyro angle
             // Use the real gyro angle
@@ -168,32 +174,41 @@ public class Drive extends SubsystemBase {
             else mRobotRotation = mRobotRotation.plus(new Rotation2d(robotTwist.dtheta));
 
             mPoseEstimator.updateWithTime(sampleTimestamps[i], mRobotRotation, modulePositions);
+
+            Logger.recordOutput("Drive/Odometry/SkidRatio/"+i, skidRatio);
         }
 
-        mOdometry.update(mRobotRotation, getModulePositions());
+        double skidFactor = ( mSkidFactorDebouncer.calculate(skidCount > 0) ) 
+            ? skidCount * kSkidScalar 
+            : 0;
 
-        double skidFactor = mSkidFactorDebouncer.calculate(skidCount > 0) ? skidCount * kSkidScalar : 0;
-        double gyroFactor = mCollisionDebouncer.calculate(mGyro.getAccMagG() > kCollisionCapG) ? kCollisionScalar : 1.0;
+        double gyroFactor = ( mCollisionDebouncer.calculate( mGyro.getAccMagG() > kCollisionCapG ) ) 
+            ? kCollisionScalar 
+            : 1.0;
         
         double visionFactor = skidFactor + gyroFactor;
-
-        Logger.recordOutput("Drive/Odometry/SkidFactor", skidFactor);
-        Logger.recordOutput("Drive/Odometry/SkidCount", skidCount);
-        Logger.recordOutput("Drive/Odometry/GyroFactor", gyroFactor);
-        Logger.recordOutput("Drive/Odometry/VisionFactor", visionFactor);
         
         /* VISION */
         mVision.periodic(mPoseEstimator.getEstimatedPosition(), mOdometry.getPoseMeters());
         VisionObservation[] observations = mVision.getVisionObservations();
         for (VisionObservation observation : observations) {
-            if (observation.hasObserved()) mPoseEstimator.addVisionMeasurement(
-                observation.pose(), observation.timeStamp(), 
-                observation.stdDevs().times(1.0 / visionFactor));
+            if (observation.hasObserved()) {
+                mPoseEstimator.addVisionMeasurement(
+                    observation.pose(), 
+                    observation.timeStamp(), 
+                    observation.stdDevs().times(1.0 / visionFactor));
+            }
 
             Telemetry.logVisionObservationStdDevs(observation);
         }
 
+        /* For logging purposes */
+        mOdometry.update(mRobotRotation, getModulePositions());
         mField.setRobotPose(getPoseEstimate());
+        Logger.recordOutput("Drive/Odometry/SkidFactor", skidFactor);
+        Logger.recordOutput("Drive/Odometry/SkidCount", skidCount);
+        Logger.recordOutput("Drive/Odometry/GyroFactor", gyroFactor);
+        Logger.recordOutput("Drive/Odometry/VisionFactor", visionFactor);
     }
 
     ////////////// CHASSIS SPEED TO MODULES \\\\\\\\\\\\\\\\
@@ -204,7 +219,11 @@ public class Drive extends SubsystemBase {
 
         /* Logs all the possible drive states, great for debugging */
         SwerveHelper.logPossibleDriveStates(
-                kDoExtraLogging, mDesiredSpeeds, getModuleStates(), mPreviousSetpoint, mRobotRotation);
+            kDoExtraLogging, 
+            mDesiredSpeeds, 
+            getModuleStates(), 
+            mPreviousSetpoint, 
+            mRobotRotation);
 
         SwerveModuleState[] unOptimizedSetpointStates = new SwerveModuleState[4];
         SwerveModuleState[] setpointStates = kKinematics.toSwerveModuleStates(mDesiredSpeeds);
@@ -213,7 +232,12 @@ public class Drive extends SubsystemBase {
         SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
 
         mPreviousSetpoint = mSetpointGenerator.generateSetpoint(
-            mPreviousSetpoint, mDesiredSpeeds, (DriverStation.isTeleop()) ? mDriveConstraints : kAutoConstraints, 0.02);
+            mPreviousSetpoint, 
+            mDesiredSpeeds, 
+            (DriverStation.isTeleop()) 
+                ? mDriveConstraints 
+                : kAutoConstraints, 
+            SwerveHelper.dt);
 
         /* Only for logging purposes */
         SwerveModuleState[] moduleTorques = SwerveHelper.zeroStates();
@@ -229,29 +253,37 @@ public class Drive extends SubsystemBase {
                     mPreviousSetpoint.moduleStates()[i].speedMetersPerSecond,
                     /* setpointAngle = currentAngle if the speed is less than 0.01 */
                     SwerveHelper.removeAzimuthJitter(
-                        mPreviousSetpoint.moduleStates()[i], mModules[i].getCurrentState()));
-
+                        mPreviousSetpoint.moduleStates()[i], 
+                        mModules[i].getCurrentState()));
                 unOptimizedSetpointStates[i] = SwerveHelper.copyState(setpointStates[i]);
+
                 setpointStates[i].optimize(mModules[i].getCurrentState().angle);
 
                 /* Feedforward cases based on driveState */
-                double driveAmps = calculateDriveFeedforward(i) + SwerveHelper.deadReckoningFeedforward(mAngleDeltas[i]);
+                double driveAmps = 
+                    calculateDriveFeedforward(i) + SwerveHelper.deadReckoningFeedforward(mAngleDeltas[i]);
                 double desiredAzimuthVelocityRadPS = 
                     mPreviousSetpoint.azimuthFeedforwards().azimuthSpeedRadiansPS()[i];
 
                 // Multiplies by cos(angleError) to stop the drive from going in the wrong direction
                 setpointStates[i].cosineScale(mModules[i].getCurrentState().angle);
 
-                optimizedSetpointStates[i] = 
-                    mModules[i].setDesiredStateWithAmpFF(setpointStates[i], driveAmps, desiredAzimuthVelocityRadPS);
+                optimizedSetpointStates[i] = mModules[i].setDesiredStateWithAmpFF(
+                    setpointStates[i], 
+                    driveAmps, 
+                    desiredAzimuthVelocityRadPS);
 
-                Logger.recordOutput("Drive/DesiredAzimuthRotationSpeed"+mModules[i].getModuleName(), desiredAzimuthVelocityRadPS);
                 /* Normalized for logging */
                 moduleTorques[i] = new SwerveModuleState(
-                    (driveAmps * kMaxLinearSpeedMPS / kDriveFOCAmpLimit), optimizedSetpointStates[i].angle);
+                    (driveAmps * kMaxLinearSpeedMPS) 
+                        / kDriveFOCAmpLimit, 
+                    optimizedSetpointStates[i].angle);
             } else {
-                setpointStates[i] = new SwerveModuleState(setpointStates[i].speedMetersPerSecond,
-                    SwerveHelper.removeAzimuthJitter(setpointStates[i], mModules[i].getCurrentState()));
+                setpointStates[i] = new SwerveModuleState(
+                    setpointStates[i].speedMetersPerSecond,
+                    SwerveHelper.removeAzimuthJitter(
+                        setpointStates[i], 
+                        mModules[i].getCurrentState()));
 
                 setpointStates[i].optimize(mModules[i].getCurrentState().angle);
                 setpointStates[i].cosineScale(mModules[i].getCurrentState().angle);
@@ -270,11 +302,23 @@ public class Drive extends SubsystemBase {
 
     /* Calculates DriveFeedforward based off state */
     public double calculateDriveFeedforward(int i) {
-        double driveAmps = (mUseChoreoFeedForward) ? 
-            SwerveHelper.convertChoreoNewtonsToAmps(getModuleStates()[i], mPathPlanningFF, i) :
-            mPathPlanningFF.torqueCurrentsAmps()[i] * SwerveHelper.ppFFScalar(getModuleStates()[i], mPathPlanningFF, i);
+        double driveAmps = (mUseChoreoFeedForward) 
+            ? SwerveHelper.convertChoreoNewtonsToAmps(
+                getModuleStates()[i], 
+                mPathPlanningFF, 
+                i)
+            : mPathPlanningFF.torqueCurrentsAmps()[i] 
+                * SwerveHelper.ppFFScalar(
+                    getModuleStates()[i], 
+                    mPathPlanningFF, 
+                    i);
 
-        if(mFilterFeedForward) driveAmps = SwerveHelper.lowPassFilter(mPrevDriveAmps[i], driveAmps, tDriveFFAggressiveness.get());
+        if(mFilterFeedForward) {
+            driveAmps = SwerveHelper.lowPassFilter(
+                mPrevDriveAmps[i], 
+                driveAmps, 
+                tDriveFFAggressiveness.get());
+        }
 
         mPrevDriveAmps[i] = driveAmps;
         return driveAmps;
@@ -292,9 +336,11 @@ public class Drive extends SubsystemBase {
     ////////////// LOCALIZATION(MAINLY RESETING LOGIC) \\\\\\\\\\\\\\\\
     public void resetGyro() {
         /* Robot is usually facing the other way(relative to field) when doing cycles on red side, so gyro is reset to 180 */
-        mRobotRotation = AllianceFlipUtil.shouldFlip() ? Rotation2d.fromDegrees(180.0) : Rotation2d.fromDegrees(0.0);
+        mRobotRotation = AllianceFlipUtil.shouldFlip() 
+            ? Rotation2d.fromDegrees(180.0) 
+            : Rotation2d.fromDegrees(0.0);
+
         mGyro.resetGyro(mRobotRotation);
-        setPose(new Pose2d(new Translation2d(), mRobotRotation));
     }
 
     public void setPose(Pose2d pose) {
