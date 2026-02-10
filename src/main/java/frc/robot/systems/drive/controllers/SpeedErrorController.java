@@ -5,27 +5,27 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.lib.tuning.LoggedTunableNumber;
 
 public class SpeedErrorController {
-    public static final LoggedTunableNumber tXP = new LoggedTunableNumber("AutoAlign/X/kP", 0.0);
-    public static final LoggedTunableNumber tXD = new LoggedTunableNumber("AutoAlign/X/kD", 0.0);
-    public static final LoggedTunableNumber tXI = new LoggedTunableNumber("AutoAlign/X/kI", 0.0);
-    public static final LoggedTunableNumber tXIZone = new LoggedTunableNumber("AutoAlign/X/kIZone", 0.0);
-    public static final LoggedTunableNumber tXIRange = new LoggedTunableNumber("AutoAlign/X/kIRange", 0.0);
+    public static final LoggedTunableNumber tXP = new LoggedTunableNumber("SpeedErrorController/X/kP", 0.0);
+    public static final LoggedTunableNumber tXD = new LoggedTunableNumber("SpeedErrorController/X/kD", 0.0);
+    public static final LoggedTunableNumber tXI = new LoggedTunableNumber("SpeedErrorController/X/kI", 0.0);
+    public static final LoggedTunableNumber tXIZone = new LoggedTunableNumber("SpeedErrorController/X/kIZone", 0.0);
+    public static final LoggedTunableNumber tXIRange = new LoggedTunableNumber("SpeedErrorController/X/kIRange", 0.0);
 
-    public static final LoggedTunableNumber tXToleranceMPS = new LoggedTunableNumber("AutoAlign/X/ToleranceMPS", 0.03);
+    public static final LoggedTunableNumber tXToleranceMPS = new LoggedTunableNumber("SpeedErrorController/X/ToleranceMPS", 0.03);
 
-    public static final LoggedTunableNumber tYP = new LoggedTunableNumber("AutoAlign/Y/kP", 0.0);
-    public static final LoggedTunableNumber tYD = new LoggedTunableNumber("AutoAlign/Y/kD", 0.0);
-    public static final LoggedTunableNumber tYI = new LoggedTunableNumber("AutoAlign/Y/kI", 0.0);
-    public static final LoggedTunableNumber tYIZone = new LoggedTunableNumber("AutoAlign/Y/kIZone", 0.0);
-    public static final LoggedTunableNumber tYIRange = new LoggedTunableNumber("AutoAlign/Y/kIRange", 0.0);
-    public static final LoggedTunableNumber tYToleranceMPS = new LoggedTunableNumber("AutoAlign/Y/ToleranceMPS", 0.05);
+    public static final LoggedTunableNumber tYP = new LoggedTunableNumber("SpeedErrorController/Y/kP", 0.0);
+    public static final LoggedTunableNumber tYD = new LoggedTunableNumber("SpeedErrorController/Y/kD", 0.0);
+    public static final LoggedTunableNumber tYI = new LoggedTunableNumber("SpeedErrorController/Y/kI", 0.0);
+    public static final LoggedTunableNumber tYIZone = new LoggedTunableNumber("SpeedErrorController/Y/kIZone", 0.0);
+    public static final LoggedTunableNumber tYIRange = new LoggedTunableNumber("SpeedErrorController/Y/kIRange", 0.0);
+    public static final LoggedTunableNumber tYToleranceMPS = new LoggedTunableNumber("SpeedErrorController/Y/ToleranceMPS", 0.05);
 
-    public static final LoggedTunableNumber tOmegaP = new LoggedTunableNumber("AutoAlign/Omega/kP", 0.0);
-    public static final LoggedTunableNumber tOmegaD = new LoggedTunableNumber("AutoAlign/Omega/kD", 0.0);
-    public static final LoggedTunableNumber tOmegaI = new LoggedTunableNumber("AutoAlign/Omega/kI", 0.0);
-    public static final LoggedTunableNumber tOmegaIZone = new LoggedTunableNumber("AutoAlign/Omega/kIZone", 0.0);
-    public static final LoggedTunableNumber tOmegaIRange = new LoggedTunableNumber("AutoAlign/Omega/kIRange", 0.0);
-    public static final LoggedTunableNumber tOmegaToleranceDPS = new LoggedTunableNumber("AutoAlign/Omega/ToleranceDPS", 1.5);
+    public static final LoggedTunableNumber tOmegaP = new LoggedTunableNumber("SpeedErrorController/Omega/kP", 0.0);
+    public static final LoggedTunableNumber tOmegaD = new LoggedTunableNumber("SpeedErrorController/Omega/kD", 0.0);
+    public static final LoggedTunableNumber tOmegaI = new LoggedTunableNumber("SpeedErrorController/Omega/kI", 0.0);
+    public static final LoggedTunableNumber tOmegaIZone = new LoggedTunableNumber("SpeedErrorController/Omega/kIZone", 0.0);
+    public static final LoggedTunableNumber tOmegaIRange = new LoggedTunableNumber("SpeedErrorController/Omega/kIRange", 0.0);
+    public static final LoggedTunableNumber tOmegaToleranceDPS = new LoggedTunableNumber("SpeedErrorController/Omega/ToleranceDPS", 1.5);
 
     private final PIDController tXController;
     private final PIDController tYController;
