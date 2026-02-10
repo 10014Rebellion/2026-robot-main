@@ -2,6 +2,7 @@ package frc.robot.systems.shooter.flywheels;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.tuning.LoggedTunableNumber;
 import static frc.robot.systems.shooter.ShooterConstants.FlywheelConstants.kFlywheelControlConfig;
@@ -15,10 +16,16 @@ public class Flywheels extends SubsystemBase {
 
   private final LoggedTunableNumber tFlywheelKP = new LoggedTunableNumber("Flywheel/Control/kP", kFlywheelControlConfig.pdController().kP());
   private final LoggedTunableNumber tFlywheelKD = new LoggedTunableNumber("Flywheel/Control/kD", kFlywheelControlConfig.pdController().kD());
+
+  private final LoggedTunableNumber tFlywheelKS = new LoggedTunableNumber("Flywheel/Control/kS", kFlywheelControlConfig.feeforward().getKs());
+  private final LoggedTunableNumber tFlywheelKV = new LoggedTunableNumber("Flywheel/Control/kV", kFlywheelControlConfig.feeforward().getKv());
+  private final LoggedTunableNumber tFlywheelKA = new LoggedTunableNumber("Flywheel/Control/kA", kFlywheelControlConfig.feeforward().getKa());
+
   private final LoggedTunableNumber tFlywheelCruiseVel = new LoggedTunableNumber("Flywheel/Control/CruiseVel", kFlywheelControlConfig.motionMagicConstants().maxVelocity());
   private final LoggedTunableNumber tFlywheelMaxAccel = new LoggedTunableNumber("Flywheel/Control/MaxAcceleration", kFlywheelControlConfig.motionMagicConstants().maxAcceleration());
   private final LoggedTunableNumber tFlywheelMaxJerk = new LoggedTunableNumber("Flywheel/Control/MaxJerk", kFlywheelControlConfig.motionMagicConstants().maxJerk());
 
+  private SimpleMotorFeedforward mFlywheelFeedforward = kFlywheelControlConfig.feeforward();
 
   public Flywheels(FlywheelIO pLeaderFlywheelIO, FlywheelIO pFollowerFlywheelIO) {
     this.mLeaderFlywheelIO = pLeaderFlywheelIO;
@@ -31,8 +38,9 @@ public class Flywheels extends SubsystemBase {
   }
 
   public void setFlywheelSpeeds(double pRPS) {
-    mLeaderFlywheelIO.setMotorVelAndAccel(pRPS, 0, 0);
+    mLeaderFlywheelIO.setMotorVelAndAccel(pRPS, 0, mFlywheelFeedforward.calculate(pRPS));
     mFollowerFlywheelIO.enforceFollower();
+    Logger.recordOutput("Flywheel/Goal", pRPS);
   }
 
   public void stopFlywheelMotor() {
@@ -71,6 +79,11 @@ public class Flywheels extends SubsystemBase {
     LoggedTunableNumber.ifChanged( hashCode(), 
       () -> setBothMotionMagicConstants(tFlywheelCruiseVel.get(), tFlywheelMaxAccel.get(), tFlywheelMaxJerk.get()), 
       tFlywheelCruiseVel, tFlywheelMaxAccel, tFlywheelMaxJerk
+    );
+
+    LoggedTunableNumber.ifChanged( hashCode(), 
+      () -> mFlywheelFeedforward = new SimpleMotorFeedforward(tFlywheelKS.get(), tFlywheelKV.get(), tFlywheelKA.get()),
+      tFlywheelKS, tFlywheelKV, tFlywheelKA
     );
   }
 }

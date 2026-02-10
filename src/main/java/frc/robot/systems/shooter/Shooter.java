@@ -29,6 +29,10 @@ public class Shooter extends SubsystemBase {
     return new InstantCommand(() -> mIndexersSS.setIndexerVolts(pVolts));
   }
 
+  public Command setIndexerRPSCmd(double pRPS) {
+    return new InstantCommand(() -> mIndexersSS.setIndexerRPS(pRPS));
+  }
+
   public Command setHoodRot(Rotation2d pRot) {
     return new InstantCommand(() -> mHoodSS.setHoodRot(pRot));
   }

@@ -50,7 +50,11 @@ public class ButtonBindings {
             .onTrue(mShooterSS.setHoodRot(Rotation2d.kZero));
 
         mDriverController.rightTrigger()
-            .onTrue(mShooterSS.setIndexersVoltsCmd(12))
+            .onTrue(mShooterSS.setIndexerRPSCmd(60))
+            .onFalse(mShooterSS.setIndexersVoltsCmd(0.0));
+
+        mDriverController.b()
+            .onTrue(mShooterSS.setIndexersVoltsCmd(0.508))
             .onFalse(mShooterSS.setIndexersVoltsCmd(0));
 
         mDriverController.leftTrigger()

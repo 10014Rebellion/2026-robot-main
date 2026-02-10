@@ -1,5 +1,7 @@
 package frc.robot.systems.shooter.indexers;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -22,8 +24,10 @@ import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 
 public class IndexerIOKrakenX44 implements IndexerIO{
     private final TalonFX mIndexerMotor;
+    
     private final VoltageOut mIndexerVoltageControl = new VoltageOut(0.0);
     private final VelocityDutyCycle mIndexerVelocityControl = new VelocityDutyCycle(0.0);
+
     private final StatusSignal<ControlModeValue> mIndexerControlMode;
     private final StatusSignal<AngularVelocity> mIndexerVelocityRPS;
     private final StatusSignal<Voltage> mIndexerVoltage;
@@ -102,6 +106,7 @@ public class IndexerIOKrakenX44 implements IndexerIO{
         pInputs.iIndexerSupplyCurrentAmps = mIndexerSupplyCurrent.getValueAsDouble();
         pInputs.iIndexerStatorCurrentAmps = mIndexerStatorCurrent.getValueAsDouble();
         pInputs.iIndexerTempCelsius = mIndexerTempCelsius.getValueAsDouble();
+
     }
 
     private boolean isLeader() {
@@ -126,6 +131,8 @@ public class IndexerIOKrakenX44 implements IndexerIO{
     public void setMotorVelocity(double pVelocityRPS, double pFeedforward) {
         if(isLeader()) mIndexerMotor.setControl(mIndexerVelocityControl.withVelocity(pVelocityRPS).withFeedForward(pFeedforward));
         else Telemetry.reportIssue(new MotorErrors.SettingControlToFollower(this));
+
+        Logger.recordOutput("Indexer/Goal", pVelocityRPS);
     }
 
     @Override

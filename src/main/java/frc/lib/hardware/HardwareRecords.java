@@ -84,6 +84,13 @@ public class HardwareRecords {
         MotionMagicConstants motionMagicConstants
     ) {}
 
+    public static record MotionMagicFOCControllerFF(
+        int slot,
+        PDConstants pdController,
+        SimpleMotorFeedforward feeforward,
+        MotionMagicConstants motionMagicConstants
+    ) {}
+
     public static record MotionMagicConstants(
         double maxVelocity,
         double maxAcceleration,

@@ -11,6 +11,7 @@ import frc.robot.Constants;
 import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
 import frc.lib.hardware.HardwareRecords.MotionMagicConstants;
 import frc.lib.hardware.HardwareRecords.MotionMagicFOCController;
+import frc.lib.hardware.HardwareRecords.MotionMagicFOCControllerFF;
 import frc.lib.hardware.HardwareRecords.ArmControllerMotionMagicFOC;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 import frc.lib.hardware.HardwareRecords.CurrentLimits;
@@ -84,8 +85,8 @@ public class ShooterConstants {
 
         public static final SimpleController kIndexerControlConfig = new SimpleController(
             0,
-            new PDConstants(0, 0), // TODO: TUNE ME
-            new SimpleMotorFeedforward(0, 0, 0) // TODO: TUNE ME
+            new PDConstants(2, 0.01), // TODO: TUNE ME
+            new SimpleMotorFeedforward(0.3, 0, 0) // TODO: TUNE ME
         );
     }
 
@@ -128,9 +129,10 @@ public class ShooterConstants {
             MotorAlignmentValue.Opposed
         );
 
-        public static final MotionMagicFOCController kFlywheelControlConfig = new MotionMagicFOCController(
+        public static final MotionMagicFOCControllerFF kFlywheelControlConfig = new MotionMagicFOCControllerFF(
             0, // not currently used
-            new PDConstants(6, 0),
+            new PDConstants(9, 0),
+            new SimpleMotorFeedforward(0.13, 0, 0),
             new MotionMagicConstants(0, 1000, 10000)
         );
     }
