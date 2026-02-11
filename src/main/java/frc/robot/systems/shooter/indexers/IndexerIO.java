@@ -13,6 +13,8 @@ public interface IndexerIO {
       public double iIndexerSupplyCurrentAmps = 0.0;
       public double iIndexerStatorCurrentAmps = 0.0;
       public double iIndexerTempCelsius = 0.0;
+
+      public double iIndexerVelocityGoal = 0.0;
     }
 
     public default void setPDConstants(double pKP, double pKD) {}

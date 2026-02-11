@@ -50,15 +50,15 @@ public class ButtonBindings {
             .onTrue(mShooterSS.setHoodRot(Rotation2d.kZero));
 
         mDriverController.rightTrigger()
-            .onTrue(mShooterSS.setIndexerRPSCmd(60))
+            .onTrue(mShooterSS.setIndexersVoltsCmd(9))
             .onFalse(mShooterSS.setIndexersVoltsCmd(0.0));
 
-        mDriverController.b()
-            .onTrue(mShooterSS.setIndexersVoltsCmd(0.508))
-            .onFalse(mShooterSS.setIndexersVoltsCmd(0));
-
         mDriverController.leftTrigger()
-            .onTrue(mShooterSS.setFlywheelsRPSCmd(80))
+            .onTrue(mShooterSS.setFlywheelsRPSCmd(90))
+            .onFalse(mShooterSS.setFlywheelsRPSCmd(0));
+
+        mDriverController.leftBumper()
+            .onTrue(mShooterSS.setFlywheelsVoltsCmd(12))
             .onFalse(mShooterSS.setFlywheelsVoltsCmd(0));
 
         // mDriverController.a()

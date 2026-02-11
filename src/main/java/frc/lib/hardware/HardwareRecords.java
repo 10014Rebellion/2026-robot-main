@@ -4,6 +4,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -47,9 +48,10 @@ public class HardwareRecords {
         MotorAlignmentValue alignmentValue
     ) {}
 
-    public static record CANCoderHardware(
+    public static record RelativeCANCoderHardware(
         int cancoderID,
-        double cancoderToMechanismRatio
+        double cancoderToMechanismRatio,
+        SensorDirectionValue direction
     ) {}
 
     public static record ElevatorController(

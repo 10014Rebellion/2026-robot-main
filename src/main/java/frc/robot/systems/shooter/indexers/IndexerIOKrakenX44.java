@@ -28,6 +28,8 @@ public class IndexerIOKrakenX44 implements IndexerIO{
     private final VoltageOut mIndexerVoltageControl = new VoltageOut(0.0);
     private final VelocityDutyCycle mIndexerVelocityControl = new VelocityDutyCycle(0.0);
 
+    private double mIndexerVelocityGoal = 0.0;
+
     private final StatusSignal<ControlModeValue> mIndexerControlMode;
     private final StatusSignal<AngularVelocity> mIndexerVelocityRPS;
     private final StatusSignal<Voltage> mIndexerVoltage;
@@ -106,6 +108,7 @@ public class IndexerIOKrakenX44 implements IndexerIO{
         pInputs.iIndexerSupplyCurrentAmps = mIndexerSupplyCurrent.getValueAsDouble();
         pInputs.iIndexerStatorCurrentAmps = mIndexerStatorCurrent.getValueAsDouble();
         pInputs.iIndexerTempCelsius = mIndexerTempCelsius.getValueAsDouble();
+        pInputs.iIndexerVelocityGoal = getVelocityGoal();
 
     }
 
@@ -132,6 +135,7 @@ public class IndexerIOKrakenX44 implements IndexerIO{
         if(isLeader()) mIndexerMotor.setControl(mIndexerVelocityControl.withVelocity(pVelocityRPS).withFeedForward(pFeedforward));
         else Telemetry.reportIssue(new MotorErrors.SettingControlToFollower(this));
 
+        mIndexerVelocityGoal = pVelocityRPS;
         Logger.recordOutput("Indexer/Goal", pVelocityRPS);
     }
 
@@ -145,5 +149,19 @@ public class IndexerIOKrakenX44 implements IndexerIO{
     public void stopMotor() {
         if(isLeader()) mIndexerMotor.stopMotor();
         else Telemetry.reportIssue(new MotorErrors.SettingControlToFollower(this));
+    }
+
+    /**
+     * @return double value for velocity setpoint. Will be zero if voltage request is sent.
+     */
+    @SuppressWarnings("unlikely-arg-type")
+    private double getVelocityGoal(){
+        if(mIndexerControlMode.equals(ControlModeValue.VoltageOut)){
+            return 0.0;
+        }
+
+        else{
+            return mIndexerVelocityGoal;
+        }
     }
 }

@@ -3,6 +3,7 @@ package frc.robot.systems.shooter;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -10,12 +11,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
 import frc.lib.hardware.HardwareRecords.MotionMagicConstants;
-import frc.lib.hardware.HardwareRecords.MotionMagicFOCController;
 import frc.lib.hardware.HardwareRecords.MotionMagicFOCControllerFF;
 import frc.lib.hardware.HardwareRecords.ArmControllerMotionMagicFOC;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 import frc.lib.hardware.HardwareRecords.CurrentLimits;
 import frc.lib.hardware.HardwareRecords.PDConstants;
+import frc.lib.hardware.HardwareRecords.RelativeCANCoderHardware;
 import frc.lib.hardware.HardwareRecords.RotationSoftLimits;
 import frc.lib.hardware.HardwareRecords.SimpleController;
 
@@ -94,7 +95,7 @@ public class ShooterConstants {
         public static final BasicMotorHardware kHoodConfig = new BasicMotorHardware(
             55,
             Constants.kSubsystemsCANBus,
-            133/9.0, // TODO: TUNE ME
+            133/9.0, 
             InvertedValue.Clockwise_Positive, 
             NeutralModeValue.Brake, 
             new CurrentLimits(40, 50)
@@ -114,6 +115,15 @@ public class ShooterConstants {
     }
 
     public static class FlywheelConstants {
+        public static final double kMaxFlywheelTestedRPS = 112;
+
+        public static final RelativeCANCoderHardware kCANCoderConfig = new RelativeCANCoderHardware(
+            50,
+            1,
+            SensorDirectionValue.Clockwise_Positive
+        );
+        ;
+
         public static final BasicMotorHardware kFlywheelLeaderConfig = new BasicMotorHardware(
             51,
             Constants.kSubsystemsCANBus,
@@ -131,8 +141,9 @@ public class ShooterConstants {
 
         public static final MotionMagicFOCControllerFF kFlywheelControlConfig = new MotionMagicFOCControllerFF(
             0, // not currently used
-            new PDConstants(9, 0),
-            new SimpleMotorFeedforward(0.13, 0, 0),
+            // original kP = 9 
+            new PDConstants(0, 0),
+            new SimpleMotorFeedforward(0.37, 0, 0),
             new MotionMagicConstants(0, 1000, 10000)
         );
     }
