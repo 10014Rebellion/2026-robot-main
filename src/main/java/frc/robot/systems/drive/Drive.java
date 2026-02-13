@@ -66,6 +66,7 @@ public class Drive extends SubsystemBase {
 
     private SwerveModulePosition[] mPrevPositions = SwerveHelper.zeroPositions();
     private Rotation2d[] mAngleDeltas = new Rotation2d[4];
+    @AutoLogOutput(key="Drive/Swerve/PreviousDriveAmps")
     private double[] mPrevDriveAmps = new double[] {0.0, 0.0, 0.0, 0.0};
 
     private final boolean kUseGenerator = true;
@@ -263,7 +264,7 @@ public class Drive extends SubsystemBase {
 
                 /* Feedforward cases based on driveState */
                 double driveAmps = 
-                    calculateDriveFeedforward(i) + SwerveHelper.deadReckoningFeedforward(mAngleDeltas[i]);
+                    calculateDriveFeedforward(unOptimizedSetpointStates, i) + SwerveHelper.deadReckoningFeedforward(mAngleDeltas[i]);
                 double desiredAzimuthVelocityRadPS = 
                     mPreviousSetpoint.azimuthFeedforwards().azimuthSpeedRadiansPS()[i];
 

@@ -91,9 +91,9 @@ public class SwerveHelper {
                 ff.robotRelativeForcesXNewtons()[i], 
                 ff.robotRelativeForcesYNewtons()[i])
             * Math.signum(projectTorque(currentState, 
-             VecBuilder.fill(
-                 ff.robotRelativeForcesXNewtons()[i], 
-                 ff.robotRelativeForcesYNewtons()[i])));
+                VecBuilder.fill(
+                    ff.robotRelativeForcesXNewtons()[i], 
+                    ff.robotRelativeForcesYNewtons()[i])));
 
         // NEWTONS -> GEARBOX TORQUE -> MOTOR TORQUE
         double driveMotorTorque = (choreoLinearForceNewtons * kWheelRadiusMeters) / kDriveMotorGearing;
