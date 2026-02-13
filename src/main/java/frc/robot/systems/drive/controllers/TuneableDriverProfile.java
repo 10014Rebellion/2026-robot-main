@@ -15,14 +15,14 @@ public class TuneableDriverProfile {
     private LoggedTunableNumber mSniperControl;
 
     public TuneableDriverProfile(
+            String pKey,
             double pDefaultLinearScalar,
             double pDefaultLinearDeadband,
             double pDefaultLinearInputsExponent,
             double pDefaultRotationScalar,
             double pDefaultRotationInputExponent,
             double pDefaultRotationDeadband,
-            double pDefaultSniperControl,
-            String pKey) {
+            double pDefaultSniperControl) {
         mLinearScalar = new LoggedTunableNumber("Drive/Teleop/" + pKey + "/LinearScalar", pDefaultLinearScalar);
         mLinearDeadBand = new LoggedTunableNumber("Drive/Teleop/" + pKey + "/LinearDeadband", pDefaultLinearDeadband);
         mLinearInputsExponent =
@@ -37,14 +37,15 @@ public class TuneableDriverProfile {
 
     public TuneableDriverProfile(DriverProfiles pDefaults) {
         this(
+            pDefaults.key(),
             pDefaults.linearScalar(),
             pDefaults.linearDeadband(),
             pDefaults.linearExponent(),
             pDefaults.rotationalScalar(),
             pDefaults.rotationalScalar(),
             pDefaults.rotationDeadband(),
-            pDefaults.sniperScalar(),
-            pDefaults.key());
+            pDefaults.sniperScalar()
+        );
     }
 
     public LoggedTunableNumber linearScalar() {

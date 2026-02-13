@@ -129,13 +129,12 @@ public class ManualTeleopController {
     }
 
     public static record DriverProfiles(
+        String key,
         double linearScalar,
         double linearExponent,
         double linearDeadband,
         double rotationalScalar,
         double rotationalExponent,
         double rotationDeadband,
-        double sniperScalar,
-        boolean swapSides,
-        String key) {}
+        double sniperScalar) {}
 }

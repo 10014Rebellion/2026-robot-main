@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ModuleIO {
     @AutoLog
     public static class ModuleInputs {
-        public boolean iIsDriveConnected = true;
+        public boolean iIsDriveConnected = false;
         public double iDrivePositionM = 0.0;
         public double iDriveVelocityMPS = 0.0;
         public double iDriveStatorCurrentAmps = 0.0;
@@ -19,7 +19,9 @@ public interface ModuleIO {
         public double iDriveMotorVolts = 0.0;
         public double iDriveAccelerationMPSS = 0.0;
 
-        public boolean iIsAzimuthConnected = true;
+        public double iAzimuthAppliedVolts = 0.0;
+
+        public boolean iIsAzimuthConnected = false;
         public Rotation2d iAzimuthPosition = new Rotation2d();
         public Rotation2d iAzimuthVelocity = new Rotation2d();
         public double iAzimuthStatorCurrentAmps = 0.0;
@@ -27,10 +29,9 @@ public interface ModuleIO {
         public double iAzimuthSupplyCurrentAmps = 0.0;
 
         public double iAzimuthTemperatureCelsius = 0.0;
-        public double iAzimuthAppliedVolts = 0.0;
         public double iAzimuthMotorVolts = 0.0;
 
-        public boolean iIsCancoderConnected = true;
+        public boolean iIsCancoderConnected = false;
         public Rotation2d iAzimuthAbsolutePosition = new Rotation2d();
 
         public double[] odometryTimestamps = new double[] {};

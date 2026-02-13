@@ -7,6 +7,9 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.DashboardConstants;
+import frc.robot.game.TransitionTracker;
+import frc.robot.systems.shooter.ShotCalculator;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -104,6 +107,7 @@ public class Robot extends LoggedRobot {
         // timing (see the template project documentation for details)
         // Threads.setCurrentThreadPriority(true, 99);
 
+        ShotCalculator.getInstance().clearShootingParameters();
         CommandScheduler.getInstance().run();
 
         // Return to non-RT thread priority (do not modify the first argument)
@@ -119,6 +123,8 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         mAutonomousCommand = mRobotContainer.getAutonomousCommand().get();
+        TransitionTracker.autonInit();
+        mAutonomousCommand = mRobotContainer.getAutonomousCommand();
 
         if (mAutonomousCommand != null) {
             CommandScheduler.getInstance().schedule(mAutonomousCommand);
@@ -133,6 +139,7 @@ public class Robot extends LoggedRobot {
         if (mAutonomousCommand != null) {
             mAutonomousCommand.cancel();
         }
+        TransitionTracker.teleopInit();
 
         CommandScheduler.getInstance().schedule(mRobotContainer.getDriverProfileCommand());
     }
