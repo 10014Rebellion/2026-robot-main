@@ -30,10 +30,12 @@ public class GameDriveManager {
         switch (pGameDriveState) {
             case HUB_HEADING_ALIGN:
                 return mDrive.getDriveManager().setToGenericHeadingAlign(
-                    () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()));
+                    () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()),
+                    () -> GameGoalPoseChooser.getHub());
             case AUTON_HUB_HEADING_ALIGN:
                 return mDrive.getDriveManager().setToGenericHeadingAlignAuton(
-                    () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()));
+                    () -> GameGoalPoseChooser.turnFromHub(mDrive.getPoseEstimate()),
+                    () -> GameGoalPoseChooser.getHub());
             case LINE_TO_TRENCH:
                 return mDrive.getDriveManager().setToGenericLineAlign(
                     () -> GameGoalPoseChooser.getClosestTrench(mDrive.getPoseEstimate()),

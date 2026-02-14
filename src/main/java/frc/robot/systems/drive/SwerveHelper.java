@@ -112,7 +112,7 @@ public class SwerveHelper {
             ((currentSpeedZero) ? 1.0 : Math.signum(currentState.speedMetersPerSecond)) 
                 * currentState.angle.getCos(), 
             ((currentSpeedZero) ? 1.0 : Math.signum(currentState.speedMetersPerSecond)) 
-                * currentState.angle.getSin()));
+                * currentState.angle.getSin());
 
         boolean unoptimizedSpeedZero = (EqualsUtil.epsilonEquals(unoptimizedDesiredState.speedMetersPerSecond, 0.0));
 

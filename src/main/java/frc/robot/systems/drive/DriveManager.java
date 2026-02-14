@@ -56,7 +56,7 @@ public class DriveManager {
         WHEEL_CHARACTERIZATION
     }
 
-    public Drive mDrive;
+    private Drive mDrive;
 
     @AutoLogOutput(key = "Drive/State")
     private DriveState mDriveState = DriveState.TELEOP;
@@ -326,8 +326,8 @@ public class DriveManager {
     }
 
     /* Accounts for velocity of drive when turning */
-    public Command setToGenericHeadingAlign(Supplier<Rotation2d> pGoalRotation) {
-        return setToGenericHeadingAlign( pGoalRotation, getDefaultTurnPointFF() );
+    public Command setToGenericHeadingAlign(Supplier<Rotation2d> pGoalRotation, Supplier<Pose2d> pGoalPoseSupplier) {
+        return Commands.runOnce(() -> mGoalPoseSup = pGoalPoseSupplier ).andThen( setToGenericHeadingAlign( pGoalRotation, getDefaultTurnPointFF() ));
     }
 
     /*
@@ -340,8 +340,8 @@ public class DriveManager {
     }
 
     /* Accounts for velocity of drive when turning */
-    public Command setToGenericHeadingAlignAuton(Supplier<Rotation2d> pGoalRotation) {
-        return setToGenericHeadingAlignAuton( pGoalRotation, getDefaultTurnPointFF() );
+    public Command setToGenericHeadingAlignAuton(Supplier<Rotation2d> pGoalRotation, Supplier<Pose2d> pGoalPoseSupplier) {
+        return Commands.runOnce(() -> mGoalPoseSup = pGoalPoseSupplier ).andThen(setToGenericHeadingAlignAuton( pGoalRotation, getDefaultTurnPointFF() ));
     }
 
     public Command setToGenericHeadingAlign(Supplier<Rotation2d> pGoalRotation, TurnPointFeedforward pTurnPointFeedforward, DriveState headingState) {
