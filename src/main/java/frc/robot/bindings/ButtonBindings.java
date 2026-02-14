@@ -2,6 +2,7 @@
 
 package frc.robot.bindings;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -10,7 +11,9 @@ import frc.lib.controllers.FlydigiApex4;
 import frc.robot.systems.conveyor.ConveyorSS;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.intake.Intake;
+import frc.robot.game.GameGoalPoseChooser;
 import frc.robot.systems.shooter.Shooter;
+import frc.robot.commands.DriveCharacterizationCommands;
 
 public class ButtonBindings {
     private final Drive mDriveSS;
@@ -24,16 +27,16 @@ public class ButtonBindings {
         this.mShooter = pShooter;
         this.mIntake = pIntake;
         this.mConveyorSS = pConveyorSS;
-        this.mDriveSS.setDefaultCommand(mDriveSS.setToTeleop());
+        this.mDriveSS.setDefaultCommand(mDriveSS.getDriveManager().setToTeleop());
     }
 
 
     public void initDriverButtonBindings() {
         new Trigger(() -> DriverStation.isTeleopEnabled())
-            .onTrue(mDriveSS.setToTeleop());
+            .onTrue(mDriveSS.getDriveManager().setToTeleop());
 
-        mDriveSS.acceptJoystickInputs(
-                () -> -mDriverController.getLeftY(), // TODO: interrogate Anshul on why theses are flipped and why on earth it works
+        mDriveSS.getDriveManager().acceptJoystickInputs(
+                () -> -mDriverController.getLeftY(),
                 () -> -mDriverController.getLeftX(),
                 () -> -mDriverController.getRightX(),
                 () -> mDriverController.getPOVAngle());
@@ -71,40 +74,22 @@ public class ButtonBindings {
         //             .andThen(mDriveSS.setToGenericAutoAlign(() -> new Pose2d(0.5, 0, Rotation2d.kCCW_Pi_2), ConstraintType.LINEAR)))
         //     .onFalse(mDriveSS.setToTeleop());
 
-        // mDriverController.a()
-        //     .onTrue(
-        //         mDriveSS.setToGenericHeadingAlign(() -> GameGoalPoseChooser.turnFromHub(mDriveSS.getPoseEstimate())))
-        //     .onFalse(mDriveSS.setToTeleop());
+        mDriverController.a()
+            .onTrue(
+                mDriveSS.getDriveManager().setToGenericHeadingAlign(() -> GameGoalPoseChooser.turnFromHub(mDriveSS.getPoseEstimate())))
+            .onFalse(mDriveSS.getDriveManager().setToTeleop());
             
-    //    mDriverController.b()
-    //         .onTrue(mDriveSS.setToGenericLineAlign(
-    //             () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
-    //             () -> Rotation2d.fromDegrees(45),
-    //             () -> 1.0,
-    //             () -> false
-    //         ))
-    //         .onFalse(mDriveSS.setToTeleop());
+       mDriverController.b()
+            .onTrue(mDriveSS.getDriveManager().setToGenericLineAlign(
+                () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
+                () -> Rotation2d.fromDegrees(45),
+                () -> 1.0,
+                () -> false
+            ))
+            .onFalse(mDriveSS.getDriveManager().setToTeleop());
 
-
-        // mDriverController.a()
-        //     .onTrue(Commands.runOnce(() -> mDriveSS.setPose(new Pose2d()), mDriveSS)
-        //             .andThen(mDriveSS.setToGenericLineAlign(() -> new Pose2d(2.5, 2.5, Rotation2d.fromDegrees(45.0)), () -> Rotation2d.fromDegrees(45.0))));
-    
-        // mDriverController.a()
-        //     .onTrue(new InstantCommand())
-        //     .onFalse(new InstantCommand());
-
-
-        // mDriverController.rightTrigger()
-        //     .onTrue(mShooterSS.setFuelPumpsVoltsCmd(12))
-        //     .onFalse(mShooterSS.setFuelPumpsVoltsCmd(0));
-
-        // mDriverController.leftBumper()
-        //     .onTrue(mShooterSS.setHoodVoltsCmd(1))
-        //     .onFalse(mShooterSS.setHoodVoltsCmd(0));
-
-        // mDriverController.rightBumper()
-        //     .onTrue(mShooterSS.setHoodVoltsCmd(-1))
-        //     .onFalse(mShooterSS.setHoodVoltsCmd(0));
+        mDriverController.x()
+            .onTrue(DriveCharacterizationCommands.testAzimuthsVoltage(mDriveSS, 0, 1, 2, 3))
+            .onFalse(mDriveSS.getDriveManager().setToTeleop());
     }
 }

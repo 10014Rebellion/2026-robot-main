@@ -4,8 +4,11 @@ package frc.robot;
 
 import static frc.robot.systems.drive.DriveConstants.*;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.auton.AutonCommands;
+import frc.robot.bindings.BindingsConstants;
+import frc.robot.bindings.ButtonBindings;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
 import frc.robot.systems.drive.gyro.GyroIO;
@@ -37,8 +40,6 @@ import frc.robot.systems.shooter.fuelpump.FuelPumpIOKrakenX44;
 import frc.robot.systems.shooter.fuelpump.FuelPumpIOSim;
 import frc.robot.systems.shooter.fuelpump.FuelPumpSS;
 import frc.robot.systems.shooter.hood.HoodSS;
-import frc.robot.bindings.BindingsConstants;
-import frc.robot.bindings.ButtonBindings;
 import frc.robot.systems.shooter.hood.HoodIO;
 import frc.robot.systems.shooter.hood.HoodIOKrakenX44;
 import frc.robot.systems.shooter.hood.HoodIOSim;
@@ -46,6 +47,7 @@ import frc.robot.systems.apriltag.ATagCameraIO;
 import frc.robot.systems.apriltag.ATagCameraIOPV;
 import frc.robot.systems.apriltag.ATagVision;
 import frc.robot.systems.apriltag.ATagVisionConstants;
+import frc.robot.systems.auton.AutonCommands;
 import frc.robot.systems.conveyor.ConveyorSS;
 import frc.robot.systems.conveyor.ConveyorConstants;
 import frc.robot.systems.conveyor.ConveyorIO;
@@ -180,9 +182,9 @@ public class RobotContainer {
         initBindings();
 
         mDriverProfileChooser.addDefaultOption(
-                BindingsConstants.kDefaultProfile.key(), mDrive.setDriveProfile(BindingsConstants.kDefaultProfile));
+                BindingsConstants.kDefaultProfile.key(), mDrive.getDriveManager().setDriveProfile(BindingsConstants.kDefaultProfile));
         for (DriverProfiles profile : BindingsConstants.kProfiles)
-            mDriverProfileChooser.addOption(profile.key(), mDrive.setDriveProfile(profile));
+            mDriverProfileChooser.addOption(profile.key(), mDrive.getDriveManager().setDriveProfile(profile));
 
         autos = new AutonCommands(mDrive);
     }
@@ -195,7 +197,7 @@ public class RobotContainer {
         mButtonBindings.initDriverButtonBindings();
     }
 
-    public Command getAutonomousCommand() {
+    public Supplier<Command> getAutonomousCommand() {
         return autos.getAuto();
     }
 

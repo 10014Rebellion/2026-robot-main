@@ -25,6 +25,7 @@ public interface ModuleIO {
         public Rotation2d iAzimuthPosition = new Rotation2d();
         public Rotation2d iAzimuthVelocity = new Rotation2d();
         public double iAzimuthStatorCurrentAmps = 0.0;
+        public double iAzimuthTorqueCurrentAmps = 0.0;
         public double iAzimuthSupplyCurrentAmps = 0.0;
 
         public double iAzimuthTemperatureCelsius = 0.0;

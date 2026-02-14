@@ -6,13 +6,17 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import static frc.robot.systems.drive.DriveConstants.kAzimuthDriveScalar;
 import static frc.robot.systems.drive.DriveConstants.kDriveMotorGearing;
 import static frc.robot.systems.drive.DriveConstants.kKinematics;
 import static frc.robot.systems.drive.DriveConstants.kMaxLinearSpeedMPS;
 import static frc.robot.systems.drive.DriveConstants.kSkidRatioCap;
+import static frc.robot.systems.drive.DriveConstants.kWheelInertia;
 import static frc.robot.systems.drive.DriveConstants.kWheelRadiusMeters;
 
 import java.util.Arrays;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,9 +33,9 @@ import frc.lib.swerve.LocalADStarAK;
 import frc.lib.telemetry.Telemetry;
 
 public class SwerveHelper {
-    private static final double dt = 0.02;
-    private static final DCMotor kKrakenFOCModel = DCMotor.getKrakenX60Foc(1);
-    private static final double kJitterThreshold = 0.01;
+    public static final double dt = 0.02;
+    public static final DCMotor kKrakenFOCModel = DCMotor.getKrakenX60Foc(1);
+    public static final double kJitterThreshold = 0.01;
 
     /* 
      * Helps driftRate value helps account for translation drift while rotating and riving
@@ -45,7 +49,9 @@ public class SwerveHelper {
             new Rotation2d(speeds.omegaRadiansPerSecond * dt * driftRate));
         var twist = new Pose2d().log(desiredDeltaPose);
 
-        return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (speeds.omegaRadiansPerSecond));
+        double discOmegaRadiansPerSecond = ChassisSpeeds.discretize(speeds, dt).omegaRadiansPerSecond;
+
+        return new ChassisSpeeds((twist.dx / dt), (twist.dy / dt), (discOmegaRadiansPerSecond));
     }
 
     public static SwerveModuleState copyState(SwerveModuleState state) {
@@ -78,17 +84,47 @@ public class SwerveHelper {
     }
 
     // ASSUMES THE CHOREO'S MOTOR TORQUE DOESN'T ALREADY EXCEED THE MOTOR'S LIMIT
-    public static double convertChoreoNewtonsToAmps(SwerveModuleState currentState, DriveFeedforwards ff, int i) {
-        double choreoLinearForceNewtons = projectTorque(currentState, 
-            VecBuilder.fill(
+    public static double convertChoreoNewtonsToAmps(SwerveModuleState currentState, SwerveModuleState unoptimizedDesiredState, DriveFeedforwards ff, int i) {
+        double choreoLinearForceNewtons = 
+            ppFFScalar(
+                currentState, 
+                unoptimizedDesiredState,
+                i) 
+            * Math.hypot(
                 ff.robotRelativeForcesXNewtons()[i], 
-                ff.robotRelativeForcesYNewtons()[i]));
+                ff.robotRelativeForcesYNewtons()[i])
+            * Math.signum(projectTorque(currentState, 
+                VecBuilder.fill(
+                    ff.robotRelativeForcesXNewtons()[i], 
+                    ff.robotRelativeForcesYNewtons()[i])));
 
         // NEWTONS -> GEARBOX TORQUE -> MOTOR TORQUE
         double driveMotorTorque = (choreoLinearForceNewtons * kWheelRadiusMeters) / kDriveMotorGearing;
         double driveMotorAmperage = kKrakenFOCModel.getCurrent(driveMotorTorque);
 
         return driveMotorAmperage;
+    }
+
+    public static double ppFFScalar(SwerveModuleState currentState, SwerveModuleState unoptimizedDesiredState, int i) {
+        boolean currentSpeedZero = ((EqualsUtil.epsilonEquals(currentState.speedMetersPerSecond, 0.0)));
+
+        Vector<N2> wheelDirection = VecBuilder.fill(
+            ((currentSpeedZero) ? 1.0 : Math.signum(currentState.speedMetersPerSecond)) 
+                * currentState.angle.getCos(), 
+            ((currentSpeedZero) ? 1.0 : Math.signum(currentState.speedMetersPerSecond)) 
+                * currentState.angle.getSin());
+
+        boolean unoptimizedSpeedZero = (EqualsUtil.epsilonEquals(unoptimizedDesiredState.speedMetersPerSecond, 0.0));
+
+        Vector<N2> setpointDirection = VecBuilder.fill(
+            ((unoptimizedSpeedZero) ? 1.0 : Math.signum(unoptimizedDesiredState.speedMetersPerSecond)) 
+                * unoptimizedDesiredState.angle.getCos(), 
+            ((unoptimizedSpeedZero) ? 1.0 : Math.signum(unoptimizedDesiredState.speedMetersPerSecond)) 
+                * unoptimizedDesiredState.angle.getSin());
+
+        Logger.recordOutput("Drive/ppFfScalar/"+i, wheelDirection.dot(setpointDirection));
+        
+        return wheelDirection.dot(setpointDirection);
     }
 
     public static void logDriveFeedforward(DriveFeedforwards ff, int i) {
@@ -237,10 +273,10 @@ public class SwerveHelper {
         return angleDelta.getRadians() * gearing * wheelRadius;
     }
 
-    public static double deadReckoningFeedforward(Rotation2d angleDelta, double gearing, double wheelRadiusM, double inertia) {
-        double distM = deadReckoningTurnToDriveConv(angleDelta, gearing, wheelRadiusM);
+    public static double deadReckoningFeedforward(Rotation2d angleDelta) {
+        double distM = deadReckoningTurnToDriveConv(angleDelta, kDriveMotorGearing, kWheelRadiusMeters);
         double accelerationM = (2 * distM) / (dt * dt);
 
-        return -kKrakenFOCModel.getCurrent(wheelRadiusM * accelerationM * inertia);
+        return -kKrakenFOCModel.getCurrent(kWheelRadiusMeters * accelerationM * kWheelInertia) * kAzimuthDriveScalar;
     }
 }

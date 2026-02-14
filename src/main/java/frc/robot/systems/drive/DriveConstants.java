@@ -19,8 +19,8 @@ import frc.robot.Constants;
 public class DriveConstants {
 
     ///////////////////// DRIVE BASE \\\\\\\\\\\\\\\\\\\\\\\
-    public static final double kRobotWidthXMeters = Units.inchesToMeters(35); // TODO: TUNE ME
-    public static final double kRobotWidthYMeters = Units.inchesToMeters(37); // TODO: TUNE ME
+    public static final double kRobotWidthXMeters = Units.inchesToMeters(19.505); // TODO: TUNE ME
+    public static final double kRobotWidthYMeters = Units.inchesToMeters(24.5); // TODO: TUNE ME
     public static final double kTrackWidthXMeters = Units.inchesToMeters(25.5); // Track Width (front to front / back to back) // TODO: TUNE ME
     public static final double kTrackWidthYMeters = Units.inchesToMeters(27); // Wheelbase (Left to left / right to right) // TODO: TUNE ME
     public static final Translation2d[] kModuleTranslations = new Translation2d[] {
@@ -103,13 +103,13 @@ public class DriveConstants {
 
     /* If 180 was added, the person who got the offset had the bevel gears on the wrong side when they did it */
     // BEVEL FACING LEFT (it shoulda been facing right tho)
-    public static final ModuleHardwareConfig kFrontLeftHardware = new ModuleHardwareConfig(31, 21, 11, -0.350 + 0.5);
+    public static final ModuleHardwareConfig kFrontLeftHardware = new ModuleHardwareConfig(31, 21, 11, 0.151123);
 
-    public static final ModuleHardwareConfig kFrontRightHardware = new ModuleHardwareConfig(32, 22, 12, 0.259766 + 0.5);
+    public static final ModuleHardwareConfig kFrontRightHardware = new ModuleHardwareConfig(32, 22, 12, -0.246582);
 
-    public static final ModuleHardwareConfig kBackLeftHardware = new ModuleHardwareConfig(33, 23, 13, -0.249 + 0.5);
+    public static final ModuleHardwareConfig kBackLeftHardware = new ModuleHardwareConfig(33, 23, 13, 0.248535);
 
-    public static final ModuleHardwareConfig kBackRightHardware = new ModuleHardwareConfig(34, 24, 14, -0.368 + 0.5);
+    public static final ModuleHardwareConfig kBackRightHardware = new ModuleHardwareConfig(34, 24, 14, -0.342773);
 
     ////////////////////////// RECORDS \\\\\\\\\\\\\\\\\\\\\\\\
     public static record ModuleHardwareConfig(int driveID, int azimuthID, int encoderID, double offset) {}

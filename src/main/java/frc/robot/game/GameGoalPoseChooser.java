@@ -68,6 +68,10 @@ public class GameGoalPoseChooser {
         return AllianceFlipUtil.apply(new Pose2d());
     }
 
+    public static Pose2d getHub() {
+        return AllianceFlipUtil.apply(FieldConstants.kHubPose);
+    }
+
     /* Utils function */
     public static boolean onLeftOrRightY(Pose2d robotPose) {
         return 
