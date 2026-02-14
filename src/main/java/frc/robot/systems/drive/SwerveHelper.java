@@ -106,13 +106,21 @@ public class SwerveHelper {
     }
 
     public static double ppFFScalar(SwerveModuleState currentState, SwerveModuleState unoptimizedDesiredState, int i) {
+        boolean currentSpeedZero = ((EqualsUtil.epsilonEquals(currentState.speedMetersPerSecond, 0.0)));
+
         Vector<N2> wheelDirection = VecBuilder.fill(
-            Math.signum(currentState.speedMetersPerSecond) * currentState.angle.getCos(), 
-            Math.signum(currentState.speedMetersPerSecond) * currentState.angle.getSin());
+            ((currentSpeedZero) ? 1.0 : Math.signum(currentState.speedMetersPerSecond)) 
+                * currentState.angle.getCos(), 
+            ((currentSpeedZero) ? 1.0 : Math.signum(currentState.speedMetersPerSecond)) 
+                * currentState.angle.getSin()));
+
+        boolean unoptimizedSpeedZero = (EqualsUtil.epsilonEquals(unoptimizedDesiredState.speedMetersPerSecond, 0.0));
 
         Vector<N2> setpointDirection = VecBuilder.fill(
-            Math.signum(unoptimizedDesiredState.speedMetersPerSecond) * unoptimizedDesiredState.angle.getCos(), 
-            Math.signum(unoptimizedDesiredState.speedMetersPerSecond) * unoptimizedDesiredState.angle.getSin());
+            ((unoptimizedSpeedZero) ? 1.0 : Math.signum(unoptimizedDesiredState.speedMetersPerSecond)) 
+                * unoptimizedDesiredState.angle.getCos(), 
+            ((unoptimizedSpeedZero) ? 1.0 : Math.signum(unoptimizedDesiredState.speedMetersPerSecond)) 
+                * unoptimizedDesiredState.angle.getSin());
 
         Logger.recordOutput("Drive/ppFfScalar/"+i, wheelDirection.dot(setpointDirection));
         
