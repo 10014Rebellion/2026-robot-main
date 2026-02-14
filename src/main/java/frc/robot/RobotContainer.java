@@ -40,8 +40,6 @@ import frc.robot.systems.shooter.fuelpump.FuelPumpIOKrakenX44;
 import frc.robot.systems.shooter.fuelpump.FuelPumpIOSim;
 import frc.robot.systems.shooter.fuelpump.FuelPumpSS;
 import frc.robot.systems.shooter.hood.HoodSS;
-import frc.robot.bindings.BindingsConstants;
-import frc.robot.bindings.ButtonBindings;
 import frc.robot.systems.shooter.hood.HoodIO;
 import frc.robot.systems.shooter.hood.HoodIOKrakenX44;
 import frc.robot.systems.shooter.hood.HoodIOSim;

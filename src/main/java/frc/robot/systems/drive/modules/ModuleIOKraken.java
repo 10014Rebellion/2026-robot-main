@@ -130,7 +130,7 @@ public class ModuleIOKraken implements ModuleIO {
         turnConfig.CurrentLimits.SupplyCurrentLimit = kAzimuthSupplyAmpLimit;
         turnConfig.TorqueCurrent.PeakForwardTorqueCurrent = kAzimuthFOCAmpLimit;
         turnConfig.TorqueCurrent.PeakReverseTorqueCurrent = -kAzimuthFOCAmpLimit;
-        driveConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
+        turnConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
 
         turnConfig.Voltage.PeakForwardVoltage = kPeakVoltage;
         turnConfig.Voltage.PeakReverseVoltage = -kPeakVoltage;

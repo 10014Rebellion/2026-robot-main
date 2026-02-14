@@ -11,7 +11,9 @@ import frc.lib.controllers.FlydigiApex4;
 import frc.robot.systems.conveyor.ConveyorSS;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.intake.Intake;
+import frc.robot.game.GameGoalPoseChooser;
 import frc.robot.systems.shooter.Shooter;
+import frc.robot.commands.DriveCharacterizationCommands;
 
 public class ButtonBindings {
     private final Drive mDriveSS;
@@ -25,7 +27,7 @@ public class ButtonBindings {
         this.mShooter = pShooter;
         this.mIntake = pIntake;
         this.mConveyorSS = pConveyorSS;
-        this.mDriveSS.setDefaultCommand(mDriveSS.setToTeleop());
+        this.mDriveSS.setDefaultCommand(mDriveSS.getDriveManager().setToTeleop());
     }
 
 

@@ -95,7 +95,7 @@ public class Module {
                 mIO.setAzimuthPosition(mAzimuthSetpointAngle, ffOutput);
 
                 Telemetry.log("Drive/" + kModuleName + "/SimpleFeedforwardAzimuth", ffOutput);
-                Telemetry.log("Drive/"+kModuleName+"DesiredAzimuthRotationSpeed", mAzimuthSetpointAngularVelocityRadPS);
+                Telemetry.log("Drive/"+kModuleName+"/DesiredAzimuthRotationSpeed", mAzimuthSetpointAngularVelocityRadPS);
             }
         }
 
