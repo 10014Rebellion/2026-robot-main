@@ -61,12 +61,12 @@ public class ButtonBindings {
             .onFalse(mShooter.setFuelPumpsVoltsCmd(0.0));
 
         mDriverController.leftTrigger()
-            .onTrue(mShooter.setFlywheelsRPSCmd(90))
-            .onFalse(mShooter.setFlywheelsRPSCmd(0));
+            .onTrue(mShooter.setFlywheelsRPSBangBangCommand(90))
+            .onFalse(mShooter.setFlywheelsRPSCmd(30));
 
-        mDriverController.leftBumper()
-            .onTrue(mShooter.setFlywheelsVoltsCmd(12))
-            .onFalse(mShooter.setFlywheelsVoltsCmd(0));
+        // mDriverController.leftBumper()
+        //     .onTrue(mShooter.setFlywheelsVoltsCmd(12))
+        //     .onFalse(mShooter.setFlywheelsVoltsCmd(0));
 
         // mDriverController.a()
         //     .onTrue(

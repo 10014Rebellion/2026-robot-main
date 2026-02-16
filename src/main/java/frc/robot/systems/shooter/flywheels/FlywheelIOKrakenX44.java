@@ -14,6 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -169,7 +170,8 @@ public class FlywheelIOKrakenX44 implements FlywheelIO{
 
     @Override
     public void setMotorVolts(double pVolts) {
-        if(isLeader()) mFlywheelMotor.setControl(mFlywheelVoltageControl.withOutput(pVolts));
+        double appliedVolts = MathUtil.clamp(pVolts, -12.0, 12.0);
+        if(isLeader()) mFlywheelMotor.setControl(mFlywheelVoltageControl.withOutput(appliedVolts));
         else Telemetry.reportIssue(new MotorErrors.SettingControlToFollower(this));
     }
 
