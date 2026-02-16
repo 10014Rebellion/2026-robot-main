@@ -139,12 +139,32 @@ public class ShooterConstants {
             MotorAlignmentValue.Opposed
         );
 
-        public static final MotionMagicFOCControllerFF kFlywheelControlConfig = new MotionMagicFOCControllerFF(
-            0, // not currently used
-            // original kP = 9 
-            new PDConstants(0, 0),
-            new SimpleMotorFeedforward(0.37, 0, 0),
-            new MotionMagicConstants(0, 1000, 10000)
-        );
+        public static final MotionMagicFOCControllerFF kFlywheelControlConfig = 
+        
+            switch(Constants.kCurrentMode) {
+                        case REAL -> new MotionMagicFOCControllerFF(
+                            0, // not currently used
+                            // original kP = 9 
+                            new PDConstants(0, 0),
+                            new SimpleMotorFeedforward(0.37, 0, 0),
+                            new MotionMagicConstants(0, 1000, 10000)
+                        );
+                        case SIM -> new MotionMagicFOCControllerFF(
+                            0, // not currently used
+                            // original kP = 9 
+                            new PDConstants(0.0011, 0),
+                            new SimpleMotorFeedforward(0.02, 0.096, 0.00045),
+                            new MotionMagicConstants(0, 1000, 10000)
+                        );
+
+                        default -> new MotionMagicFOCControllerFF(
+                            0, // not currently used
+                            // original kP = 9 
+                            new PDConstants(0, 0),
+                            new SimpleMotorFeedforward(0.0, 0, 0),
+                            new MotionMagicConstants(0, 0, 0)
+                        );
+            };
+
     }
 }

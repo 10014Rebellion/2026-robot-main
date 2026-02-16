@@ -5,13 +5,14 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
 import frc.lib.hardware.HardwareRecords.FollowerMotorHardware;
 import frc.robot.systems.shooter.ShooterConstants.FlywheelConstants;
 
 public class FlywheelIOSim implements FlywheelIO{
 
-    private DCMotorSim mFlywheelMotor;
+    private FlywheelSim mFlywheelMotor;
     private boolean mIsFollower;
     private double mAppliedVoltage;
     private final PIDController mFlywheelController;
@@ -29,10 +30,9 @@ public class FlywheelIOSim implements FlywheelIO{
     }
 
     private FlywheelIOSim(int pMotorID, BasicMotorHardware pHardware){
-        mFlywheelMotor = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX44Foc(1), 0.004, pHardware.rotorToMechanismRatio()),
-            DCMotor.getKrakenX60Foc(1).withReduction(pHardware.rotorToMechanismRatio()),
-            0.0,
+        mFlywheelMotor = new FlywheelSim(
+            LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX44Foc(1), 0.004, pHardware.rotorToMechanismRatio()),
+            DCMotor.getKrakenX44Foc(1).withReduction(pHardware.rotorToMechanismRatio()),
             0.0
         ); 
 
@@ -41,13 +41,14 @@ public class FlywheelIOSim implements FlywheelIO{
 
     public void updateInputs(FlywheelInputs pInputs) {
         mFlywheelMotor.update(0.02);
-        pInputs.iFlywheelAccelerationRPSS = (2*Math.PI) / mFlywheelMotor.getAngularAccelerationRadPerSecSq();
+        pInputs.iFlywheelAccelerationRPSS = mFlywheelMotor.getAngularAccelerationRadPerSecSq() / (2 * Math.PI);
         pInputs.iFlywheelMotorVolts = mAppliedVoltage;
         pInputs.iFlywheelStatorCurrentAmps = Math.abs(mFlywheelMotor.getCurrentDrawAmps());
         pInputs.iFlywheelSupplyCurrentAmps = 0.0;
         pInputs.iFlywheelTempCelsius = 0.0;
-        pInputs.iFlywheelVelocityRPS = mFlywheelMotor.getAngularVelocityRPM() * 60.0;
+        pInputs.iFlywheelVelocityRPS = mFlywheelMotor.getAngularVelocityRPM() / 60.0;
         pInputs.iIsFlywheelConnected = true;
+        pInputs.iIsLeader = (mIsFollower) ? false : true;
     }
 
     public void setPDConstants(double pKP, double pKD) {
@@ -59,17 +60,12 @@ public class FlywheelIOSim implements FlywheelIO{
     }
 
     public void setMotorVelAndAccel(double pVelocityRPS, double pAccelerationRPSS, double pFeedforward) {
-        setMotorVolts(mFlywheelController.calculate(mFlywheelMotor.getAngularVelocityRPM() * 60.0, pVelocityRPS) + pFeedforward);
+        setMotorVolts(mFlywheelController.calculate(mFlywheelMotor.getAngularVelocityRPM() / 60.0, pVelocityRPS) + pFeedforward);
     }
 
     // Inverts voltage if follower as the rest of the close loop control runs of this same method //
     public void setMotorVolts(double pVolts) {
         mAppliedVoltage = MathUtil.clamp(pVolts, -12.0, 12.0);
-
-        if(mIsFollower){
-            mAppliedVoltage *= -1;
-        }
-
         mFlywheelMotor.setInputVoltage(mAppliedVoltage);
     }
 
