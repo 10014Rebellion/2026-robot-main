@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 public final class Constants {
     public static final Mode kCurrentMode = RobotBase.isReal() ? Mode.REAL : Mode.SIM;
     public static final boolean kTuningMode = !DriverStation.isFMSAttached();
-    public static final CANBus kSubsystemsCANBus = DriveConstants.kCANBus;
+    public static final CANBus kSubsystemsCANBus = new CANBus("subsystems"); // Tuned for C3RBERUS!
     public static final double kPeriodicSec = 0.02;
 
     public static final boolean isSim() {
