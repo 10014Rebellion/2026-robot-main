@@ -47,8 +47,6 @@ public class FlywheelsSS extends SubsystemBase {
   
     private SimpleMotorFeedforward mFlywheelFeedforward = kFlywheelControlConfig.feedforward();
   
-    private Debouncer atGoalDebounce = new Debouncer(0.25, DebounceType.kBoth);
-  
     public FlywheelsSS(FlywheelIO pLeaderFlywheelIO, FlywheelIO pFollowerFlywheelIO) {
       this.mLeaderFlywheelIO = pLeaderFlywheelIO;
       this.mFollowerFlywheelIO = pFollowerFlywheelIO;
