@@ -29,11 +29,16 @@
             "/AdvantageKit/Flywheel",
             "/AdvantageKit/Flywheel/Encoder",
             "/AdvantageKit/Flywheel/Follower",
-            "/AdvantageKit/Flywheel/Leader"
+            "/AdvantageKit/Flywheel/Leader",
+            "/AdvantageKit/RealOutputs/Drive",
+            "/AdvantageKit/RealOutputs/Drive/Odometry",
+            "/AdvantageKit/RealOutputs/Drive/HolonomicController",
+            "/AdvantageKit/RealOutputs/Drive/OdometryPP",
+            "/AdvantageKit/RealOutputs/Drive/Swerve"
           ]
         },
         "tabs": {
-          "selected": 3,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -45,7 +50,7 @@
             },
             {
               "type": 1,
-              "title": "Line Graph",
+              "title": "Intake",
               "controller": {
                 "leftSources": [
                   {
@@ -89,16 +94,6 @@
                       "color": "#80588e",
                       "size": "normal"
                     }
-                  },
-                  {
-                    "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/Intake/IIntakeRollerVelocityMPS",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#e48b32",
-                      "size": "normal"
-                    }
                   }
                 ],
                 "discreteSources": [],
@@ -126,7 +121,7 @@
             },
             {
               "type": 1,
-              "title": "Line Graph",
+              "title": "FuelPump",
               "controller": {
                 "leftSources": [
                   {
@@ -291,14 +286,42 @@
               },
               "controllerUUID": "uxn4jzs6q2juvt7tlawm18weat2w4cim",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 249
             },
             {
               "type": 2,
-              "title": "2D Field",
+              "title": "DrivePose",
               "controller": {
-                "sources": [],
-                "field": "FRC:Evergreen",
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Drive/Odometry/PoseEstimate",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "bumpers": ""
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Drive/HolonomicController/PositionGoal",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Drive/HolonomicController/PositionSetpoint",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ffff"
+                    }
+                  }
+                ],
+                "field": "FRC:2026 Field",
                 "orientation": 0,
                 "size": "large"
               },
@@ -307,27 +330,17 @@
               "controlsHeight": 200
             },
             {
-              "type": 3,
-              "title": "3D Field",
+              "type": 9,
+              "title": "Swerve",
               "controller": {
                 "sources": [],
-                "game": "FRC:Evergreen"
+                "maxSpeed": 5,
+                "sizeX": 0.65,
+                "sizeY": 0.65,
+                "orientation": 1
               },
-              "controllerUUID": "8y2m99vojy5aek994t9zuujmr57sy5nl",
-              "renderer": {
-                "cameraIndex": -1,
-                "orbitFov": 50,
-                "cameraPosition": [
-                  0,
-                  0,
-                  0
-                ],
-                "cameraTarget": [
-                  0,
-                  0,
-                  0
-                ]
-              },
+              "controllerUUID": "bnssl75fagz7ewc6ttss0b81jsnnuwig",
+              "renderer": null,
               "controlsHeight": 200
             }
           ]
