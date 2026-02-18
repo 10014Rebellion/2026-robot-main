@@ -10,7 +10,7 @@ import frc.lib.hardware.HardwareRecords.CurrentLimits;
 
 public class ConveyorConstants {
     public static final BasicMotorHardware kConveyorMotorConstants = new BasicMotorHardware(
-        42, // Motor ID // TODO: TUNE ME!
+        44, // Motor ID // TODO: TUNE ME!
         Constants.kSubsystemsCANBus, 
         1, // Rotor to Mechanism Ratio // TODO: TUNE ME!
         InvertedValue.Clockwise_Positive,

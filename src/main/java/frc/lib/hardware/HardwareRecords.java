@@ -1,6 +1,7 @@
 package frc.lib.hardware;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -54,12 +55,11 @@ public class HardwareRecords {
         SensorDirectionValue direction
     ) {}
 
-    public static record MaxSplineEncoderHardware(
+    public static record CANdiEncoder(
         int canID,
-        double offset,
-        boolean zeroCentered,
-        boolean inverted,
-        double gearRatio
+        FeedbackSensorSourceValue feedbackPort,
+        double sensorToMechanismRatio,
+        Rotation2d offset
     ){}
 
     public static record ElevatorController(

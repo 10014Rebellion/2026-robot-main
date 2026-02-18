@@ -1,5 +1,6 @@
 package frc.robot.systems.intake;
 
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -8,8 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
 import frc.lib.hardware.HardwareRecords.ArmControllerMotionMagic;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
+import frc.lib.hardware.HardwareRecords.CANdiEncoder;
 import frc.lib.hardware.HardwareRecords.CurrentLimits;
-import frc.lib.hardware.HardwareRecords.MaxSplineEncoderHardware;
 import frc.lib.hardware.HardwareRecords.MotionMagicConstants;
 import frc.lib.hardware.HardwareRecords.PDConstants;
 import frc.lib.hardware.HardwareRecords.RotationSoftLimits;
@@ -25,13 +26,12 @@ public class IntakeConstants {
             new CurrentLimits(30, 40)
         );
 
-        public static final MaxSplineEncoderHardware kPivotEncoderConfig = new MaxSplineEncoderHardware(
+        public static final CANdiEncoder kPivotEncoderConfig = new CANdiEncoder(
             40, 
-            0, // assumes its from 0-1 and no invertions
-            true, // makes encoder from -0.5 to 0.5 which is optimal for the pivot
-            false,
-            1
-        );
+            FeedbackSensorSourceValue.FusedCANdiPWM1,
+            1,
+            Rotation2d.fromRotations(0.27)
+            );
 
         public static final ArmControllerMotionMagic kPivotController = new ArmControllerMotionMagic(
             0, 
@@ -48,7 +48,7 @@ public class IntakeConstants {
 
     public static class RollerConstants {
         public final static BasicMotorHardware kRollerMotorConfig = new BasicMotorHardware(
-            41, // TODO: TUNE ME;
+            42, // TODO: TUNE ME;
             Constants.kSubsystemsCANBus,
             1,
             InvertedValue.CounterClockwise_Positive,

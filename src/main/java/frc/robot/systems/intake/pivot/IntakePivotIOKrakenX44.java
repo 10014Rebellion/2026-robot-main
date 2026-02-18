@@ -7,13 +7,14 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
-import com.revrobotics.ResetMode;
-import com.revrobotics.encoder.DetachedEncoder;
-import com.revrobotics.encoder.DetachedEncoder.Model;
-import com.revrobotics.encoder.config.DetachedEncoderConfig;
+// import com.revrobotics.ResetMode;
+// import com.revrobotics.encoder.DetachedEncoder;
+// import com.revrobotics.encoder.DetachedEncoder.Model;
+// import com.revrobotics.encoder.config.DetachedEncoderConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
@@ -23,13 +24,13 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
-import frc.lib.hardware.HardwareRecords.MaxSplineEncoderHardware;
+import frc.lib.hardware.HardwareRecords.CANdiEncoder;
 import frc.lib.hardware.HardwareRecords.RotationSoftLimits;
 import frc.robot.systems.intake.IntakeConstants.PivotConstants;
 
 public class IntakePivotIOKrakenX44 implements IntakePivotIO{
     private final TalonFX mIntakePivotMotor;
-    private final DetachedEncoder mIntakePivotEncoder;
+    // private final DetachedEncoder mIntakePivotEncoder;
     private final VoltageOut mIntakePivotVoltageControl = new VoltageOut(0.0);
     private final MotionMagicDutyCycle mIntakePivotRotationControl = new MotionMagicDutyCycle(0.0);
     
@@ -43,24 +44,25 @@ public class IntakePivotIOKrakenX44 implements IntakePivotIO{
     private final StatusSignal<Temperature> mIntakePivotTempCelsius;
 
     private final RotationSoftLimits mLimits;
+    private final Rotation2d mOffset;
     
-    public IntakePivotIOKrakenX44(BasicMotorHardware pConfig, MaxSplineEncoderHardware pEncoderConfig, RotationSoftLimits pLimits) {
+    public IntakePivotIOKrakenX44(BasicMotorHardware pConfig, CANdiEncoder pEncoderConfig, RotationSoftLimits pLimits) {
         this.mLimits = pLimits;
 
         // Encoder
-        mIntakePivotEncoder = new DetachedEncoder(pEncoderConfig.canID(), Model.MAXSplineEncoder){};
-        DetachedEncoderConfig encoderConfig = new DetachedEncoderConfig();
-        encoderConfig.dutyCycleZeroCentered(pEncoderConfig.zeroCentered());
-        encoderConfig.inverted(pEncoderConfig.inverted());
-        encoderConfig.dutyCycleOffset((float) pEncoderConfig.offset());
-        encoderConfig.angleConversionFactor(1);
-        encoderConfig.averageDepth(64);
-        encoderConfig.positionConversionFactor(1);
-        encoderConfig.velocityConversionFactor(1);
-        encoderConfig.signals.encoderAnglePeriodMs(50);
-        encoderConfig.signals.encoderPositionPeriodMs(50);
-        encoderConfig.signals.encoderVelocityPeriodMs(50);
-        mIntakePivotEncoder.configure(encoderConfig, ResetMode.kResetSafeParameters);
+        // mIntakePivotEncoder = new DetachedEncoder(pEncoderConfig.canID(), Model.MAXSplineEncoder){};
+        // DetachedEncoderConfig encoderConfig = new DetachedEncoderConfig();
+        // encoderConfig.dutyCycleZeroCentered(pEncoderConfig.zeroCentered());
+        // encoderConfig.inverted(pEncoderConfig.inverted());
+        // encoderConfig.dutyCycleOffset((float) pEncoderConfig.offset());
+        // encoderConfig.angleConversionFactor(1);
+        // encoderConfig.averageDepth(64);
+        // encoderConfig.positionConversionFactor(1);
+        // encoderConfig.velocityConversionFactor(1);
+        // encoderConfig.signals.encoderAnglePeriodMs(50);
+        // encoderConfig.signals.encoderPositionPeriodMs(50);
+        // encoderConfig.signals.encoderVelocityPeriodMs(50);
+        // mIntakePivotEncoder.configure(encoderConfig, ResetMode.kResetSafeParameters);
 
         // Motor
         mIntakePivotMotor = new TalonFX(pConfig.motorID(), pConfig.canBus());
@@ -74,10 +76,10 @@ public class IntakePivotIOKrakenX44 implements IntakePivotIO{
         IntakeConfig.MotorOutput.NeutralMode = pConfig.neutralMode();
         IntakeConfig.MotorOutput.Inverted = pConfig.direction();
 
-        IntakeConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder; // Okay so im like 99% sure this will not work... but unfortunately im still gonna try it.
+        IntakeConfig.Feedback.FeedbackSensorSource = pEncoderConfig.feedbackPort(); // Okay so im like 99% sure this will not work... but unfortunately im still gonna try it.
         IntakeConfig.Feedback.FeedbackRemoteSensorID = pEncoderConfig.canID();
-        IntakeConfig.Feedback.SensorToMechanismRatio = pEncoderConfig.gearRatio();
-        IntakeConfig.Feedback.RotorToSensorRatio = pConfig.rotorToMechanismRatio() / pEncoderConfig.gearRatio();
+        IntakeConfig.Feedback.SensorToMechanismRatio = pEncoderConfig.sensorToMechanismRatio();
+        // IntakeConfig.Feedback.RotorToSensorRatio = pConfig.rotorToMechanismRatio() / pEncoderConfig.sensorToMechanismRatio();
 
         IntakeConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         IntakeConfig.Slot0.kP = PivotConstants.kPivotController.pdController().kP();
@@ -110,6 +112,8 @@ public class IntakePivotIOKrakenX44 implements IntakePivotIO{
             mIntakePivotTempCelsius
         );
 
+
+        mOffset = pEncoderConfig.offset();
         mIntakePivotMotor.optimizeBusUtilization();
     }
 
@@ -134,7 +138,7 @@ public class IntakePivotIOKrakenX44 implements IntakePivotIO{
     }
 
     private Rotation2d getPos() {
-        return Rotation2d.fromRotations(mIntakePivotRotation.getValueAsDouble());
+        return Rotation2d.fromRotations(mIntakePivotRotation.getValueAsDouble()).minus(mOffset);
     }
 
     @Override 

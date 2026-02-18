@@ -7,7 +7,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.lib.hardware.HardwareRecords.BasicMotorHardware;
-import frc.lib.hardware.HardwareRecords.MaxSplineEncoderHardware;
+import frc.lib.hardware.HardwareRecords.CANdiEncoder;
 import frc.lib.hardware.HardwareRecords.RotationSoftLimits;
 
 import frc.robot.systems.intake.IntakeConstants.PivotConstants;
@@ -19,7 +19,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
     private double mAppliedVolts = 0.0;
     private final RotationSoftLimits mLimits;
 
-    public IntakePivotIOSim(BasicMotorHardware pConfig, MaxSplineEncoderHardware pEncoderConfig, RotationSoftLimits pLimits) {
+    public IntakePivotIOSim(BasicMotorHardware pConfig, CANdiEncoder pEncoderConfig, RotationSoftLimits pLimits) {
         mIntakePivotMotor = new DCMotorSim(
             LinearSystemId.createDCMotorSystem(DCMotor.getKrakenX60(1), 0.004, pConfig.rotorToMechanismRatio()),
             DCMotor.getKrakenX60Foc(1).withReduction(pConfig.rotorToMechanismRatio()),
