@@ -71,9 +71,8 @@ public class FlywheelIOKrakenX44 implements FlywheelIO{
         FlywheelConfig.MotorOutput.NeutralMode = pHardware.neutralMode();
         FlywheelConfig.MotorOutput.Inverted = pHardware.direction();
 
-        FlywheelConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        FlywheelConfig.Feedback.RotorToSensorRatio = pHardware.rotorToMechanismRatio();
-        FlywheelConfig.Feedback.SensorToMechanismRatio = FlywheelConstants.kCANCoderConfig.cancoderToMechanismRatio();
+        FlywheelConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        FlywheelConfig.Feedback.SensorToMechanismRatio = pHardware.rotorToMechanismRatio();
 
         mFlywheelMotor.getConfigurator().apply(FlywheelConfig);
 

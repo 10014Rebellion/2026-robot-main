@@ -23,6 +23,8 @@ public interface IntakePivotIO {
 
     public default void setMotorVolts(double pVolts) {}
 
+    public default void setMotorAmps(double pAmps) {}
+
     public default void setMotorRot(Rotation2d pRot, double feedforward) {}
 
     public default void setPDConstants(double pKP, double pKD) {}

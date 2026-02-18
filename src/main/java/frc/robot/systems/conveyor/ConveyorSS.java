@@ -22,6 +22,10 @@ public class ConveyorSS extends SubsystemBase {
     return new InstantCommand(() -> mConveyorIO.setMotorVolts(pVolts));
   }
 
+  public Command stopConveyorMotorCmd() {
+    return new InstantCommand(() -> mConveyorIO.stopMotor());
+  }
+
   public void stopConveyorMotor() {
     mConveyorIO.stopMotor();
   }

@@ -129,7 +129,7 @@ public class ShooterConstants {
             Constants.kSubsystemsCANBus,
             1,
             InvertedValue.CounterClockwise_Positive,
-            NeutralModeValue.Brake,
+            NeutralModeValue.Coast,
             new CurrentLimits(50, 60)
         );
 
@@ -142,7 +142,7 @@ public class ShooterConstants {
         public static final MotionMagicFOCControllerFF kFlywheelControlConfig = new MotionMagicFOCControllerFF(
             0, // not currently used
             // original kP = 9 
-            new PDConstants(0, 0),
+            new PDConstants(9.0, 0),
             new SimpleMotorFeedforward(0.37, 0, 0),
             new MotionMagicConstants(0, 1000, 10000)
         );

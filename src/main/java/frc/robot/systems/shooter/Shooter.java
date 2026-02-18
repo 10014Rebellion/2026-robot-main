@@ -17,11 +17,11 @@ public class Shooter {
   }
 
   public Command setFlywheelsRPSCmd(double pRPS) {
-    return new InstantCommand(() -> mFlywheelSS.setFlywheelSpeeds(pRPS));
+    return new InstantCommand(() -> mFlywheelSS.setFlywheelSpeeds(pRPS), mFlywheelSS);
   }
 
   public Command setFlywheelsVoltsCmd(double pVolts) {
-    return new InstantCommand(() -> mFlywheelSS.setFlywheelVolts(pVolts));
+    return new InstantCommand(() -> mFlywheelSS.setFlywheelVolts(pVolts), mFlywheelSS);
   }
 
   public Command setFuelPumpsVoltsCmd(double pVolts) {

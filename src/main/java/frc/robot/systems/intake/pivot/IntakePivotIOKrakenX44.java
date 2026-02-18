@@ -1,11 +1,16 @@
 package frc.robot.systems.intake.pivot;
 
+import org.dyn4j.dynamics.Torque;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -32,7 +37,8 @@ public class IntakePivotIOKrakenX44 implements IntakePivotIO{
     private final TalonFX mIntakePivotMotor;
     // private final DetachedEncoder mIntakePivotEncoder;
     private final VoltageOut mIntakePivotVoltageControl = new VoltageOut(0.0);
-    private final MotionMagicDutyCycle mIntakePivotRotationControl = new MotionMagicDutyCycle(0.0);
+    private final TorqueCurrentFOC mIntakePivotAmpsControl = new TorqueCurrentFOC(0.0);
+    private final MotionMagicTorqueCurrentFOC mIntakePivotRotationControl = new MotionMagicTorqueCurrentFOC(0.0);
     
     private final StatusSignal<Angle> mIntakePivotRotation;
     private final StatusSignal<AngularVelocity> mIntakePivotVelocityRPS;
@@ -162,6 +168,11 @@ public class IntakePivotIOKrakenX44 implements IntakePivotIO{
     public void setMotorVolts(double pVolts) {
         mIntakePivotMotor.setControl(mIntakePivotVoltageControl.withOutput(pVolts));
         enforceSoftLimits();
+    }
+
+    @Override
+    public void setMotorAmps(double pAmps){
+        mIntakePivotMotor.setControl(mIntakePivotAmpsControl.withOutput(pAmps));
     }
 
     @Override

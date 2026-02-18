@@ -57,9 +57,7 @@ public class Module {
 
         /* Works because signals are sampled together */
         int sampleCount = mInputs.odometryTimestamps.length;
-        // System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+sampleCount+"\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         odometryPositions = new SwerveModulePosition[sampleCount];
-        // System.out.println("\n\n\n\n\n\n\n\n"+sampleCount+"\n\n\n\n\n\n\n\n\n\n");
         for (int i = 0; i < sampleCount; i++) {
             odometryPositions[i] = new SwerveModulePosition(
                 mInputs.odometryDrivePositionsM[i], 
@@ -76,7 +74,6 @@ public class Module {
 
             mIO.setDriveVelocity(mVelocitySetpointMPS, ffOutput);
 
-            System.out.println("\n\n\n\n\n\n\n\n"+mVelocitySetpointMPS+"\n\n\n\n\n\n\n\n\n\n");
             Logger.recordOutput("Drive/" + kModuleName + "/VelocitySetpointMPS", mVelocitySetpointMPS);
             Logger.recordOutput("Drive/" + kModuleName + (
                 (DriveConstants.kUseVoltageFeedforward) ? 

@@ -35,20 +35,20 @@ public class IntakeConstants {
 
         public static final ArmControllerMotionMagic kPivotController = new ArmControllerMotionMagic(
             0, 
-            new PDConstants(0, 0), 
-            new MotionMagicConstants(0, 0, 0), 
+            new PDConstants(5, 0), 
+            new MotionMagicConstants(5, 20, 0), 
             new ArmFeedforward(0, 0, 0, 0)
         );
 
         public static final RotationSoftLimits kPivotLimits = new RotationSoftLimits(
-            Rotation2d.fromRotations(0), // Negative voltage limit
+            Rotation2d.fromRotations(0.35), // Negative voltage limit
             Rotation2d.fromRotations(0) // Positive voltage limit
         );
     }
 
     public static class RollerConstants {
         public final static BasicMotorHardware kRollerMotorConfig = new BasicMotorHardware(
-            42, // TODO: TUNE ME;
+            42,
             Constants.kSubsystemsCANBus,
             1,
             InvertedValue.CounterClockwise_Positive,
