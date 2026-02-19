@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.tuning.LoggedTunableNumber;
 
 import static frc.robot.systems.intake.IntakeConstants.PivotConstants.kPivotController;
-import static frc.robot.systems.intake.IntakeConstants.PivotConstants.kPivotLimits;
 
 public class IntakePivotSS extends SubsystemBase {
   private final IntakePivotIO mIntakePivotIO;
@@ -31,9 +30,6 @@ public class IntakePivotSS extends SubsystemBase {
   private final LoggedTunableNumber tPivotCruiseVel = new LoggedTunableNumber("Intake/Pivot/Control/CruiseVel", kPivotController.motionMagicConstants().maxVelocity());
   private final LoggedTunableNumber tPivotMaxAccel = new LoggedTunableNumber("Intake/Pivot/Control/MaxAcceleration", kPivotController.motionMagicConstants().maxAcceleration());
   private final LoggedTunableNumber tPivotMaxJerk = new LoggedTunableNumber("Intake/Pivot/Control/MaxJerk", kPivotController.motionMagicConstants().maxJerk());
-
-  private double mCustomAmps = 0.0;
-  private Rotation2d mCustomSetpoint = Rotation2d.fromRotations(kPivotLimits.backwardLimit().getRotations());
 
   public static final LoggedTunableNumber tCustomAmps = new LoggedTunableNumber("Intake/Pivot/Custom/Amps", 0.0);
   public static final LoggedTunableNumber tCustomSetpointRotation = new LoggedTunableNumber("Intake/Pivot/Custom/SetpointRotations", 0.0);
@@ -98,16 +94,6 @@ public class IntakePivotSS extends SubsystemBase {
     LoggedTunableNumber.ifChanged( hashCode(), 
       () -> mIntakePivotIO.setMotionMagicConstants(tPivotCruiseVel.get(), tPivotMaxAccel.get(), tPivotMaxJerk.get()), 
       tPivotCruiseVel, tPivotMaxAccel, tPivotMaxJerk
-    );
-
-    LoggedTunableNumber.ifChanged( hashCode(), 
-      () -> mCustomAmps = tCustomAmps.get(), 
-      tCustomAmps
-    );
-
-    LoggedTunableNumber.ifChanged( hashCode(), 
-      () -> mCustomSetpoint = Rotation2d.fromRotations(tCustomSetpointRotation.get()), 
-      tCustomSetpointRotation
     );
   }
 }

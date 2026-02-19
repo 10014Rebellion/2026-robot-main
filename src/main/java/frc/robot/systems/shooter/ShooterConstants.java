@@ -83,8 +83,7 @@ public class ShooterConstants {
         );
 
         public static final MotionMagicFOCControllerFF kFuelPumpControlConfig = new MotionMagicFOCControllerFF(
-            0, // not currently used
-            // original kP = 9 
+            0,
             new PDConstants(0, 0),
             new SimpleMotorFeedforward(0.37, 0, 0),
             new MotionMagicConstants(0, 1000, 10000)
@@ -95,7 +94,7 @@ public class ShooterConstants {
         public static final BasicMotorHardware kHoodConfig = new BasicMotorHardware(
             55,
             Constants.kSubsystemsCANBus,
-            133/9.0, 
+            133.0 / 9.0, 
             InvertedValue.Clockwise_Positive, 
             NeutralModeValue.Brake, 
             new CurrentLimits(40, 50)
@@ -103,9 +102,9 @@ public class ShooterConstants {
 
         public static final ArmControllerMotionMagic kHoodControlConfig = new ArmControllerMotionMagic(
             0, // not currently used
-            new PDConstants(10, 0), // TODO: TUNE ME
-            new MotionMagicConstants(100, 200, 0),  // TODO: TUNE ME
-            new ArmFeedforward(0, 0.03, 0, 0) // TODO: TUNE ME
+            new PDConstants(10, 0), // Tuned for C3RBERUS!
+            new MotionMagicConstants(100, 200, 0),  // Tuned for C3RBERUS!
+            new ArmFeedforward(0, 0.03, 0, 0) // Tuned for C3RBERUS!
         );
 
         public static final RotationSoftLimits kHoodLimits = new RotationSoftLimits(
@@ -142,9 +141,9 @@ public class ShooterConstants {
         public static final MotionMagicFOCControllerFF kFlywheelControlConfig = new MotionMagicFOCControllerFF(
             0, // not currently used
             // original kP = 9 
-            new PDConstants(9.0, 0),
-            new SimpleMotorFeedforward(0.37, 0, 0),
-            new MotionMagicConstants(0, 1000, 10000)
+            new PDConstants(9.0, 0), // Tuned for C3RBERUS!
+            new SimpleMotorFeedforward(0.37, 0, 0), // Tuned for C3RBERUS!
+            new MotionMagicConstants(0, 1000, 10000) // Tuned for C3RBERUS!
         );
     }
 }
