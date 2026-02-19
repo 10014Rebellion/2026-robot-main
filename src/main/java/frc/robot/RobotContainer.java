@@ -1,5 +1,3 @@
-// REBELLION 10014
-
 package frc.robot;
 
 import static frc.robot.systems.drive.DriveConstants.*;

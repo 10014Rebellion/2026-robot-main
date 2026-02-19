@@ -14,43 +14,36 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.telemetry.Telemetry;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoEvent extends Command {
     private final EventLoop mAutoEventLoop = new EventLoop();
     private boolean mIsRunning = false; 
     private final Trigger mIsRunningTrigger;
     private String mAutoName;
   
-    /** Creates a new AutoEvent. */
-    public AutoEvent(String pAutoName, Subsystem subsystem) {
+    public AutoEvent(String pAutoName, Subsystem pSubsystem) {
         mAutoName = pAutoName;
 
         mIsRunningTrigger = loggedCondition("IsRunning", () -> mIsRunning, false);
 
-        addRequirements(subsystem);
-        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(pSubsystem);
     }
 
-    // Called when the command is initially scheduled.
     @Override
     public void initialize() {
         mIsRunning = true;
         mAutoEventLoop.poll();
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         mAutoEventLoop.poll();   
     }
 
-    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
         mIsRunning = false;
     }
 
-    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;
@@ -64,7 +57,6 @@ public class AutoEvent extends Command {
         return mIsRunningTrigger;
     }
 
-    /* Available but heavinly un-reccomended compared to using loggedCondition() */
     public Trigger condition(BooleanSupplier condition) {
         return new Trigger(mAutoEventLoop, condition);
     }
