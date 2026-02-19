@@ -3,12 +3,12 @@ package frc.robot.bindings.profilebindings.drivers;
 import frc.robot.bindings.BindingCommands;
 import frc.robot.bindings.profilebindings.ProfileBindings;
 
-public class EliBindings implements ProfileBindings {
+public class DefaultBindings implements ProfileBindings {
     private BindingCommands mCommands;
 
-    public EliBindings(){}
+    public DefaultBindings(){}
 
-    public EliBindings(BindingCommands pCommands) {
+    public DefaultBindings(BindingCommands pCommands) {
         this.mCommands = pCommands;
     }
 

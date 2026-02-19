@@ -2,6 +2,7 @@
 
 package frc.robot.bindings;
 
+import frc.robot.bindings.profilebindings.drivers.*;
 import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
 
 public class BindingsConstants {
@@ -16,7 +17,8 @@ public class BindingsConstants {
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
             0.1, // Right Joystick Deadband
-            0.2 // Sniper Scalar
+            0.2, // Sniper Scalar
+            new DefaultBindings()
         );
 
     public static DriverProfiles[] kProfiles = {
@@ -28,7 +30,8 @@ public class BindingsConstants {
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
             0.1, //     Right Joystick Deadband
-            0.2 // Sniper Scalar
+            0.2, // Sniper Scalar
+            new BoscoBindings()
         ),
 
         new DriverProfiles(
@@ -39,7 +42,8 @@ public class BindingsConstants {
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
             0.1, // Right Joystick Deadband
-            0.2 // Sniper Scalar
+            0.2, // Sniper Scalar,
+            new EliBindings()
         ),
 
         new DriverProfiles(
@@ -50,7 +54,8 @@ public class BindingsConstants {
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
             0.1, // Right Joystick Deadband
-            0.2 // Sniper Scalar
+            0.2, // Sniper Scalar
+            new TahaBindings()
         ),
     };
 }

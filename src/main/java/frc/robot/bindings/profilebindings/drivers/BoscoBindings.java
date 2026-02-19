@@ -6,6 +6,8 @@ import frc.robot.bindings.profilebindings.ProfileBindings;
 public class BoscoBindings implements ProfileBindings {
     private BindingCommands mCommands;
 
+    public BoscoBindings(){}
+
     public BoscoBindings(BindingCommands pCommands) {
         this.mCommands = pCommands;
     }

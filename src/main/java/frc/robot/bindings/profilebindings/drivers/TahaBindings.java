@@ -6,6 +6,8 @@ import frc.robot.bindings.profilebindings.ProfileBindings;
 public class TahaBindings implements ProfileBindings {
     private BindingCommands mCommands;
 
+    public TahaBindings(){}
+
     public TahaBindings(BindingCommands pCommands) {
         this.mCommands = pCommands;
     }
