@@ -82,7 +82,7 @@ public class IntakePivotSS extends SubsystemBase {
     mPivotFF.setKa(kA);
   }
 
-  @AutoLogOutput(key = "Intake/Feedback/ErrorMeters")
+  @AutoLogOutput(key = "Intake/Feedback/ErrorRotations")
   public double getErrorRotations() {
     return mCurrentSetpoint.getRotations() - getIntakePivotRotations().getRotations();
   }
