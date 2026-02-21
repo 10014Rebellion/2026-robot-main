@@ -45,7 +45,7 @@ public class FlywheelsSS extends SubsystemBase {
   private Debouncer mAtGoalDebouncer = new Debouncer(mTimeout, DebounceType.kRising);
 
   private FlywheelState mCurrentState = FlywheelState.TORQUE_FOC;
-  private double mCurrentRPS = 0.0;
+  private double mCurrentRPSGoal = 0.0;
 
   public FlywheelsSS(FlywheelIO pLeaderFlywheelIO, FlywheelIO pFollowerFlywheelIO, EncoderIO pFlywheelEncoder) {
     this.mLeaderFlywheelIO = pLeaderFlywheelIO;
@@ -64,7 +64,7 @@ public class FlywheelsSS extends SubsystemBase {
 
   public void setFlywheelSpeeds(FlywheelState pState, double pRPS){
     mCurrentState = pState;
-    mCurrentRPS = pRPS;
+    mCurrentRPSGoal = pRPS;
   }
 
   public void stopFlywheelMotor() {
@@ -90,7 +90,7 @@ public class FlywheelsSS extends SubsystemBase {
 
   @AutoLogOutput(key = "Shooter/Flywheel/Feedback/ErrorRotationsPerSec")
   public double getErrorRotationsPerSec() {
-    return mCurrentRPS - getFlywheelRPS();
+    return mCurrentRPSGoal - getFlywheelRPS();
   }
 
   @AutoLogOutput(key = "Shooter/Flywheel/Feedback/AtGoal")
@@ -107,29 +107,29 @@ public class FlywheelsSS extends SubsystemBase {
     refreshTuneables();
     mFollowerFlywheelIO.enforceFollower(); // Sometimes during enable and disable it no longer follows briefly, this scares me, so this is a failsafe
 
-    double ffOutput = mFlywheelFeedforward.calculateWithVelocities(getFlywheelRPS(), mCurrentRPS);
+    double ffOutput = mFlywheelFeedforward.calculateWithVelocities(getFlywheelRPS(), mCurrentRPSGoal);
 
     if(mCurrentState.equals(FlywheelState.TORQUE_FOC)){
-      mLeaderFlywheelIO.setMotorVelAndAccel(mCurrentRPS, 0, ffOutput);
+      mLeaderFlywheelIO.setMotorVelAndAccel(mCurrentRPSGoal, 0, ffOutput);
       mFollowerFlywheelIO.enforceFollower();
     }
 
     else{
-      if(getFlywheelRPS() < mCurrentRPS){
+      if(getFlywheelRPS() < mCurrentRPSGoal){
         // Send max voltage until above setpoint //
         setFlywheelVolts(12.0);
       }
 
-      boolean inTolerance = Math.abs(getFlywheelRPS() - mCurrentRPS) <= mTolerance;
+      boolean inTolerance = Math.abs(getFlywheelRPS() - mCurrentRPSGoal) <= mTolerance;
       boolean atGoal = mAtGoalDebouncer.calculate(inTolerance);
 
         if(atGoal){
-          mLeaderFlywheelIO.setMotorVelAndAccel(mCurrentRPS - 30, 0, ffOutput);
+          mLeaderFlywheelIO.setMotorVelAndAccel(mCurrentRPSGoal - 30, 0, ffOutput);
           mFollowerFlywheelIO.enforceFollower();
         }
 
         else{
-          mLeaderFlywheelIO.setMotorVelAndAccel(mCurrentRPS + 10, 0, ffOutput);
+          mLeaderFlywheelIO.setMotorVelAndAccel(mCurrentRPSGoal + 10, 0, ffOutput);
           mFollowerFlywheelIO.enforceFollower();  
         }
     }

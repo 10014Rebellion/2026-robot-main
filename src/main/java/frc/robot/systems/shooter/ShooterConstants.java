@@ -71,6 +71,9 @@ public class ShooterConstants {
 
 
     public static class FuelPumpConstants {
+
+        public static final double kTolerance = 3.0;
+
         public enum FuelPumpStates {
             DISCONNECTED(null),
             INDEXING(() -> Rotation2d.fromRotations(0)), // TODO: TUNE ME!
