@@ -72,7 +72,7 @@ public class ShooterConstants {
 
     public static class FuelPumpConstants {
 
-        public static final double kTolerance = 3.0;
+        public static final double kToleranceRPS = 3.0;
 
         public enum FuelPumpStates {
             DISCONNECTED(null),
@@ -122,6 +122,9 @@ public class ShooterConstants {
     }
 
     public static class HoodConstants {
+
+        public static final double kToleranceRotations = 0.5;
+
         public static final BasicMotorHardware kHoodConfig = new BasicMotorHardware(
             55,
             Constants.kSubsystemsCANBus,
@@ -152,7 +155,7 @@ public class ShooterConstants {
         }
 
         public static final double kMaxFlywheelTestedRPS = 112;
-        public static final double kTolerance = 3.0;
+        public static final double kToleranceRPS = 3.0;
         public static final double kBangBangTimeout = 0.25;
 
         public static final RelativeCANCoderHardware kCANCoderConfig = new RelativeCANCoderHardware(

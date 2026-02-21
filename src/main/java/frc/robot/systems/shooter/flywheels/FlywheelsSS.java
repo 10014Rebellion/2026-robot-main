@@ -34,10 +34,10 @@ public class FlywheelsSS extends SubsystemBase {
   private final LoggedTunableNumber tFlywheelMaxAccel = new LoggedTunableNumber("Flywheel/Control/MaxAcceleration", kFlywheelControlConfig.motionMagicConstants().maxAcceleration());
   private final LoggedTunableNumber tFlywheelMaxJerk = new LoggedTunableNumber("Flywheel/Control/MaxJerk", kFlywheelControlConfig.motionMagicConstants().maxJerk());
 
-  private final LoggedTunableNumber tFlywheelTolerance = new LoggedTunableNumber("Flywheel/BangBang/Tolerance", ShooterConstants.FlywheelConstants.kTolerance);
+  private final LoggedTunableNumber tFlywheelTolerance = new LoggedTunableNumber("Flywheel/BangBang/Tolerance", ShooterConstants.FlywheelConstants.kToleranceRPS);
   private final LoggedTunableNumber tFlywheelTimeout = new LoggedTunableNumber("Flywheel/BangBang/Timeout", ShooterConstants.FlywheelConstants.kBangBangTimeout);
 
-  private double mTolerance = ShooterConstants.FlywheelConstants.kTolerance;
+  private double mTolerance = ShooterConstants.FlywheelConstants.kToleranceRPS;
   private double mTimeout = ShooterConstants.FlywheelConstants.kBangBangTimeout;
 
   private SimpleMotorFeedforward mFlywheelFeedforward = kFlywheelControlConfig.feedforward();
