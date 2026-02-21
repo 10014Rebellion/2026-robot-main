@@ -142,7 +142,15 @@ public class ShooterConstants {
     }
 
     public static class FlywheelConstants {
+
+        public enum FlywheelState{
+            TORQUE_FOC,
+            BANG_BANG
+        }
+
         public static final double kMaxFlywheelTestedRPS = 112;
+        public static final double kBangBangTolerance = 3.0;
+        public static final double kBangBangTimeout = 0.25;
 
         public static final RelativeCANCoderHardware kCANCoderConfig = new RelativeCANCoderHardware(
             50,

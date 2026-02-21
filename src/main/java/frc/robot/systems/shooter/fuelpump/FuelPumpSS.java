@@ -41,7 +41,6 @@ public class FuelPumpSS extends SubsystemBase {
     mLeaderFuelPumpIO.setMotorVolts(pVolts);
     mFollowerFuelPumpIO.enforceFollower();
   }
-
   
   public void stopFuelPumpMotor() {
     mLeaderFuelPumpIO.stopMotor();
@@ -51,6 +50,12 @@ public class FuelPumpSS extends SubsystemBase {
   private void setBothPDConstants(double pKP, double pKD) {
     mLeaderFuelPumpIO.setPDConstants(0, pKP, pKD);
     mFollowerFuelPumpIO.setPDConstants(0, pKP, pKD);
+  }
+
+  private void setFF(double pKS, double pKV, double pKA){
+    mFuelPumpFeedForward.setKs(pKS);
+    mFuelPumpFeedForward.setKv(pKV);
+    mFuelPumpFeedForward.setKa(pKA);
   }
 
   @Override
@@ -72,7 +77,7 @@ public class FuelPumpSS extends SubsystemBase {
     );
   
     LoggedTunableNumber.ifChanged( hashCode(), 
-      () -> mFuelPumpFeedForward = new SimpleMotorFeedforward(tFuelPumpKS.get(), tFuelPumpKV.get(), tFuelPumpKA.get()), 
+      () -> setFF(tFuelPumpKS.get(), tFuelPumpKV.get(), tFuelPumpKA.get()), 
       tFuelPumpKS, tFuelPumpKV, tFuelPumpKA
     );
   }
