@@ -76,7 +76,6 @@ public class Module {
 
             mIO.setDriveVelocity(mVelocitySetpointMPS, ffOutput);
 
-            System.out.println("\n\n\n\n\n\n\n\n"+mVelocitySetpointMPS+"\n\n\n\n\n\n\n\n\n\n");
             Logger.recordOutput("Drive/" + kModuleName + "/VelocitySetpointMPS", mVelocitySetpointMPS);
             Logger.recordOutput("Drive/" + kModuleName + (
                 (DriveConstants.kUseVoltageFeedforward) ? 
