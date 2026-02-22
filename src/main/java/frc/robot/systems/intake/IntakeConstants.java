@@ -21,7 +21,7 @@ public class IntakeConstants {
             41, // TODO: TUNE ME;
             Constants.kSubsystemsCANBus,
             1,
-            InvertedValue.Clockwise_Positive,
+            InvertedValue.CounterClockwise_Positive,
             NeutralModeValue.Brake,
             new CurrentLimits(30, 40)
         );
@@ -30,8 +30,8 @@ public class IntakeConstants {
             40, 
             FeedbackSensorSourceValue.FusedCANdiPWM1,
             1,
-            Rotation2d.fromRotations(0.335)
-            );
+            Rotation2d.fromRotations(0.102051 + 0.055555)
+        );
 
         public static final ArmControllerMotionMagic kPivotController = new ArmControllerMotionMagic(
             0, 
@@ -41,8 +41,8 @@ public class IntakeConstants {
         );
 
         public static final RotationSoftLimits kPivotLimits = new RotationSoftLimits(
-            Rotation2d.fromRotations(0.294), // Negative voltage limit
-            Rotation2d.fromRotations(-0.088) // Positive voltage limit
+            Rotation2d.fromRotations(-0.06), // Negative voltage limit
+            Rotation2d.fromRotations(0.305) // Positive voltage limit
         );
     }
 

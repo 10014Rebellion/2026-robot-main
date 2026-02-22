@@ -38,52 +38,57 @@ public class ButtonBindings {
 
         mDriverController.y().onTrue(Commands.runOnce(() -> mDriveSS.resetGyro()));
 
+        mDriverController.povUp().onTrue(mIntakeSS.setPivotVolts(12))
+        .onFalse(mIntakeSS.setPivotVolts(0));
+        mDriverController.povDown().onTrue(mIntakeSS.setPivotVolts(-12))
+        .onFalse(mIntakeSS.setPivotVolts(0));
+
         // mDriverController.rightTrigger()
         //     .onTrue(mIntakeSS.setPivotTuneableAmps())
         //     .onFalse(mIntakeSS.stopPivotMotorCmd());
 
-        mDriverController.rightTrigger()
-            // .onTrue(mIntakeSS.setRollerVoltsCmd(12.0))
-            .onTrue(
-                mConveyorSS.setConveyorVoltsCmd(10.014).andThen(
-                mShooter.setFuelPumpsVoltsCmd(10.014))
-            )
-            .onFalse(
-                mConveyorSS.setConveyorVoltsCmd(0.0).andThen(
-                mShooter.setFuelPumpsVoltsCmd(0.0))
-            );
+        // mDriverController.rightTrigger()
+        //     // .onTrue(mIntakeSS.setRollerVoltsCmd(12.0))
+        //     .onTrue(
+        //         mConveyorSS.setConveyorVoltsCmd(10.014).andThen(
+        //         mShooter.setFuelPumpsVoltsCmd(10.014))
+        //     )
+        //     .onFalse(
+        //         mConveyorSS.setConveyorVoltsCmd(0.0).andThen(
+        //         mShooter.setFuelPumpsVoltsCmd(0.0))
+        //     );
 
-        mDriverController.a()
-            // .onTrue(mIntakeSS.setRollerVoltsCmd(12.0))
-            .onTrue(
-                mConveyorSS.setConveyorVoltsCmd(10.014).andThen(
-                mIntakeSS.setRollerVoltsCmd(12))
-            )
-            .onFalse(
-                mConveyorSS.setConveyorVoltsCmd(0.0).andThen(
-                mIntakeSS.setRollerVoltsCmd(0.0))
-            );
+        // mDriverController.a()
+        //     // .onTrue(mIntakeSS.setRollerVoltsCmd(12.0))
+        //     .onTrue(
+        //         mConveyorSS.setConveyorVoltsCmd(10.014).andThen(
+        //         mIntakeSS.setRollerVoltsCmd(12))
+        //     )
+        //     .onFalse(
+        //         mConveyorSS.setConveyorVoltsCmd(0.0).andThen(
+        //         mIntakeSS.setRollerVoltsCmd(0.0))
+        //     );
 
-        mDriverController.rightBumper()
-            .onTrue(mIntakeSS.setPivotRotCmd(Rotation2d.fromRotations(0.15)))
-            .onFalse(mIntakeSS.setPivotRotCmd(Rotation2d.fromRotations(0.294)));
+        // mDriverController.rightBumper()
+        //     .onTrue(mIntakeSS.setPivotRotCmd(Rotation2d.fromRotations(0.15)))
+        //     .onFalse(mIntakeSS.setPivotRotCmd(Rotation2d.fromRotations(0.294)));
 
-        mDriverController.povUp()
-            .onTrue(mShooter.setHoodRot(Rotation2d.fromDegrees(20)));
+        // mDriverController.povUp()
+        //     .onTrue(mShooter.setHoodRot(Rotation2d.fromDegrees(20)));
 
-        mDriverController.povRight()
-            .onTrue(mShooter.setHoodRot(Rotation2d.fromDegrees(10.014)));
+        // mDriverController.povRight()
+        //     .onTrue(mShooter.setHoodRot(Rotation2d.fromDegrees(10.014)));
 
-        mDriverController.povDown()
-            .onTrue(mShooter.setHoodRot(Rotation2d.kZero));
+        // mDriverController.povDown()
+        //     .onTrue(mShooter.setHoodRot(Rotation2d.kZero));
 
         // mDriverController.rightTrigger()
         //     .onTrue(mShooter.setFuelPumpsVoltsCmd(9))
         //     .onFalse(mShooter.setFuelPumpsVoltsCmd(0.0));
 
-        mDriverController.leftBumper()
-            .onTrue(mShooter.setFlywheelsRPSCmd(90))
-            .onFalse(mShooter.setFlywheelsRPSCmd(0));
+        // mDriverController.leftBumper()
+        //     .onTrue(mShooter.setFlywheelsRPSCmd(90))
+        //     .onFalse(mShooter.setFlywheelsRPSCmd(0));
 
         // mDriverController.leftBumper()
         //     .onTrue(mShooter.setFlywheelsVoltsCmd(12))

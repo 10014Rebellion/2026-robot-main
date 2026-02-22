@@ -40,6 +40,10 @@ public class Intake {
     return new InstantCommand(() -> mIntakeRollerSS.stopMotor(), mIntakeRollerSS);
   }
 
+  public Command setPivotVolts(double pVolts) {
+    return new InstantCommand(() -> mIntakePivotSS.setPivotVolts(pVolts));
+  }
+
   public Command setPivotRotCmd(Rotation2d pRotSP) {
     return new InstantCommand(() -> mIntakePivotSS.setPivotRot(pRotSP));
   }
