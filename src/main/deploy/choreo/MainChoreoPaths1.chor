@@ -92,8 +92,8 @@
  "generationFeatures":[],
  "codegen":{
   "root":"..\\C:\\Repos\\2026-robot-main\\src\\main\\java\\frc\\robot",
-  "genVars":true,
-  "genTrajData":true,
-  "useChoreoLib":true
+  "genVars":false,
+  "genTrajData":false,
+  "useChoreoLib":false
  }
 }
