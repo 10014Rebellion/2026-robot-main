@@ -91,6 +91,11 @@ public class ClimbIOKrakenx44 implements ClimbIO {
     }
 
     @Override
+    public void enforceSoftLimits(){
+        
+    }
+
+    @Override
     public void setMotorVolts(double pVolts) {
         mClimbMotor.setControl(mClimbVoltageControl.withOutput(pVolts));
     }

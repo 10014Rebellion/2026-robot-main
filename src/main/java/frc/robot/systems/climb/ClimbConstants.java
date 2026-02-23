@@ -15,28 +15,28 @@ import frc.lib.simulation.SimulationRecords.SimulatedElevator;
 public class ClimbConstants {
     
     public static final BasicMotorHardware kClimbMotorConstants = new BasicMotorHardware(
-        42, // Motor ID // TODO: TUNE ME!
+        0, // Motor ID // TODO: TUNE ME!
         Constants.kSubsystemsCANBus, 
-        1, // Rotor to Mechanism Ratio // TODO: TUNE ME!
+        1 / 5.0, // Rotor to Mechanism Ratio // TODO: TUNE ME!
         InvertedValue.CounterClockwise_Positive,
-        NeutralModeValue.Brake,
+        NeutralModeValue.Coast,
         new CurrentLimits(30, 40)
+    );
+    
+    public static final PositionSoftLimits kSoftLimits = new PositionSoftLimits(
+        0, 
+        .5
     );
 
     public static final SimulatedElevator kSimElevator = new SimulatedElevator(
         DCMotor.getKrakenX60(1), 
-        20, 
-        5, 
-        0, 
-        20, 
+        9, 
+        1, 
+        kSoftLimits.backwardLimitM(), 
+        kSoftLimits.forwardLimitM(), 
         true, 
         0.0, 
-        0.002
-    );
-
-    public static final PositionSoftLimits kSoftLimits = new PositionSoftLimits(
-        1.0, 
-        0
+        0.001
     );
 
     public static final ElevatorController kController = new ElevatorController(

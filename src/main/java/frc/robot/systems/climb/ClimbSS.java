@@ -72,13 +72,16 @@ public class ClimbSS extends SubsystemBase {
 
     if (mCurrentGoal != null) {
       mCurrentClimbGoalPositionMeters = mCurrentGoal.getGoalMeters();
-
+      
+      mClimbIO.enforceSoftLimits();
       setPosition(mCurrentClimbGoalPositionMeters);
     }
   }
   
   public void setPosition(double pMeters){
-    mClimbIO.setMotorVolts(mController.calculate(pMeters) * 12 + mFeedforward.calculate(mClimbInputs.iClimbVelocityMPS));
+    mClimbIO.setMotorVolts(
+      12 * mController.calculate(pMeters) + 
+      mFeedforward.calculate(mClimbInputs.iClimbVelocityMPS));
   }
   
   public void setGoal(ClimbGoal pGoal){
