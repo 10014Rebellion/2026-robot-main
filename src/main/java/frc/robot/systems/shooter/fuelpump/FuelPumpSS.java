@@ -3,6 +3,7 @@ package frc.robot.systems.shooter.fuelpump;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.systems.shooter.ShooterConstants;
@@ -26,7 +27,7 @@ public class FuelPumpSS extends SubsystemBase {
   
   private SimpleMotorFeedforward mFuelPumpFeedForward = FuelPumpConstants.kFuelPumpControlConfig.feedforward();
 
-  private double mCurrentRPSGoal = 0.0;
+  private Rotation2d mCurrentRPSGoal = Rotation2d.kZero;
   
   public FuelPumpSS(FuelPumpIO pLeaderFuelPumpIO, FuelPumpIO pFollowerFuelPumpIO) {
     this.mLeaderFuelPumpIO = pLeaderFuelPumpIO;
@@ -38,9 +39,9 @@ public class FuelPumpSS extends SubsystemBase {
   }
 
   public void setFuelPumpRPS(double pDesiredRPS) {
-    mCurrentRPSGoal = pDesiredRPS;
-    double calculatedFF = mFuelPumpFeedForward.calculateWithVelocities(getAvgFuelPumpRPS(), mCurrentRPSGoal);
-    mLeaderFuelPumpIO.setMotorVelocity(mCurrentRPSGoal, calculatedFF);
+    mCurrentRPSGoal = Rotation2d.fromRotations(pDesiredRPS);
+    double calculatedFF = mFuelPumpFeedForward.calculateWithVelocities(getAvgFuelPumpRPS(), pDesiredRPS);
+    mLeaderFuelPumpIO.setMotorVelocity(pDesiredRPS, calculatedFF);
     mFollowerFuelPumpIO.enforceFollower();
   }
 
@@ -67,7 +68,12 @@ public class FuelPumpSS extends SubsystemBase {
 
   @AutoLogOutput(key = "Shooter/FuelPump/Feedback/ErrorRotationsPerSec")
   public double getErrorRotationsPerSec() {
-    return mCurrentRPSGoal - getAvgFuelPumpRPS();
+    return mCurrentRPSGoal.getRotations() - getAvgFuelPumpRPS();
+  }
+
+  @AutoLogOutput(key = "Shooter/FuelPump/Feedback/CurrentGoal")
+  public Rotation2d getCurrentGoal() {
+    return mCurrentRPSGoal;
   }
 
   @AutoLogOutput(key = "Shooter/FuelPump/Feedback/AtGoal")

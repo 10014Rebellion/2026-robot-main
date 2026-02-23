@@ -38,12 +38,11 @@ public class IntakePivotSS extends SubsystemBase {
   public static final LoggedTunableNumber tCustomAmps = new LoggedTunableNumber("Intake/Pivot/Custom/Amps", 0.0);
   public static final LoggedTunableNumber tPivotPositionTolerance = new LoggedTunableNumber("Intake/Pivot/Control/Tolerance", IntakeConstants.PivotConstants.kPivotMotorToleranceRotations);
 
-  private Rotation2d mCurrentSetpoint;
+  private Rotation2d mCurrentRotationalGoal = Rotation2d.kZero;
   
   public IntakePivotSS(IntakePivotIO pIntakePivotIO) {
     this.mIntakePivotIO = pIntakePivotIO;
     this.mPivotFF = kPivotController.feedforward();
-    this.mCurrentSetpoint = Rotation2d.kZero;
   }
 
   public void setPivotRot() {
@@ -51,7 +50,7 @@ public class IntakePivotSS extends SubsystemBase {
   }
 
   public void setPivotRot(Rotation2d pRot) {
-    mCurrentSetpoint = pRot;
+    mCurrentRotationalGoal = pRot;
     double ffOutput = mPivotFF.calculate(
       mIntakePivotInputs.iIntakePivotRotation.getRadians(), 
       mIntakePivotInputs.iIntakeClosedLoopReferenceSlope.getRadians()
@@ -93,13 +92,19 @@ public class IntakePivotSS extends SubsystemBase {
 
   @AutoLogOutput(key = "Intake/Feedback/ErrorRotations")
   public double getErrorRotations() {
-    return mCurrentSetpoint.getRotations() - getIntakePivotRotations().getRotations();
+    return mCurrentRotationalGoal.getRotations() - getIntakePivotRotations().getRotations();
   }
-
+  
+  @AutoLogOutput(key = "Intake/Feedback/CurrentGoal")
+  public double getCurrentGoal() {
+    return mCurrentRotationalGoal.getRotations();
+  }
+  
   @AutoLogOutput(key = "Intake/Feedback/AtGoal")
   public boolean atGoal() {
     return Math.abs(getErrorRotations()) < tPivotPositionTolerance.get();
   }
+
 
   @Override
   public void periodic() {

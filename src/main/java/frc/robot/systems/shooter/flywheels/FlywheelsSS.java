@@ -34,13 +34,12 @@ public class FlywheelsSS extends SubsystemBase {
 
   private final LoggedTunableNumber tFlywheelTolerance = new LoggedTunableNumber("Flywheel/Control/Tolerance", ShooterConstants.FlywheelConstants.kToleranceRPS);
 
-  private double mCurrentRPSGoal;
+  private Rotation2d mCurrentRPSGoal = Rotation2d.kZero;
 
   public FlywheelsSS(FlywheelIO pLeaderFlywheelIO, FlywheelIO pFollowerFlywheelIO, EncoderIO pFlywheelEncoder) {
     this.mLeaderFlywheelIO = pLeaderFlywheelIO;
     this.mFollowerFlywheelIO = pFollowerFlywheelIO;
     this.mFlywheelEncoder = pFlywheelEncoder;
-    this.mCurrentRPSGoal = 0.0;
   }
 
   public void setFlywheelVolts(double pVolts) {
@@ -49,7 +48,7 @@ public class FlywheelsSS extends SubsystemBase {
   }
 
   public void setFlywheelSpeeds(Rotation2d pRotPerS) {
-    mCurrentRPSGoal = pRotPerS.getRotations();
+    mCurrentRPSGoal = pRotPerS;
     mLeaderFlywheelIO.setMotorVelAndAccel(pRotPerS.getRotations(), 0, kFlywheelControlConfig.feedforward().calculate(pRotPerS.getRotations()));
     mFollowerFlywheelIO.enforceFollower();
   }
@@ -85,7 +84,12 @@ public class FlywheelsSS extends SubsystemBase {
 
   @AutoLogOutput(key = "Shooter/Flywheel/Feedback/ErrorRotationsPerSec")
   public double getErrorRotationsPerSec() {
-    return mCurrentRPSGoal - getFlywheelRPS();
+    return mCurrentRPSGoal.getRotations() - getFlywheelRPS();
+  }
+
+  @AutoLogOutput(key = "Shooter/Flywheel/Feedback/CurrentGoal")
+  public Rotation2d getCurrentGoal() {
+    return mCurrentRPSGoal;
   }
 
   @AutoLogOutput(key = "Shooter/Flywheel/Feedback/AtGoal")

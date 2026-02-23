@@ -25,7 +25,7 @@ public class HoodSS extends SubsystemBase{
   private final LoggedTunableNumber tHoodMaxJerk = new LoggedTunableNumber("Hood/Control/MaxJerk", HoodConstants.kHoodControlConfig.motionMagicConstants().maxJerk());
   private final LoggedTunableNumber tHoodTolerance = new LoggedTunableNumber("Hood/Control/Tolerance", HoodConstants.kToleranceRotations);
 
-  private Rotation2d mCurrentPositionGoal = Rotation2d.fromRotations(0.0);
+  private Rotation2d mCurrentRotationalGoal = Rotation2d.fromRotations(0.0);
 
   public HoodSS(HoodIO pHoodIO) {
     this.mHoodIO = pHoodIO;
@@ -37,12 +37,13 @@ public class HoodSS extends SubsystemBase{
   }
 
   public void holdHood() {
+    mCurrentRotationalGoal = mHoodInputs.iHoodAngle;
     mHoodIO.setMotorPosition(mHoodInputs.iHoodAngle, mHoodInputs.iHoodVelocityRPS);
   }
 
   public void setHoodRot(Rotation2d pRotSP) {
-    mCurrentPositionGoal = pRotSP;
-    mHoodIO.setMotorPosition(mCurrentPositionGoal, mHoodFF.calculate(mCurrentPositionGoal.getRadians(), mHoodInputs.iHoodVelocityRPS));
+    mCurrentRotationalGoal = pRotSP;
+    mHoodIO.setMotorPosition(mCurrentRotationalGoal, mHoodFF.calculate(mCurrentRotationalGoal.getRadians(), mHoodInputs.iHoodVelocityRPS));
   }
 
   public void stopHoodMotor() {
@@ -62,7 +63,12 @@ public class HoodSS extends SubsystemBase{
 
   @AutoLogOutput(key = "Shooter/Hood/Feedback/ErrorRotation")
   public double getErrorRotationsPerSec() {
-    return mCurrentPositionGoal.getRotations() - getPosition().getRotations();
+    return mCurrentRotationalGoal.getRotations() - getPosition().getRotations();
+  }
+
+  @AutoLogOutput(key = "Shooter/Hood/Feedback/CurrentGoal")
+  public Rotation2d getCurrentGoal() {
+    return mCurrentRotationalGoal;
   }
 
   @AutoLogOutput(key = "Shooter/Hood/Feedback/AtGoal")
