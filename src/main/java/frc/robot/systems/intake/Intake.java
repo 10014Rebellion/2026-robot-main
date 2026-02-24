@@ -54,9 +54,9 @@ public class Intake {
     return Commands.run(() -> mIntakePivotSS.setPivotRotManually(pRotSP), mIntakePivotSS);
   }
 
-  public Command holdPivotCmd(){
-    return new InstantCommand(() -> mIntakePivotSS.holdPivot());
-  }
+  // public Command holdPivotCmd(){
+  //   return new InstantCommand(() -> mIntakePivotSS.holdPivot());
+  // }
 
   public Command setPivotRotCmd() {
     return Commands.run(() -> mIntakePivotSS.setPivotRotManually(), mIntakePivotSS);

@@ -2,7 +2,7 @@ package frc.robot.systems.shooter;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.systems.shooter.flywheels.FlywheelsSS;
 import frc.robot.systems.shooter.fuelpump.FuelPumpSS;
 import frc.robot.systems.shooter.hood.HoodSS;
@@ -17,34 +17,34 @@ public class Shooter {
   }
 
   public Command setFlywheelsRPSCmd(Rotation2d pRPS) {
-    return new InstantCommand(() -> mFlywheelSS.setFlywheelSpeeds(pRPS), mFlywheelSS);
+    return Commands.run(() -> mFlywheelSS.setFlywheelSpeeds(pRPS), mFlywheelSS);
   }
 
   public Command setFlywheelsRPSCmd() {
-    return new InstantCommand(() -> mFlywheelSS.setFlywheelSpeeds(), mFlywheelSS);
+    return Commands.run(() -> mFlywheelSS.setFlywheelSpeeds(), mFlywheelSS);
   }
 
   public Command setFlywheelsVoltsCmd(double pVolts) {
-    return new InstantCommand(() -> mFlywheelSS.setFlywheelVolts(pVolts), mFlywheelSS);
+    return Commands.run(() -> mFlywheelSS.setFlywheelVolts(pVolts), mFlywheelSS);
   }
 
   public Command setFuelPumpsVoltsCmd(double pVolts) {
-    return new InstantCommand(() -> mFuelPumpsSS.setFuelPumpVolts(pVolts));
+    return Commands.run(() -> mFuelPumpsSS.setFuelPumpVolts(pVolts), mFuelPumpsSS);
   }
 
   public Command setFuelPumpRPSCmd(double pRPS) {
-    return new InstantCommand(() -> mFuelPumpsSS.setFuelPumpRPS(pRPS));
+    return Commands.run(() -> mFuelPumpsSS.setFuelPumpRPS(pRPS), mFuelPumpsSS);
   }
 
   public Command setHoodRot(Rotation2d pRot) {
-    return new InstantCommand(() -> mHoodSS.setHoodRot(pRot));
+    return Commands.run(() -> mHoodSS.setHoodRot(pRot), mHoodSS);
   }
 
   public Command holdHoodCmd() {
-    return new InstantCommand(() -> mHoodSS.holdHood());
+    return Commands.run(() -> mHoodSS.holdHood(), mHoodSS);
   }
 
   public Command setHoodVoltsCmd(double pVolts) {
-    return new InstantCommand(() -> mHoodSS.setHoodVolts(pVolts));
+    return Commands.run(() -> mHoodSS.setHoodVolts(pVolts), mHoodSS);
   }
 }
