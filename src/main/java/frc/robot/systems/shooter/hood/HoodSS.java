@@ -62,7 +62,7 @@ public class HoodSS extends SubsystemBase{
   }
 
   @AutoLogOutput(key = "Shooter/Hood/Feedback/ErrorRotation")
-  public double getErrorRotationsPerSec() {
+  public double getErrorPositionRotations() {
     return mCurrentRotationalGoal.getRotations() - getPosition().getRotations();
   }
 
@@ -73,7 +73,7 @@ public class HoodSS extends SubsystemBase{
 
   @AutoLogOutput(key = "Shooter/Hood/Feedback/AtGoal")
   public boolean atGoal() {
-    return Math.abs(getErrorRotationsPerSec()) < tHoodTolerance.get();
+    return Math.abs(getErrorPositionRotations()) < tHoodTolerance.get();
   }
   
   @Override

@@ -69,7 +69,7 @@ public class IntakePivotSS extends SubsystemBase {
     this.mPivotFF = kPivotController.feedforward();
   }
 
-    @Override
+  @Override
   public void periodic() {
     mIntakePivotIO.updateInputs(mIntakePivotInputs);
 
