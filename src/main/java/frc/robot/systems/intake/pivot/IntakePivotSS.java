@@ -15,7 +15,29 @@ import frc.robot.systems.intake.IntakeConstants;
 
 import static frc.robot.systems.intake.IntakeConstants.PivotConstants.kPivotController;
 
+import java.util.function.Supplier;
+
 public class IntakePivotSS extends SubsystemBase {
+  public static final LoggedTunableNumber tPivotCustomSetpointRot = 
+    new LoggedTunableNumber("Intake/Pivot/Control/CustomSetpointRot", 0);
+
+  public static enum IntakePivotState {
+    INTAKE(() -> Rotation2d.fromRotations(-0.05)),
+    IDLE(() -> Rotation2d.kCCW_Pi_2),
+    TUNING(() -> Rotation2d.fromRotations(tPivotCustomSetpointRot.get()));
+
+    private Supplier<Rotation2d> mRotSupplier;
+
+    private IntakePivotState(Supplier<Rotation2d> pRotSupplier) {
+      mRotSupplier = pRotSupplier;
+    }
+
+    public Rotation2d getDesiredRotation() {
+      return mRotSupplier.get();
+    } 
+  }
+
+
   private final IntakePivotIO mIntakePivotIO;
   private final IntakePivotInputsAutoLogged mIntakePivotInputs = new IntakePivotInputsAutoLogged();
 
@@ -23,8 +45,6 @@ public class IntakePivotSS extends SubsystemBase {
 
   private final LoggedTunableNumber tPivotKP = new LoggedTunableNumber("Intake/Pivot/Control/kP", kPivotController.pdController().kP());
   private final LoggedTunableNumber tPivotKD = new LoggedTunableNumber("Intake/Pivot/Control/kD", kPivotController.pdController().kD());
-  private final LoggedTunableNumber tPivotCustomSetpointRot = new LoggedTunableNumber("Intake/Pivot/Control/CustomSetpointRot", 0);
-
 
   private final LoggedTunableNumber tPivotKS = new LoggedTunableNumber("Intake/Pivot/Control/kS", kPivotController.feedforward().getKs());
   private final LoggedTunableNumber tPivotKG = new LoggedTunableNumber("Intake/Pivot/Control/kG", kPivotController.feedforward().getKg());
@@ -38,15 +58,52 @@ public class IntakePivotSS extends SubsystemBase {
   public static final LoggedTunableNumber tCustomAmps = new LoggedTunableNumber("Intake/Pivot/Custom/Amps", 0.0);
   public static final LoggedTunableNumber tPivotPositionTolerance = new LoggedTunableNumber("Intake/Pivot/Control/Tolerance", IntakeConstants.PivotConstants.kPivotMotorToleranceRotations);
 
+  private IntakePivotState mIntakePivotState = IntakePivotState.IDLE;
   private Rotation2d mCurrentRotationalGoal = Rotation2d.kZero;
+  private Double mAppliedVolts = null;
+  private Double mAppliedAmps = null;
+
   
   public IntakePivotSS(IntakePivotIO pIntakePivotIO) {
     this.mIntakePivotIO = pIntakePivotIO;
     this.mPivotFF = kPivotController.feedforward();
   }
 
-  public void setPivotRot() {
-    setPivotRot(Rotation2d.fromRotations(tPivotCustomSetpointRot.getAsDouble()));
+    @Override
+  public void periodic() {
+    mIntakePivotIO.updateInputs(mIntakePivotInputs);
+
+    refreshTuneables();
+    enforceSoftLimits();
+
+    Logger.processInputs("Intake/Pivot", mIntakePivotInputs);
+
+    if(mIntakePivotState != null) {
+      mCurrentRotationalGoal = mIntakePivotState.getDesiredRotation();
+      setPivotRot(mCurrentRotationalGoal);
+    }
+  }
+
+  public void enforceSoftLimits() {
+    boolean positive;
+    if(mAppliedVolts != null) {
+      positive = mAppliedVolts > 0;
+    } else if(mAppliedAmps != null) {
+      positive = mAppliedAmps > 0;
+    } else {
+      positive = getErrorRotations().getRotations() > 0;
+    }
+
+    if((getIntakePivotRotations().getRotations() > IntakeConstants.PivotConstants.kPivotLimits.forwardLimit().getRotations() && positive) || 
+       (getIntakePivotRotations().getRotations() < IntakeConstants.PivotConstants.kPivotLimits.backwardLimit().getRotations() && !positive)) {
+      mIntakePivotIO.stopMotor();
+    }
+  }
+
+  public void setPivotState(IntakePivotState pIntakePivotState) {
+    mAppliedAmps = null;
+    mAppliedVolts = null;
+    mIntakePivotState = pIntakePivotState;
   }
 
   public void setPivotRot(Rotation2d pRot) {
@@ -67,57 +124,43 @@ public class IntakePivotSS extends SubsystemBase {
     );
   }
 
-  public void holdPivot(){
-    setPivotRot(mIntakePivotInputs.iEncoderPosition);
+  public void setPivotRotManually(Rotation2d pRot) {
+    mAppliedAmps = null;
+    mAppliedVolts = null;
+    mIntakePivotState = null;
+    setPivotRot(pRot);
+  }
+
+  public void setPivotRotManually() {
+    setPivotRotManually(Rotation2d.fromRotations(tPivotCustomSetpointRot.getAsDouble()));
   }
 
   public void setPivotVolts(double pVolts) {
+    mCurrentRotationalGoal = null;
+    mIntakePivotState = null;
+    mAppliedAmps = null;
+    mAppliedVolts = pVolts;
     mIntakePivotIO.setMotorVolts(pVolts);
   }
 
+  public void setPivotAmps(double pAmps) {
+    mCurrentRotationalGoal = null;
+    mIntakePivotState = null;
+    mAppliedVolts = null;
+    mAppliedAmps = pAmps;
+    mIntakePivotIO.setMotorVolts(pAmps);
+  }
+
   public void setCustomPivotAmps() {
-    mIntakePivotIO.setMotorAmps(tCustomAmps.get());
+    setPivotAmps(tCustomAmps.get());;
   }
 
   public void stopPivotMotor() {
+    mCurrentRotationalGoal = null;
+    mIntakePivotState = null;
+    mAppliedAmps = null;
+    mAppliedVolts = 0.0;
     mIntakePivotIO.stopMotor();
-  }
-
-  public Rotation2d getIntakePivotRotations(){
-    return mIntakePivotInputs.iIntakePivotRotation;
-  }
-
-  private void setFF(double kS, double kG, double kV, double kA) {
-    mPivotFF.setKs(kS);
-    mPivotFF.setKg(kG);
-    mPivotFF.setKv(kV);
-    mPivotFF.setKa(kA);
-  }
-
-  @AutoLogOutput(key = "Intake/Feedback/ErrorRotations")
-  public double getErrorRotations() {
-    return mCurrentRotationalGoal.getRotations() - getIntakePivotRotations().getRotations();
-  }
-  
-  @AutoLogOutput(key = "Intake/Feedback/CurrentGoal")
-  public double getCurrentGoal() {
-    return mCurrentRotationalGoal.getRotations();
-  }
-  
-  @AutoLogOutput(key = "Intake/Feedback/AtGoal")
-  public boolean atGoal() {
-    return Math.abs(getErrorRotations()) < tPivotPositionTolerance.get();
-  }
-
-
-  @Override
-  public void periodic() {
-    mIntakePivotIO.updateInputs(mIntakePivotInputs);
-
-    refreshTuneables();
-    mIntakePivotIO.enforceSoftLimits();
-
-    Logger.processInputs("Intake/Pivot", mIntakePivotInputs);
   }
 
   private void refreshTuneables() {
@@ -135,5 +178,31 @@ public class IntakePivotSS extends SubsystemBase {
       () -> mIntakePivotIO.setMotionMagicConstants(tPivotCruiseVel.get(), tPivotMaxAccel.get(), tPivotMaxJerk.get()), 
       tPivotCruiseVel, tPivotMaxAccel, tPivotMaxJerk
     );
+  }
+
+  private void setFF(double kS, double kG, double kV, double kA) {
+    mPivotFF.setKs(kS);
+    mPivotFF.setKg(kG);
+    mPivotFF.setKv(kV);
+    mPivotFF.setKa(kA);
+  }
+
+  public Rotation2d getIntakePivotRotations(){
+    return mIntakePivotInputs.iIntakePivotRotation;
+  }
+
+  @AutoLogOutput(key = "Intake/Feedback/ErrorRotations")
+  public Rotation2d getErrorRotations() {
+    return Rotation2d.fromRotations(mCurrentRotationalGoal.getRotations() - getIntakePivotRotations().getRotations());
+  }
+  
+  @AutoLogOutput(key = "Intake/Feedback/CurrentGoal")
+  public double getCurrentGoal() {
+    return mCurrentRotationalGoal.getRotations();
+  }
+  
+  @AutoLogOutput(key = "Intake/Feedback/AtGoal")
+  public boolean atGoal() {
+    return Math.abs(getErrorRotations().getRotations()) < tPivotPositionTolerance.get();
   }
 }

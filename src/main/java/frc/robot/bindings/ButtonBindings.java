@@ -6,9 +6,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.controllers.FlydigiApex4;
 import frc.robot.systems.conveyor.ConveyorSS;
+import frc.robot.systems.conveyor.ConveyorSS.ConveyorState;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.intake.Intake;
 import frc.robot.systems.intake.IntakeConstants;
+import frc.robot.systems.intake.pivot.IntakePivotSS.IntakePivotState;
+import frc.robot.systems.intake.roller.IntakeRollerSS.IntakeRollerState;
 import frc.robot.systems.shooter.Shooter;
 
 public class ButtonBindings {
@@ -49,16 +52,19 @@ public class ButtonBindings {
             .onTrue(mShooter.setFlywheelsRPSCmd(Rotation2d.fromRotations(20)).andThen(mShooter.setFuelPumpsVoltsCmd(0)));
 
         mDriverController.rightTrigger()
-            .onTrue(mIntakeSS.setPivotRotCmd(IntakeConstants.PivotConstants.kPivotLimits.forwardLimit()))
-            .onFalse(mIntakeSS.holdPivotCmd());
+            .onTrue(mIntakeSS.setPivotState(IntakePivotState.INTAKE));
+            // .onFalse(mIntakeSS.setPivotState(IntakePivotState.IDLE));
 
-        mDriverController.rightTrigger()
-            .onTrue(mIntakeSS.setPivotRotCmd(IntakeConstants.PivotConstants.kPivotLimits.backwardLimit()))
-            .onFalse(mIntakeSS.holdPivotCmd());
+        mDriverController.rightBumper()
+            .onTrue(mIntakeSS.setPivotState(IntakePivotState.IDLE))
+            .onFalse(mIntakeSS.setPivotState(IntakePivotState.INTAKE));
+
 
         mDriverController.y()
-            .onTrue(mIntakeSS.setRollerVoltsCmd(10).andThen(mConveyorSS.setConveyorVoltsCmd(10)))
-            .onTrue(mIntakeSS.setRollerVoltsCmd(0).andThen(mConveyorSS.setConveyorVoltsCmd(0)));
+            .onTrue(mIntakeSS.setRollerState(IntakeRollerState.INTAKE))
+            .onTrue(mConveyorSS.setConveyorState(ConveyorState.INTAKE))
+            .onTrue(mIntakeSS.setRollerState(IntakeRollerState.IDLE))
+            .onTrue(mConveyorSS.setConveyorState(ConveyorState.IDLE));
 
         mDriverController.a()
             .onTrue(mShooter.setHoodRot(Rotation2d.fromDegrees(20)))

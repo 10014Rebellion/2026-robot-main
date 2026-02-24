@@ -9,7 +9,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.systems.intake.pivot.IntakePivotSS;
+import frc.robot.systems.intake.pivot.IntakePivotSS.IntakePivotState;
 import frc.robot.systems.intake.roller.IntakeRollerSS;
+import frc.robot.systems.intake.roller.IntakeRollerSS.IntakeRollerState;
 
 public class Intake {
   private final IntakePivotSS mIntakePivotSS;
@@ -20,8 +22,16 @@ public class Intake {
     this.mIntakeRollerSS = pIntakeRollerSS;
   }
 
-  public Command setRollerVoltsCmd(double pVolts) {
-    return new InstantCommand(() -> mIntakeRollerSS.setVolts(pVolts), mIntakeRollerSS);
+  public Command setRollerState(IntakeRollerState rollerState) {
+    return mIntakeRollerSS.setIntakeRollerState(rollerState);
+  }
+
+  public Command setRollerVoltsManualCmd(double pVolts) {
+    return mIntakeRollerSS.setIntakeVoltsManualCmd(pVolts);
+  }
+  
+  public Command stopRollerMotorManualCmd() {
+    return mIntakeRollerSS.stopIntakeVoltsManualCmd();
   }
 
   public Command stopPivotMotorCmd() {
@@ -32,16 +42,16 @@ public class Intake {
     return new InstantCommand(() -> mIntakePivotSS.setCustomPivotAmps(), mIntakePivotSS);
   }
 
-  public Command stopRollerMotorCmd() {
-    return new InstantCommand(() -> mIntakeRollerSS.stopMotor(), mIntakeRollerSS);
+  public Command setPivotState(IntakePivotState intakePivotState) {
+    return Commands.run(() -> mIntakePivotSS.setPivotState(intakePivotState), mIntakePivotSS);
   }
 
   public Command setPivotVolts(double pVolts) {
-    return new InstantCommand(() -> mIntakePivotSS.setPivotVolts(pVolts));
+    return Commands.run(() -> mIntakePivotSS.setPivotVolts(pVolts), mIntakePivotSS);
   }
 
-  public Command setPivotRotCmd(Rotation2d pRotSP) {
-    return Commands.run(() -> mIntakePivotSS.setPivotRot(pRotSP));
+  public Command setPivotRotManualCmd(Rotation2d pRotSP) {
+    return Commands.run(() -> mIntakePivotSS.setPivotRotManually(pRotSP), mIntakePivotSS);
   }
 
   public Command holdPivotCmd(){
@@ -49,6 +59,6 @@ public class Intake {
   }
 
   public Command setPivotRotCmd() {
-    return Commands.run(() -> mIntakePivotSS.setPivotRot());
+    return Commands.run(() -> mIntakePivotSS.setPivotRotManually(), mIntakePivotSS);
   }
 }
