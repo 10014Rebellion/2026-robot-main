@@ -10,7 +10,6 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.tuning.LoggedTunableNumber;
 
@@ -55,11 +54,14 @@ public class ConveyorSS extends SubsystemBase {
     }, this);
   }
 
-  public Command stopConveyorMotorCmd() {
-    return new InstantCommand(() -> mConveyorIO.stopMotor());
+  public Command stopConveyorMotorManuallyCmd() {
+    return Commands.run(() -> {
+      mConveyorState = null;
+      stopConveyorMotor();
+    }, this);
   }
 
-  public void stopConveyorMotor() {
+  private void stopConveyorMotor() {
     mConveyorIO.stopMotor();
   }
 

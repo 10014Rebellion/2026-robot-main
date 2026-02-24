@@ -6,8 +6,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.controllers.FlydigiApex4;
 import frc.robot.systems.conveyor.ConveyorSS;
+import frc.robot.systems.conveyor.ConveyorSS.ConveyorState;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.intake.Intake;
+import frc.robot.systems.intake.roller.IntakeRollerSS.IntakeRollerState;
 import frc.robot.systems.shooter.Shooter;
 
 public class ButtonBindings {
@@ -45,10 +47,11 @@ public class ButtonBindings {
         mDriverController.b().onTrue(mIntakeSS.setPivotRotCmd()).onFalse(mIntakeSS.setPivotVolts(0));
 
         mDriverController.x().onTrue(mIntakeSS.setPivotTuneableAmps()).onFalse(mIntakeSS.setPivotVolts(0));
-        mDriverController.y().onTrue(
-            mIntakeSS.setRollerVoltsCmd(10)
-            .andThen(mConveyorSS.setConveyorVoltsCmd(10))
-        ).onFalse(mIntakeSS.setRollerVoltsCmd(0).andThen(mConveyorSS.setConveyorVoltsCmd(0)));
+        mDriverController.y()
+            .onTrue(mConveyorSS.setConveyorState(ConveyorState.TUNING))
+            .onTrue(mIntakeSS.setRollerState(IntakeRollerState.TUNING))
+            .onFalse(mConveyorSS.setConveyorState(ConveyorState.IDLE))
+            .onFalse(mIntakeSS.setRollerState(IntakeRollerState.IDLE));
 
 
         // mDriverController.povUp().onTrue(mShooter.setHoodRot(Rotation2d.fromRotations(10)));
