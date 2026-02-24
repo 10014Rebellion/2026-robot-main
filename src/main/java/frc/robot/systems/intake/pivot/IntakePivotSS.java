@@ -4,13 +4,14 @@
 
 package frc.robot.systems.intake.pivot;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.tuning.LoggedTunableNumber;
-
+import frc.robot.systems.intake.IntakeConstants;
 
 import static frc.robot.systems.intake.IntakeConstants.PivotConstants.kPivotController;
 
@@ -33,7 +34,11 @@ public class IntakePivotSS extends SubsystemBase {
   private final LoggedTunableNumber tPivotCruiseVel = new LoggedTunableNumber("Intake/Pivot/Control/CruiseVel", kPivotController.motionMagicConstants().maxVelocity());
   private final LoggedTunableNumber tPivotMaxAccel = new LoggedTunableNumber("Intake/Pivot/Control/MaxAcceleration", kPivotController.motionMagicConstants().maxAcceleration());
   private final LoggedTunableNumber tPivotMaxJerk = new LoggedTunableNumber("Intake/Pivot/Control/MaxJerk", kPivotController.motionMagicConstants().maxJerk());
+
   public static final LoggedTunableNumber tCustomAmps = new LoggedTunableNumber("Intake/Pivot/Custom/Amps", 0.0);
+  public static final LoggedTunableNumber tPivotPositionTolerance = new LoggedTunableNumber("Intake/Pivot/Control/Tolerance", IntakeConstants.PivotConstants.kPivotMotorToleranceRotations);
+
+  private Rotation2d mCurrentRotationalGoal = Rotation2d.kZero;
   
   public IntakePivotSS(IntakePivotIO pIntakePivotIO) {
     this.mIntakePivotIO = pIntakePivotIO;
@@ -45,6 +50,7 @@ public class IntakePivotSS extends SubsystemBase {
   }
 
   public void setPivotRot(Rotation2d pRot) {
+    mCurrentRotationalGoal = pRot;
     double ffOutput = mPivotFF.calculate(
       mIntakePivotInputs.iIntakePivotRotation.getRadians(), 
       mIntakePivotInputs.iIntakeClosedLoopReferenceSlope.getRadians()
@@ -52,8 +58,8 @@ public class IntakePivotSS extends SubsystemBase {
 
     double cos = mIntakePivotInputs.iIntakeClosedLoopReference.getCos();
 
-    Logger.recordOutput("IntakePivot/ffOutput", ffOutput);
-    Logger.recordOutput("IntakePivot/cos", cos);
+    Logger.recordOutput("Intake/Pivot/ffOutput", ffOutput);
+    Logger.recordOutput("Intake/Pivot/cos", cos);
 
     mIntakePivotIO.setMotorRot(
       pRot, 
@@ -73,12 +79,32 @@ public class IntakePivotSS extends SubsystemBase {
     mIntakePivotIO.stopMotor();
   }
 
+  public Rotation2d getIntakePivotRotations(){
+    return mIntakePivotInputs.iIntakePivotRotation;
+  }
+
   private void setFF(double kS, double kG, double kV, double kA) {
     mPivotFF.setKs(kS);
     mPivotFF.setKg(kG);
     mPivotFF.setKv(kV);
     mPivotFF.setKa(kA);
   }
+
+  @AutoLogOutput(key = "Intake/Feedback/ErrorRotations")
+  public double getErrorRotations() {
+    return mCurrentRotationalGoal.getRotations() - getIntakePivotRotations().getRotations();
+  }
+  
+  @AutoLogOutput(key = "Intake/Feedback/CurrentGoal")
+  public double getCurrentGoal() {
+    return mCurrentRotationalGoal.getRotations();
+  }
+  
+  @AutoLogOutput(key = "Intake/Feedback/AtGoal")
+  public boolean atGoal() {
+    return Math.abs(getErrorRotations()) < tPivotPositionTolerance.get();
+  }
+
 
   @Override
   public void periodic() {
@@ -87,7 +113,7 @@ public class IntakePivotSS extends SubsystemBase {
     refreshTuneables();
     mIntakePivotIO.enforceSoftLimits();
 
-    Logger.processInputs("Intake", mIntakePivotInputs);
+    Logger.processInputs("Intake/Pivot", mIntakePivotInputs);
   }
 
   private void refreshTuneables() {

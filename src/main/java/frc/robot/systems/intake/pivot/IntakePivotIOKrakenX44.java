@@ -1,9 +1,6 @@
 package frc.robot.systems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Radian;
-import static edu.wpi.first.units.Units.Rotation;
-
-import org.dyn4j.geometry.Rotation;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
