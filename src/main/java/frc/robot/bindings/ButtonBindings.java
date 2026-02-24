@@ -8,6 +8,7 @@ import frc.lib.controllers.FlydigiApex4;
 import frc.robot.systems.conveyor.ConveyorSS;
 import frc.robot.systems.drive.Drive;
 import frc.robot.systems.intake.Intake;
+import frc.robot.systems.intake.IntakeConstants;
 import frc.robot.systems.shooter.Shooter;
 
 public class ButtonBindings {
@@ -38,50 +39,33 @@ public class ButtonBindings {
 
         mDriverController.startButton().onTrue(Commands.runOnce(() -> mDriveSS.resetGyro()));
 
-        mDriverController.leftTrigger().onTrue(mShooter.setFlywheelsRPSCmd(Rotation2d.fromRotations(80))).onFalse(mShooter.setFlywheelsVoltsCmd(0));
-        mDriverController.rightTrigger().onTrue(mShooter.setFuelPumpsVoltsCmd(10)).onFalse(mShooter.setFuelPumpsVoltsCmd(0));
+        mDriverController.leftTrigger()
+            .onTrue(mShooter.setFlywheelsRPSCmd(Rotation2d.fromRotations(60)).andThen(mShooter.setFuelPumpsVoltsCmd(10.0)))
+            .onTrue(mShooter.setFlywheelsRPSCmd(Rotation2d.fromRotations(20)).andThen(mShooter.setFuelPumpsVoltsCmd(0)));
 
 
-        mDriverController.b().onTrue(mIntakeSS.setPivotRotCmd()).onFalse(mIntakeSS.setPivotVolts(0));
+        mDriverController.leftBumper()
+            .onTrue(mShooter.setFlywheelsRPSCmd(Rotation2d.fromRotations(80)).andThen(mShooter.setFuelPumpsVoltsCmd(10.0)))
+            .onTrue(mShooter.setFlywheelsRPSCmd(Rotation2d.fromRotations(20)).andThen(mShooter.setFuelPumpsVoltsCmd(0)));
 
-        mDriverController.x().onTrue(mIntakeSS.setPivotTuneableAmps()).onFalse(mIntakeSS.setPivotVolts(0));
-        mDriverController.y().onTrue(
-            mIntakeSS.setRollerVoltsCmd(10)
-            .andThen(mConveyorSS.setConveyorVoltsCmd(10))
-        ).onFalse(mIntakeSS.setRollerVoltsCmd(0).andThen(mConveyorSS.setConveyorVoltsCmd(0)));
+        mDriverController.rightTrigger()
+            .onTrue(mIntakeSS.setPivotRotCmd(IntakeConstants.PivotConstants.kPivotLimits.forwardLimit()))
+            .onFalse(mIntakeSS.holdPivotCmd());
 
+        mDriverController.rightTrigger()
+            .onTrue(mIntakeSS.setPivotRotCmd(IntakeConstants.PivotConstants.kPivotLimits.backwardLimit()))
+            .onFalse(mIntakeSS.holdPivotCmd());
 
-        // mDriverController.povUp().onTrue(mShooter.setHoodRot(Rotation2d.fromRotations(10)));
-        // mDriverController.povDown().onTrue(mShooter.setHoodRot(Rotation2d.fromRotations(5)));
+        mDriverController.y()
+            .onTrue(mIntakeSS.setRollerVoltsCmd(10).andThen(mConveyorSS.setConveyorVoltsCmd(10)))
+            .onTrue(mIntakeSS.setRollerVoltsCmd(0).andThen(mConveyorSS.setConveyorVoltsCmd(0)));
 
+        mDriverController.a()
+            .onTrue(mShooter.setHoodRot(Rotation2d.fromDegrees(20)))
+            .onFalse(mShooter.holdHoodCmd());
 
-
-
-
-        // mDriverController.a()
-        //     .onTrue(
-        //         Commands.runOnce(() -> mDriveSS.setPose(new Pose2d()), mDriveSS)
-        //             .andThen(mDriveSS.setToGenericAutoAlign(() -> new Pose2d(0.5, 0, Rotation2d.kCCW_Pi_2), ConstraintType.LINEAR)))
-        //     .onFalse(mDriveSS.setToTeleop());
-
-    //     mDriverController.a()
-    //         .onTrue(
-    //             mDriveSS.getDriveManager().setToGenericHeadingAlign(
-    //                 () -> GameGoalPoseChooser.turnFromHub(mDriveSS.getPoseEstimate()),
-    //                 () -> GameGoalPoseChooser.getHub()))
-    //         .onFalse(mDriveSS.getDriveManager().setToTeleop());
-            
-    //    mDriverController.b()
-    //         .onTrue(mDriveSS.getDriveManager().setToGenericLineAlign(
-    //             () -> new Pose2d(3.0, 3.0, Rotation2d.kZero),
-    //             () -> Rotation2d.fromDegrees(45),
-    //             () -> 1.0,
-    //             () -> false
-    //         ))
-    //         .onFalse(mDriveSS.getDriveManager().setToTeleop());
-
-    //     mDriverController.x()
-    //         .onTrue(DriveCharacterizationCommands.testAzimuthsVoltage(mDriveSS, 0, 1, 2, 3))
-    //         .onFalse(mDriveSS.getDriveManager().setToTeleop());
+        mDriverController.b()
+            .onTrue(mShooter.setHoodRot(Rotation2d.fromDegrees(10)))
+            .onFalse(mShooter.holdHoodCmd());
     }
 }

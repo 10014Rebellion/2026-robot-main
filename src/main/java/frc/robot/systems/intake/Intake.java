@@ -44,6 +44,10 @@ public class Intake {
     return Commands.run(() -> mIntakePivotSS.setPivotRot(pRotSP));
   }
 
+  public Command holdPivotCmd(){
+    return new InstantCommand(() -> mIntakePivotSS.holdPivot());
+  }
+
   public Command setPivotRotCmd() {
     return Commands.run(() -> mIntakePivotSS.setPivotRot());
   }

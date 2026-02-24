@@ -67,6 +67,10 @@ public class IntakePivotSS extends SubsystemBase {
     );
   }
 
+  public void holdPivot(){
+    setPivotRot(mIntakePivotInputs.iEncoderPosition);
+  }
+
   public void setPivotVolts(double pVolts) {
     mIntakePivotIO.setMotorVolts(pVolts);
   }
