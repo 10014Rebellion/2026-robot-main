@@ -55,8 +55,8 @@ public class ButtonBindings {
             .onFalse(mConveyorSS.setConveyorState(ConveyorState.IDLE));
 
         mDriverController.a()
-            .onTrue(mIntakeSS.setRollerState(IntakeRollerState.INTAKE))
-            .onFalse(mIntakeSS.setRollerState(IntakeRollerState.IDLE));
+            .onTrue(mIntakeSS.setRollerStateCmd(IntakeRollerState.INTAKE))
+            .onFalse(mIntakeSS.setRollerStateCmd(IntakeRollerState.IDLE));
 
         mDriverController.b()
             .onTrue(mShooter.setFuelPumpsVoltsCmd(10.0))
