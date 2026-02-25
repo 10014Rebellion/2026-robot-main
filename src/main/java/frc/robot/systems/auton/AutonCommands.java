@@ -20,16 +20,23 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoEvent;
 import frc.robot.commands.SequentialEndingCommandGroup;
 import frc.robot.systems.drive.Drive;
+import frc.robot.systems.intake.Intake;
+import frc.robot.systems.intake.pivot.IntakePivotSS.IntakePivotState;
+import frc.robot.systems.shooter.Shooter;
 import frc.lib.math.AllianceFlipUtil;
 
 public class AutonCommands extends SubsystemBase {
     private final Drive mRobotDrive;
+    private final Intake mIntake;
+    private final Shooter mShooter;
 
     private final SendableChooser<Supplier<Command>> mAutoChooser;
     private final LoggedDashboardChooser<Supplier<Command>> mAutoChooserLogged;
 
-    public AutonCommands(Drive pRobotDrive) {
+    public AutonCommands(Drive pRobotDrive, Intake pIntake, Shooter pShooter) {
         this.mRobotDrive = pRobotDrive;
+        this.mIntake = pIntake;
+        this.mShooter = pShooter;
 
         mAutoChooser = new SendableChooser<>();
 
@@ -163,7 +170,7 @@ public class AutonCommands extends SubsystemBase {
     }
 
     public Command deployIntakeCommand() {
-        return new InstantCommand();
+        return mIntake.setPivotStateCmd(IntakePivotState.INTAKE);
     }
 
     public Command bindexCommand() {

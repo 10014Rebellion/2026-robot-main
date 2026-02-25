@@ -28,6 +28,7 @@ public class IntakePivotSS extends SubsystemBase {
   public static enum IntakePivotState {
     INTAKE(() -> PivotConstants.kPivotLimits.backwardLimit()),
     STOWED(() -> PivotConstants.kPivotLimits.forwardLimit()),
+    COMPACT(() -> PivotConstants.kPivotLimits.backwardLimit().div(2)),
     TUNING(() -> Rotation2d.fromRotations(tPivotCustomSetpointRot.get()));
 
     private Supplier<Rotation2d> mRotSupplier;

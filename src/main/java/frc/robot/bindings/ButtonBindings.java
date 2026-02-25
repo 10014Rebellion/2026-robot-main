@@ -2,6 +2,8 @@ package frc.robot.bindings;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.controllers.FlydigiApex4;
@@ -68,7 +70,18 @@ public class ButtonBindings {
 
     }
 
+    public Command rumbleDriverController(){
+        return Commands.startEnd(
+            () -> mPilotController.setRumble(RumbleType.kBothRumble, 1.0), 
+            () -> mPilotController.setRumble(RumbleType.kBothRumble, 0.5));
+    }
+
     public void initPilotBindings() {
+
+        // Rumble the driver controller if the conveyer is jammed //
+        // new Trigger(mConveyorSS::isConveyerJammed)
+        // .onTrue(rumbleDriverController().withTimeout(0.8));
+
         mDriveSS.getDriveManager().acceptJoystickInputs(
                 () -> -mPilotController.getLeftY(),
                 () -> -mPilotController.getLeftX(),
@@ -90,13 +103,15 @@ public class ButtonBindings {
         mPilotController.rightBumper()
             .whileTrue(mIntakeSS.setPivotRotManualCmd());
 
+        mPilotController.leftTrigger()
+            .onTrue(mIntakeSS.setPivotStateCmd(IntakePivotState.COMPACT));
+
         mPilotController.leftBumper()
             .whileTrue(mIntakeSS.setPivotStateCmd(IntakePivotState.STOWED));
 
         mPilotController.leftTrigger()
             .whileTrue(mIntakeSS.setPivotStateCmd(IntakePivotState.INTAKE));
-        
-        
 
+        mPilotController.setRumble(null, 0);
     }
 }
