@@ -17,24 +17,47 @@
             "/TunableNumbers",
             "/TunableNumbers/Indexer",
             "/TunableNumbers/Indexer/Control",
-            "/TunableNumbers/Flywheel/Control",
             "/AdvantageKit/RealOutputs/Indexer",
             "/AdvantageKit/RealOutputs/Flywheel",
-            "/TunableNumbers/Intake",
-            "/TunableNumbers/Intake/Pivot",
             "/TunableNumbers/Intake/Pivot/Custom",
-            "/AdvantageKit/FuelPump",
             "/AdvantageKit/FuelPump/Leader",
             "/AdvantageKit/FuelPump/Follower",
-            "/AdvantageKit/Flywheel",
             "/AdvantageKit/Flywheel/Encoder",
             "/AdvantageKit/Flywheel/Follower",
             "/AdvantageKit/Flywheel/Leader",
-            "/AdvantageKit/RealOutputs/Drive",
-            "/AdvantageKit/RealOutputs/Drive/Odometry",
-            "/AdvantageKit/RealOutputs/Drive/HolonomicController",
-            "/AdvantageKit/RealOutputs/Drive/OdometryPP",
-            "/AdvantageKit/RealOutputs/Drive/Swerve"
+            "/AdvantageKit/RealOutputs/Drive/Swerve",
+            "/AdvantageKit/Flywheel/Encoder/IEncoderVelocityRPS",
+            "/TunableNumbers/Intake/Pivot/Control",
+            "/AdvantageKit/RealOutputs/IntakePivot",
+            "/AdvantageKit/RealOutputs/Intake/Pivot",
+            "/AdvantageKit/Intake/Pivot/IIntakeClosedLoopReferenceSlope",
+            "/AdvantageKit/Intake/Pivot/IIntakeClosedLoopReference",
+            "/AdvantageKit/RealOutputs/Shooter/Flywheel",
+            "/AdvantageKit/RealOutputs/Shooter/Flywheel/Feedback",
+            "/AdvantageKit/RealOutputs/Shooter/FuelPump",
+            "/AdvantageKit/RealOutputs/Shooter/FuelPump/Feedback",
+            "/AdvantageKit/RealOutputs/Shooter/FuelPump/Feedback/CurrentGoal",
+            "/AdvantageKit/RealOutputs/Conveyor",
+            "/AdvantageKit/Intake",
+            "/AdvantageKit/Intake/Pivot/IEncoderPosition",
+            "/TunableNumbers/Flywheel/Control",
+            "/TunableNumbers/Hood/Control",
+            "/AdvantageKit/RealOutputs/Shooter/Hood",
+            "/AdvantageKit/RealOutputs/Shooter/Hood/Feedback",
+            "/AdvantageKit/Intake/Pivot",
+            "/AdvantageKit/RealOutputs/Intake",
+            "/AdvantageKit/RealOutputs/Hood",
+            "/AdvantageKit/RealOutputs/Hood/EnumVal",
+            "/TunableNumbers/Intake",
+            "/TunableNumbers/Intake/Pivot",
+            "/AdvantageKit/RealOutputs/Intake/Feedback",
+            "/photonvision",
+            "/photonvision/coprocessors/C0-74-2B-F9-2A-38",
+            "/photonvision/coprocessors/C0-74-2B-F9-31-86",
+            "/photonvision/coprocessors/C0-74-2B-F9-35-A4",
+            "/photonvision/coprocessors/C0-74-2B-F9-31-86/cameraNames",
+            "/photonvision/coprocessors/C0-74-2B-F9-35-A4/cameraNames",
+            "/photonvision/coprocessors/C0-74-2B-F9-2A-38/cameraNames"
           ]
         },
         "tabs": {
@@ -55,21 +78,21 @@
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/Intake/IIntakePivotRotation/value",
+                    "logKey": "NT:/AdvantageKit/Intake/Pivot/IIntakeClosedLoopReference/value",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#2b66a2",
+                      "color": "#e5b31b",
                       "size": "normal"
                     }
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/Intake/IIntakePivotStatorCurrentAmps",
+                    "logKey": "NT:/AdvantageKit/Intake/Pivot/IIntakePivotRotation/value",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#e5b31b",
+                      "color": "#2b66a2",
                       "size": "normal"
                     }
                   }
@@ -77,21 +100,21 @@
                 "rightSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/Intake/IIntakeRollerMotorVolts",
+                    "logKey": "NT:/AdvantageKit/Intake/Pivot/IIntakePivotStatorCurrentAmps",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#af2437",
+                      "color": "#80588e",
                       "size": "normal"
                     }
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/Intake/IIntakePivotVelocityRPS",
+                    "logKey": "NT:/AdvantageKit/Intake/Pivot/IIntakePivotMotorVolts",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#80588e",
+                      "color": "#3b875a",
                       "size": "normal"
                     }
                   }
@@ -105,7 +128,7 @@
                     "type": "angle",
                     "factor": 1,
                     "from": "radians",
-                    "to": "rotations"
+                    "to": "degrees"
                   }
                 },
                 "rightUnitConversion": {
@@ -117,7 +140,7 @@
               },
               "controllerUUID": "90popf2r7ow1i61u1nrj3ezllau5ww2a",
               "renderer": null,
-              "controlsHeight": 200
+              "controlsHeight": 319
             },
             {
               "type": 1,
@@ -212,7 +235,17 @@
                 "leftSources": [
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/Flywheel/Goal",
+                    "logKey": "NT:/AdvantageKit/Flywheel/Encoder/IEncoderVelocityRPS/value",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#858584",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/Flywheel/Leader/IFlywheelClosedLoopReference/value",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -222,26 +255,47 @@
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/Flywheel/Leader/IFlywheelRotorVelocityRPS",
+                    "logKey": "NT:/AdvantageKit/Flywheel/Encoder/IEncoderVelocityRPS/value",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#80588e",
+                      "color": "#d993aa",
                       "size": "normal"
                     }
                   },
                   {
                     "type": "stepped",
-                    "logKey": "NT:/AdvantageKit/Flywheel/Follower/IFlywheelRotorVelocityRPS",
+                    "logKey": "NT:/AdvantageKit/Flywheel/Leader/IFlywheelRotorVelocityRPS/value",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#af2437",
+                      "color": "#2b66a2",
                       "size": "normal"
                     }
                   }
                 ],
-                "rightSources": [],
+                "rightSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/Flywheel/Leader/IFlywheelStatorCurrentAmps",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/Flywheel/Follower/IFlywheelStatorCurrentAmps",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#c0b487",
+                      "size": "normal"
+                    }
+                  }
+                ],
                 "discreteSources": [
                   {
                     "type": "stripes",
@@ -274,7 +328,7 @@
                 "leftLockedRange": null,
                 "rightLockedRange": null,
                 "leftUnitConversion": {
-                  "autoTarget": null,
+                  "autoTarget": "rotations",
                   "preset": null
                 },
                 "rightUnitConversion": {
@@ -287,6 +341,101 @@
               "controllerUUID": "uxn4jzs6q2juvt7tlawm18weat2w4cim",
               "renderer": null,
               "controlsHeight": 249
+            },
+            {
+              "type": 1,
+              "title": "Hood",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/Hood/IHoodAngle/value",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/Hood/IHoodReferenceValue/value",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Hood/EnumVal/value",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Hood/IncrementAngle/value",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#80588e",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [
+                  {
+                    "type": "stripes",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Hood/State",
+                    "logType": "String",
+                    "visible": true,
+                    "options": {
+                      "color": "#e48b32"
+                    }
+                  }
+                ],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "autoTarget": null,
+                  "preset": {
+                    "type": "angle",
+                    "factor": 1,
+                    "from": "radians",
+                    "to": "degrees"
+                  }
+                },
+                "rightUnitConversion": {
+                  "autoTarget": null,
+                  "preset": null
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "4l3irup9xu6lwgx321iffrc1nrb8l7ge",
+              "renderer": null,
+              "controlsHeight": 277
+            },
+            {
+              "type": 8,
+              "title": "Joysticks",
+              "controller": [
+                "Xbox Controller (White)",
+                "None",
+                "None",
+                "None",
+                "None",
+                "None"
+              ],
+              "controllerUUID": "fd59v60e4v4pk9gna9g9ngeexxql2ftc",
+              "renderer": null,
+              "controlsHeight": 85
             },
             {
               "type": 2,
