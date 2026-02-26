@@ -30,6 +30,7 @@ public class IntakePivotSS extends SubsystemBase {
     // IDLE(null), // when enabled, doesnt do anything
     INTAKE(() -> PivotConstants.kPivotLimits.backwardLimit()),
     STOWED(() -> PivotConstants.kPivotLimits.forwardLimit()),
+    COMPACT(() -> PivotConstants.kPivotLimits.backwardLimit().div(2)),
     TUNING(() -> Rotation2d.fromRotations(tPivotCustomSetpointRot.get()));
 
     private Supplier<Rotation2d> mRotSupplier;
