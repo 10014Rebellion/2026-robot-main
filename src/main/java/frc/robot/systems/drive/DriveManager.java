@@ -41,6 +41,7 @@ public class DriveManager {
         // TELEOP AND AUTON CONTROLS
         TELEOP,
         TELEOP_SNIPER,
+        TELEOP_TRIGGER,
         POV_SNIPER,
         HEADING_ALIGN,
         AUTO_ALIGN,
@@ -90,7 +91,7 @@ public class DriveManager {
         mAutoAlignController.updateControllers();
         mLineAlignController.updateControllers();
 
-        ChassisSpeeds teleopSpeeds = mTeleopController.computeChassisSpeeds(
+        ChassisSpeeds teleopSpeeds = mTeleopController.computeChassisSpeedsJoysticks(
             mDrive.getPoseEstimate().getRotation(), 
             false, 
             true);
@@ -99,11 +100,16 @@ public class DriveManager {
             case TELEOP:
                 break;
             case TELEOP_SNIPER:
-                desiredSpeeds = mTeleopController.computeChassisSpeeds(
+                desiredSpeeds = mTeleopController.computeChassisSpeedsJoysticks(
                    mDrive.getPoseEstimate().getRotation(), 
                    true, 
                    true);
                 break;
+            case TELEOP_TRIGGER:
+                desiredSpeeds = mTeleopController.computeChassisSpeedsTrigger(
+                   mDrive.getPoseEstimate().getRotation(), 
+                   false, 
+                   true);
             case POV_SNIPER:
                 desiredSpeeds = mTeleopController.computeSniperPOVChassisSpeeds(
                    mDrive.getPoseEstimate().getRotation(), 
@@ -366,9 +372,16 @@ public class DriveManager {
 
     ///////////// SETTERS \\\\\\\\\\\\\
     public void acceptJoystickInputs(
-            DoubleSupplier pXSupplier, DoubleSupplier pYSupplier,
-            DoubleSupplier pThetaSupplier, Supplier<Rotation2d> pPOVSupplier) {
-        mTeleopController.acceptJoystickInputs(pXSupplier, pYSupplier, pThetaSupplier, pPOVSupplier);
+            DoubleSupplier pJoystickXSupplier, DoubleSupplier pJoystickYSupplier,
+            DoubleSupplier pJoystickOmegaSupplier, DoubleSupplier pRightTriggSupplier,
+            DoubleSupplier pLeftTriggSupplier, Supplier<Rotation2d> pPOVSupplier) {
+
+        // Translating joystick to field oriented by flipping x and y, accounting for invertions
+        DoubleSupplier xSupplier = () -> -1 * pJoystickYSupplier.getAsDouble();
+        DoubleSupplier ySupplier = () -> -1 * pJoystickXSupplier.getAsDouble();
+        DoubleSupplier omegaSupplier = () -> -1 * pJoystickOmegaSupplier.getAsDouble();
+
+        mTeleopController.constructControllerSuppliers(xSupplier, ySupplier, omegaSupplier, pRightTriggSupplier, pLeftTriggSupplier, pPOVSupplier);
     }
 
     public Command setDriveProfile(DriverProfiles profile) {

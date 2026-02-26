@@ -6,17 +6,22 @@ import frc.robot.bindings.profilebindings.drivers.*;
 import frc.robot.systems.drive.controllers.ManualTeleopController.DriverProfiles;
 
 public class BindingsConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int kPilotControllerPort = 0;
+    public static final int kGunnerControllerPort = 0;
+
+    public static final double kTriggerDeadband = 0.01; // TODO: TUNE ME
+    public static final double kLeftJoystickDeadband = 0.01; // TODO: TUNE ME
+    public static final double kRightJoystickDeadband = 0.01; // TODO: TUNE ME
 
     public static final DriverProfiles kDefaultProfile =
         new DriverProfiles(
             "Default", // Name
             1, // Linear Scalar
             3,  // Linear Exponent
-            0.075, // Left Joystick Deadband
+            0.0, // Joystick Deadband
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
-            0.1, // Right Joystick Deadband
+            0.0, // Right Joystick Deadband
             0.2, // Sniper Scalar
             new DefaultBindings()
         );
@@ -26,10 +31,10 @@ public class BindingsConstants {
             "Bosco", // Name
             1, // Linear Scalar
             3, // Linear Exponent
-            0.075, // Left Joystick Deadband
+            0.0, //  Joystick Deadband
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
-            0.1, //     Right Joystick Deadband
+            0.0, //  Right Joystick Deadband
             0.2, // Sniper Scalar
             new BoscoBindings()
         ),
@@ -38,10 +43,10 @@ public class BindingsConstants {
             "Eli", // Name
             1, // Linear Scalar
             3,  // Linear Exponent
-            0.075, // Left Joystick Deadband
+            0.0, // Joystick Deadband
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
-            0.1, // Right Joystick Deadband
+            0.0, // Right Joystick Deadband
             0.2, // Sniper Scalar,
             new EliBindings()
         ),
@@ -50,12 +55,36 @@ public class BindingsConstants {
             "Taha", // Name
             1, // Linear Scalar
             3,  // Linear Exponent
-            0.075, // Left Joystick Deadband
+            0.0, // Joystick Deadband
             1.0, // Rotational Scalar
             3.0, // Rotational Exponent
-            0.1, // Right Joystick Deadband
+            0.0, // Right Joystick Deadband
             0.2, // Sniper Scalar
             new TahaBindings()
+        ),
+
+        new DriverProfiles(
+            "Ishita", // Name
+            1, // Linear Scalar
+            3,  // Linear Exponent
+            0.0, // Joystick Deadband
+            1.0, // Rotational Scalar
+            3.0, // Rotational Exponent
+            0.0, // Right Joystick Deadband
+            0.2, // Sniper Scalar
+            new IshitiaBindings()
+        ),
+
+        new DriverProfiles(
+            "Nikki", // Name
+            1, // Linear Scalar
+            3,  // Linear Exponent
+            0.0, // Joystick Deadband
+            1.0, // Rotational Scalar
+            3.0, // Rotational Exponent
+            0.0, // Right Joystick Deadband
+            0.2, // Sniper Scalar
+            new NikkiBindings()
         ),
     };
 }

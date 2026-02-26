@@ -11,12 +11,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.telemetry.Telemetry;
+import frc.robot.bindings.BindingsConstants;
 import frc.robot.bindings.profilebindings.ProfileBindings;
 import frc.robot.logging.DriveErrors.ProfileExponentZero;
 import frc.robot.systems.drive.DriveConstants;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import javax.naming.Binding;
 
 /* Controls the pose of the robot using 3 PID controllers and Feedforwards */
 public class ManualTeleopController {
@@ -25,39 +28,66 @@ public class ManualTeleopController {
     private DoubleSupplier mXSupplier;
     private DoubleSupplier mYSupplier;
     private DoubleSupplier mOmegaSupplier;
+    private DoubleSupplier mRightTriggSupplier;
+    private DoubleSupplier mLeftTriggSupplier;
 
     private Supplier<Rotation2d> mPOVSupplier;
 
     public ManualTeleopController() {}
 
-    public void acceptJoystickInputs(
+    public void constructControllerSuppliers(
             DoubleSupplier pXSupplier,
             DoubleSupplier pYSupplier,
             DoubleSupplier pOmegaSupplier,
+            DoubleSupplier pRightTriggSupplier,
+            DoubleSupplier pLeftTriggSupplier,
             Supplier<Rotation2d> pPOVSupplier) {
         this.mXSupplier = pXSupplier;
         this.mYSupplier = pYSupplier;
         this.mOmegaSupplier = pOmegaSupplier;
+        this.mRightTriggSupplier = pRightTriggSupplier;
+        this.mLeftTriggSupplier = pLeftTriggSupplier;
         this.mPOVSupplier = pPOVSupplier;
     }
 
-    public ChassisSpeeds computeChassisSpeeds(
+    public ChassisSpeeds computeChassisSpeedsTrigger(
             Rotation2d pRobotAngle, boolean pIsJoystickSniper, boolean pIsJoystickFieldOriented) {
+        return computeSpeeds(
+            twoWayDeadbandValue(mXSupplier.getAsDouble(), BindingsConstants.kLeftJoystickDeadband + mDriverProfile.extraXYStickDeadband().get())
+                * twoWayDeadbandValue(mRightTriggSupplier.getAsDouble(), BindingsConstants.kTriggerDeadband), 
+            twoWayDeadbandValue(mYSupplier.getAsDouble(), BindingsConstants.kLeftJoystickDeadband + mDriverProfile.extraXYStickDeadband().get())
+                * twoWayDeadbandValue(mRightTriggSupplier.getAsDouble(), BindingsConstants.kTriggerDeadband), 
+            twoWayDeadbandValue(mOmegaSupplier.getAsDouble(), BindingsConstants.kRightJoystickDeadband + mDriverProfile.extraRotationDeadband().get())
+                * twoWayDeadbandValue((1.0 - mLeftTriggSupplier.getAsDouble()), BindingsConstants.kTriggerDeadband), 
+            pRobotAngle, pIsJoystickSniper, pIsJoystickFieldOriented
+        );            
+    }
+
+    public ChassisSpeeds computeChassisSpeedsJoysticks(
+            Rotation2d pRobotAngle, boolean pIsJoystickSniper, boolean pIsJoystickFieldOriented) {
+        return computeSpeeds(
+            twoWayDeadbandValue(mXSupplier.getAsDouble(), BindingsConstants.kLeftJoystickDeadband + mDriverProfile.extraXYStickDeadband().get()), 
+            twoWayDeadbandValue(mYSupplier.getAsDouble(), BindingsConstants.kLeftJoystickDeadband + mDriverProfile.extraXYStickDeadband().get()), 
+            twoWayDeadbandValue(mOmegaSupplier.getAsDouble(), BindingsConstants.kRightJoystickDeadband + mDriverProfile.extraRotationDeadband().get()),
+            pRobotAngle, pIsJoystickSniper, pIsJoystickFieldOriented);
+    }
+
+    private ChassisSpeeds computeSpeeds(double pXValue, double pYValue, double pOmegaValue, Rotation2d pRobotAngle, boolean pIsJoystickSniper, boolean pIsJoystickFieldOriented) {
         double xAdjustedJoystickInput = shapeAxis(
-            mXSupplier.getAsDouble(),
-            mDriverProfile.linearDeadBand().get(),
+            pXValue,
+            mDriverProfile.extraXYStickDeadband().get(),
             mDriverProfile.linearInputsExponent().get(),
             mDriverProfile.linearScalar().get());
 
         double yAdjustedJoystickInput = shapeAxis(
-            mYSupplier.getAsDouble(),
-            mDriverProfile.linearDeadBand().get(),
+            pYValue,
+            mDriverProfile.extraXYStickDeadband().get(),
             mDriverProfile.linearInputsExponent().get(),
             mDriverProfile.linearScalar().get());
 
         double omegaAdjustedJoystickInput = shapeAxis(
-            mOmegaSupplier.getAsDouble(),
-            mDriverProfile.rotationDeadband().get(),
+            pOmegaValue,
+            mDriverProfile.extraRotationDeadband().get(),
             mDriverProfile.rotationInputsExponent().get(),
             mDriverProfile.rotationScalar().get());
 
@@ -76,25 +106,34 @@ public class ManualTeleopController {
         return desiredSpeeds;
     }
 
+
     private double shapeAxis(double pValue, double pDeadband, double pExponent, double pScalar) {
         double deadbandedValue = MathUtil.applyDeadband(pValue, pDeadband);
-
+    
         if (Telemetry.conditionReport(pExponent == 0.0, new ProfileExponentZero(1))) {
             pExponent = 1;
         }
-
+    
         if (deadbandedValue == 0.0) return 0.0;
-
-        double exponentiatedValue =
-                Math.signum(deadbandedValue) * Math.pow(Math.abs(deadbandedValue), Math.abs(pExponent));
-
+    
+        double exponentiatedValue = Math.signum(deadbandedValue) * Math.pow(Math.abs(deadbandedValue), Math.abs(pExponent));
+    
         return zerotoOneClamp(pScalar) * exponentiatedValue;
+    }
+
+    /*
+     * DESIGNED FOR INPUTS THAT ARE FROM EITHER -1 to 1 or 0 to 1. DEADBANDS TO ZERO OR DEADBANDS TO 1 OR -1.
+     */
+    private double twoWayDeadbandValue(double pValue, double pDeadband) {
+        if(Math.abs(pValue) < pDeadband) return 0;
+        if (Math.abs(pValue) > 1.0 - pDeadband) return 1 * Math.signum(pValue);
+        return pValue;
     }
 
     public ChassisSpeeds computeSniperPOVChassisSpeeds(Rotation2d pRobotAngle, boolean pIsPOVFieldOriented) {
         double omegaAdjustedJoystickInput = shapeAxis(
             mOmegaSupplier.getAsDouble(),
-            mDriverProfile.rotationDeadband().get(),
+            mDriverProfile.extraRotationDeadband().get(),
             mDriverProfile.rotationInputsExponent().get(),
             mDriverProfile.sniperControl().get()
                 * mDriverProfile.linearScalar().get() // Assumes sniper is true for POV
@@ -133,10 +172,10 @@ public class ManualTeleopController {
         String key,
         double linearScalar,
         double linearExponent,
-        double linearDeadband,
+        double extraXYStickDeadband,
         double rotationalScalar,
         double rotationalExponent,
-        double rotationDeadband,
+        double extraRotationDeadband,
         double sniperScalar,
         ProfileBindings profileBinding) {}
 }

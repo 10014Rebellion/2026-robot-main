@@ -15,7 +15,7 @@ public class ButtonBindings {
     private final Shooter mShooter;
     private final Intake mIntakeSS;
     private final ConveyorSS mConveyorSS;
-    private final FlydigiApex4 mDriverController = new FlydigiApex4(BindingsConstants.kDriverControllerPort);
+    private final FlydigiApex4 mDriverController = new FlydigiApex4(BindingsConstants.kPilotControllerPort);
 
     public ButtonBindings(Drive pDriveSS, Shooter pShooter, Intake pIntake, ConveyorSS pConveyorSS) {
         this.mDriveSS = pDriveSS;
@@ -31,10 +31,13 @@ public class ButtonBindings {
             .onTrue(mDriveSS.getDriveManager().setToTeleop());
 
         mDriveSS.getDriveManager().acceptJoystickInputs(
-                () -> -mDriverController.getLeftY(),
-                () -> -mDriverController.getLeftX(),
-                () -> -mDriverController.getRightX(),
-                () -> mDriverController.getPOVAngle());
+            mDriverController.getLeftXSup(),
+            mDriverController.getLeftYSup(),
+            mDriverController.getRightXSup(),
+            mDriverController.getRightTriggerSup(),
+            mDriverController.getLeftTriggerSup(),
+            mDriverController.getPOVAngleSup()
+        );
 
         mDriverController.y().onTrue(Commands.runOnce(() -> mDriveSS.resetGyro()));
 
