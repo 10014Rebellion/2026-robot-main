@@ -52,10 +52,6 @@ public class FlywheelsSS extends SubsystemBase {
   private final LoggedTunableNumber tFlywheelKV = new LoggedTunableNumber("Flywheel/Control/kV", kFlywheelControlConfig.feedforward().getKv());
   private final LoggedTunableNumber tFlywheelKA = new LoggedTunableNumber("Flywheel/Control/kA", kFlywheelControlConfig.feedforward().getKa());
 
-  private final LoggedTunableNumber tFlywheelCruiseVel = new LoggedTunableNumber("Flywheel/Control/CruiseVel", kFlywheelControlConfig.motionMagicConstants().maxVelocity());
-  private final LoggedTunableNumber tFlywheelMaxAccel = new LoggedTunableNumber("Flywheel/Control/MaxAcceleration", kFlywheelControlConfig.motionMagicConstants().maxAcceleration());
-  private final LoggedTunableNumber tFlywheelMaxJerk = new LoggedTunableNumber("Flywheel/Control/MaxJerk", kFlywheelControlConfig.motionMagicConstants().maxJerk());
-
   private final LoggedTunableNumber tFlywheelTolerance = new LoggedTunableNumber("Flywheel/Control/Tolerance", ShooterConstants.FlywheelConstants.kToleranceRPS);
 
   private Rotation2d mCurrentRPSGoal = Rotation2d.kZero;
@@ -162,10 +158,9 @@ public class FlywheelsSS extends SubsystemBase {
   }
 
   public void setFlywheelClosedLoop(Rotation2d pRotsPerS){
-    mLeaderFlywheelIO.setMotorVelAndAccel(
-      pRotsPerS.getRotations(), 
-      0, 
-      kFlywheelControlConfig.feedforward().calculate(pRotsPerS.getRotations()));
+    mLeaderFlywheelIO.setMotorVel(
+      pRotsPerS.getRotations(),
+      0.85 * kFlywheelControlConfig.feedforward().calculate(pRotsPerS.getRotations()));
     mFollowerFlywheelIO.enforceFollower();
   }
 
@@ -178,20 +173,10 @@ public class FlywheelsSS extends SubsystemBase {
     mFollowerFlywheelIO.setPDConstants(pKP, pKD);
   }
 
-  private void setBothMotionMagicConstants(double pCruiseVel, double pMaxAccel, double pMaxJerk) {
-    mLeaderFlywheelIO.setMotionMagicConstants(pCruiseVel, pMaxAccel, pMaxJerk);
-    mFollowerFlywheelIO.setMotionMagicConstants(pCruiseVel, pMaxAccel, pMaxJerk);
-  }
-
   private void refreshTuneables() {
     LoggedTunableNumber.ifChanged( hashCode(), 
       () -> setBothPDConstants(tFlywheelKP.get(), tFlywheelKD.get()), 
       tFlywheelKP, tFlywheelKD
-    );
-  
-    LoggedTunableNumber.ifChanged( hashCode(), 
-      () -> setBothMotionMagicConstants(tFlywheelCruiseVel.get(), tFlywheelMaxAccel.get(), tFlywheelMaxJerk.get()), 
-      tFlywheelCruiseVel, tFlywheelMaxAccel, tFlywheelMaxJerk
     );
 
     LoggedTunableNumber.ifChanged( hashCode(), 

@@ -20,6 +20,7 @@ import frc.lib.hardware.HardwareRecords.CurrentLimits;
 import frc.lib.hardware.HardwareRecords.PDConstants;
 import frc.lib.hardware.HardwareRecords.RelativeCANCoderHardware;
 import frc.lib.hardware.HardwareRecords.RotationSoftLimits;
+import frc.lib.hardware.HardwareRecords.SimpleController;
 public class ShooterConstants {
     /** 
      * Empirically tuned hood angle for a given horizontal shooter-to-hub distance.
@@ -174,12 +175,18 @@ public class ShooterConstants {
             MotorAlignmentValue.Opposed
         );
 
-        public static final MotionMagicFOCControllerFF kFlywheelControlConfig = new MotionMagicFOCControllerFF(
-            0, // not currently used
-            // original kP = 9 
-            new PDConstants(9, 0), // Tuned for C3RBERUS!
-            new SimpleMotorFeedforward(5.0, 0.1, 0), // Tuned for C3RBERUS!
-            new MotionMagicConstants(0, 1000, 10000) // Tuned for C3RBERUS!
+        public static final SimpleController kFlywheelControlConfig = new SimpleController(
+            0,
+            new PDConstants(999999.0, 0), // Tuned for C3RBERUS!
+            new SimpleMotorFeedforward(0.0, 0.0, 0) // Tuned for C3RBERUS!
         );
+
+        // public static final MotionMagicFOCControllerFF kFlywheelControlConfig = new MotionMagicFOCControllerFF(
+        //     0, // not currently used
+        //     // original kP = 9 
+        //     new PDConstants(9, 0), // Tuned for C3RBERUS!
+        //     new SimpleMotorFeedforward(5.0, 0.1, 0), // Tuned for C3RBERUS!
+        //     new MotionMagicConstants(0, 1000, 10000) // Tuned for C3RBERUS!
+        // );
     }
 }

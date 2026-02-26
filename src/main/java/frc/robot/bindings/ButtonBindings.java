@@ -35,6 +35,7 @@ public class ButtonBindings {
 
     public void initBindings() {
         initPilotBindings();
+        initGunnerBindings();
         new Trigger(() -> DriverStation.isTeleopEnabled())
             .onTrue(mDriveSS.getDriveManager().setToTeleop());
 
@@ -95,8 +96,10 @@ public class ButtonBindings {
 
         mPilotController.leftTrigger()
             .whileTrue(mIntakeSS.setPivotStateCmd(IntakePivotState.INTAKE));
-        
-        
+    }
 
+    public void initGunnerBindings() {
+        mGunnerController.leftBumper().whileTrue(mShooter.setFlywheelsRPSCmd())
+        .onFalse(mShooter.setFlywheelsVoltsCmd(0));
     }
 }
