@@ -1,15 +1,22 @@
 package frc.robot.bindings;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.controllers.FlydigiApex4;
+import frc.robot.game.GameGoalPoseChooser;
 import frc.robot.systems.climb.ClimbSS;
 import frc.robot.systems.conveyor.ConveyorSS;
 import frc.robot.systems.conveyor.ConveyorSS.ConveyorState;
 import frc.robot.systems.drive.Drive;
+import frc.robot.systems.drive.controllers.HolonomicController.ConstraintType;
 import frc.robot.systems.intake.Intake;
 import frc.robot.systems.intake.pivot.IntakePivotSS.IntakePivotState;
 import frc.robot.systems.shooter.Shooter;
@@ -37,6 +44,7 @@ public class ButtonBindings {
 
 
     public void initBindings() {
+
         initPilotBindings();
         initGunnerBindings();
         new Trigger(() -> DriverStation.isTeleopEnabled())
@@ -76,6 +84,35 @@ public class ButtonBindings {
         return Commands.startEnd(
             () -> mPilotController.setRumble(RumbleType.kBothRumble, 1.0), 
             () -> mPilotController.setRumble(RumbleType.kBothRumble, 0.5));
+    }
+
+    public BooleanSupplier shootingReady(){
+        return () -> mShooter.getIsFlywheelAtGoal() && mShooter.getIsHoodAtGoal() && mDriveSS.getDriveManager().getAutoAlignController().atGoal();
+    }
+
+    public Command scoreAtPose(){
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                mDriveSS.getDriveManager().setToGenericAutoAlign(() -> mDriveSS.getClosestShootingConfig().pose(), ConstraintType.LINEAR),
+                mShooter.setShooterConfig(mDriveSS.getClosestShootingConfig().flywheelRPS(), mDriveSS.getClosestShootingConfig().hoodRotation())),
+            new WaitUntilCommand(shootingReady()),
+            mShooter.setFuelPumpStateCmd(mDriveSS.getClosestShootingConfig().fuelPumpVolts()));
+    }
+
+    public void initPilotExperimentalBindings(){
+        
+        mPilotController.rightTrigger()
+            .onTrue(scoreAtPose())
+            .onFalse(
+                mDriveSS.getDriveManager().setToTeleop().andThen(
+                mShooter.setFlywheelStateCmd(FlywheelState.STANDBY)).andThen(
+                mShooter.setHoodStateCmd(HoodState.STOWED)).andThen(
+                mShooter.setFuelPumpStateCmd(FuelPumpState.IDLE)));
+
+    }
+
+    public void initGunnerExperimentalBindings(){
+        
     }
 
     public void initPilotBindings() {
@@ -134,8 +171,9 @@ public class ButtonBindings {
         mGunnerController.povLeft()
             .whileTrue(mShooter.decrementHoodCmd());
 
-        mGunnerController.a().whileTrue(mClimbSS.unHookClawsCmd());
-        mGunnerController.b().whileTrue(mClimbSS.hookClawsCmd());
+
+        // mGunnerController.a().whileTrue(mClimbSS.unHookClawsCmd());
+        // mGunnerController.b().whileTrue(mClimbSS.hookClawsCmd());
 
         // mGunnerController.leftBumper().whileTrue(mShooter.setFlywheelsRPSCmd(FlywheelState.SHOOT_FAR));
 

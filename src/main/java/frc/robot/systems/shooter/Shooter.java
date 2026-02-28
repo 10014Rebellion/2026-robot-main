@@ -18,6 +18,10 @@ public class Shooter {
     this.mFuelPumpsSS = pFuelPumpSS; this.mHoodSS = pHoodSS; this.mFlywheelSS = pFlywheelSS; // I miss my C++ initializer lists :'(
   }
 
+  public Command setShooterConfig(FlywheelState pFlywheelState, HoodState pHoodState){
+    return mFlywheelSS.setFlywheelStateCmd(pFlywheelState).andThen(mHoodSS.setHoodStateCmd(pHoodState));
+  }
+
   public Command setFlywheelStateCmd(FlywheelState pState){
     return mFlywheelSS.setFlywheelStateCmd(pState);
   }
@@ -28,6 +32,10 @@ public class Shooter {
 
   public boolean getIsFlywheelAtGoal() {
     return mFlywheelSS.atGoal();
+  }
+
+  public boolean getIsHoodAtGoal() {
+    return mHoodSS.atGoal();
   }
   
   public Command setFlywheelsRPSCmd() {

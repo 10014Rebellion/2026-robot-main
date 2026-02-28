@@ -43,8 +43,8 @@ public class ClimbSS extends SubsystemBase {
   private final ClimbIO mClimbIO;
   private final ClimbInputsAutoLogged mClimbInputs = new ClimbInputsAutoLogged();
 
-  private final Servo mRightServo;
-  private final Servo mLeftServo;
+  // private final Servo mRightServo;
+  // private final Servo mLeftServo;
   
   private ElevatorFeedforward mFeedforward;
   
@@ -61,8 +61,8 @@ public class ClimbSS extends SubsystemBase {
 
   public ClimbSS(ClimbIO pClimbIO, PositionSoftLimits pSoftLimits) {
     mClimbIO = pClimbIO;
-    mRightServo = new Servo(ClimbConstants.kRightHookPort);
-    mLeftServo = new Servo(ClimbConstants.kLeftHookPort);
+    // mRightServo = new Servo(ClimbConstants.kRightHookPort);
+    // mLeftServo = new Servo(ClimbConstants.kLeftHookPort);
     mFeedforward = ClimbConstants.kController.feedforward();
   }
 
@@ -111,19 +111,19 @@ public class ClimbSS extends SubsystemBase {
     }, this);
   }
 
-  public Command unHookClawsCmd(){
-    return Commands.run(() -> {
-      mLeftServo.setAngle(ClimbConstants.kLeftHookOutPosition);
-      mRightServo.setAngle(ClimbConstants.kRightHookOutPosition);
-    }, this);
-  }
+  // public Command unHookClawsCmd(){
+  //   return Commands.run(() -> {
+  //     mLeftServo.setAngle(ClimbConstants.kLeftHookOutPosition);
+  //     mRightServo.setAngle(ClimbConstants.kRightHookOutPosition);
+  //   }, this);
+  // }
 
-  public Command hookClawsCmd(){
-    return Commands.run(() -> {
-      mLeftServo.setAngle(ClimbConstants.kLeftHookInPosition);
-      mRightServo.setAngle(ClimbConstants.kRightHookInPosition);
-    }, this);
-  }
+  // public Command hookClawsCmd(){
+  //   return Commands.run(() -> {
+  //     mLeftServo.setAngle(ClimbConstants.kLeftHookInPosition);
+  //     mRightServo.setAngle(ClimbConstants.kRightHookInPosition);
+  //   }, this);
+  // }
   
   public void setClimbState(ClimbState pClimbState){
     mAppliedVolts = null;
