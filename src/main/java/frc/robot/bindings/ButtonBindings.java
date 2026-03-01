@@ -1,25 +1,16 @@
 package frc.robot.bindings;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.controllers.FlydigiApex4;
-import frc.robot.game.GameGoalPoseChooser;
 import frc.robot.systems.climb.ClimbSS;
 import frc.robot.systems.conveyor.ConveyorSS;
 import frc.robot.systems.conveyor.ConveyorSS.ConveyorState;
 import frc.robot.systems.drive.Drive;
-import frc.robot.systems.drive.controllers.HolonomicController.ConstraintType;
 import frc.robot.systems.intake.Intake;
 import frc.robot.systems.intake.pivot.IntakePivotSS.IntakePivotState;
 import frc.robot.systems.intake.roller.IntakeRollerSS.IntakeRollerState;
@@ -194,7 +185,13 @@ public class ButtonBindings {
             .onFalse(mConveyorSS.setConveyorStateCmd(ConveyorState.IDLE).alongWith(mShooter.setFuelPumpStateCmd(FuelPumpState.IDLE)));
 
         mGunnerController.rightTrigger()
-            .whileTrue(mConveyorSS.setConveyorStateCmd(ConveyorState.INTAKE).alongWith(mShooter.setFuelPumpStateCmd(FuelPumpState.INTAKE)))
+            .whileTrue(
+                new SequentialCommandGroup(
+                    mShooter.setFuelPumpStateCmd(FuelPumpState.UNJAM).withTimeout(0.2),
+                    mShooter.setFuelPumpStateCmd(FuelPumpState.INTAKE).alongWith(mConveyorSS.setConveyorStateCmd(ConveyorState.UNJAM)).until(mShooter.isFuelPumpAtSetpoint()),
+                    mConveyorSS.setConveyorStateCmd(ConveyorState.INTAKE)
+                )
+            )
             .onFalse(mConveyorSS.setConveyorStateCmd(ConveyorState.IDLE).alongWith(mShooter.setFuelPumpStateCmd(FuelPumpState.IDLE)));
 
         new Trigger(() -> (mGunnerController.getRightY() < -0.25)).onTrue(mIntakeSS.trashCompact()).onFalse(mIntakeSS.setPivotStateCmd(IntakePivotState.INTAKE));

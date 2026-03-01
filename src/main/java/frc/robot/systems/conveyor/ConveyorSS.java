@@ -19,6 +19,7 @@ public class ConveyorSS extends SubsystemBase {
     IDLE(() -> 0.0),
     INTAKE(() -> 10.014),
     OUTTAKE(() -> -10.014),
+    UNJAM(() -> -9),
     CONVEY_TO_INDEX(() -> 10.014),
     TUNING(new LoggedTunableNumber("Conveyor/TuneableVoltage", 0.0));
 

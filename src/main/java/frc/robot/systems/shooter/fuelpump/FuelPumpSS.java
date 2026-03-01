@@ -18,6 +18,7 @@ public class FuelPumpSS extends SubsystemBase {
     public static enum FuelPumpState {
     IDLE(() -> 0.0),
     INTAKE(() -> 10.014),
+    UNJAM(() -> -2),
     OUTTAKE(() -> -10.014),
     TUNING(new LoggedTunableNumber("FuelPump/TuneableVoltage", 0.0));
 
@@ -98,6 +99,10 @@ public class FuelPumpSS extends SubsystemBase {
 
   public double getAvgFuelPumpRPS() {
     return (mLeaderFuelPumpInputs.iFuelPumpVelocityRPS + mFollowerFuelPumpInputs.iFuelPumpVelocityRPS) / 2.0;
+  }
+
+  public boolean isReadyToShoot() {
+    return getAvgFuelPumpRPS() >= FuelPumpConstants.kRPSForShooting.getRotations();
   }
   
   public void setFuelPumpRPS(double pDesiredRPS) {
