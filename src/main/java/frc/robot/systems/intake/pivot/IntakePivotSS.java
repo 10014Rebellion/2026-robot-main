@@ -13,9 +13,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib.tuning.LoggedTunableNumber;
 import frc.robot.systems.intake.IntakeConstants;
 import frc.robot.systems.intake.IntakeConstants.PivotConstants;
@@ -45,7 +44,6 @@ public class IntakePivotSS extends SubsystemBase {
       return mRotSupplier.get();
     } 
   }
-
 
   private final IntakePivotIO mIntakePivotIO;
   private final IntakePivotInputsAutoLogged mIntakePivotInputs = new IntakePivotInputsAutoLogged();
@@ -126,9 +124,9 @@ public class IntakePivotSS extends SubsystemBase {
   }
 
   public Command trashCompact(){
-    return Commands.sequence(
-      setIntakePivotStateCmd(IntakePivotState.TUNING).withTimeout(0.5),
-      setIntakePivotStateCmd(IntakePivotState.INTAKE).withTimeout(0.5));
+    return new RepeatCommand(Commands.sequence(
+      setIntakePivotStateCmd(IntakePivotState.COMPACT).withTimeout(0.3),
+      setIntakePivotStateCmd(IntakePivotState.INTAKE).withTimeout(0.3)));
   }
 
   public Command setIntakePivotStateCmd(IntakePivotState pIntakePivotState){
